@@ -1,0 +1,69 @@
+{{Extend "layout"}}
+{{Block "title"}}{{"防火墙规则"|T}} - {{Stored.title}}{{/Block}}
+{{Block "breadcrumb"}}
+{{Super}}
+<li><a href="{{BackendURL}}/firewall/index">{{"防火墙规则"|T}}</a></li>
+<li class="active">{{Stored.title}}</li>
+{{/Block}}
+
+{{Block "main"}}
+<div class="row">
+    <div class="col-md-12">
+        <div class="block-flat">
+            <div class="header">
+                <h3>{{Stored.title}}</h3>
+            </div>
+            <div class="content">
+                <form class="form-horizontal group-border-dashed" method="POST">
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">{{"账户名"|T}}</label>
+                        <div class="col-sm-9">
+                            <span style="padding-top:5px;vertical-align:middle">{{Stored.user}}</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">{{"验证"|T}}</label>
+                        <div class="col-sm-9">
+                            <input class="form-control" type="text" name="code" value="{{Form " code"}}"
+                                required="required" placeholder="{{" 验证码"|T}}">
+                            <div class="help-block">{{"在手机App上绑定之后，请在这里输入手机上显示的验证码，验证是否绑定成功"|T}}</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group form-submit-group">
+                        <div class="col-sm-9 col-sm-offset-2">
+                            <button type="submit" class="btn btn-primary btn-lg"><i class="fa fa-save"></i>
+                                {{"保存"|T}}</button>
+                            <button type="reset" class="btn btn-default btn-lg"><i class="fa fa-refresh"></i>
+                                {{"重置"|T}}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{/Block}}
+
+{{Block "footer"}}
+{{Include "filemanager/file.script"}}
+<script>
+    function uploadURL(currentPath) {
+        return BACKEND_URL + '/download/file?do=upload&path=' + encodeURIComponent(currentPath);
+    }
+    function initDropzone(options) {
+        $('#multi-upload-dropzone').dropzone($.extend({}, options, {
+            url: uploadURL('{{Stored.path}}'),
+            dictDefaultMessage: '{{"可以把文件拖到这里来进行上传哦"|T}}'
+        }));
+        $('#multi-upload-zip-dropzone').dropzone($.extend({}, options, {
+            url: uploadURL('{{Stored.path}}') + '&pipe=unzip',
+            dictDefaultMessage: '{{"可以把文件拖到这里来进行上传哦"|T}}<p>{{"仅支持上传zip压缩包。成功解压到当前目录后，该压缩包会被自动删除"|T}}</p>',
+            acceptedFiles: 'application/zip,application/x-zip-compressed'
+        }));
+    }
+</script>
+<script type="text/javascript" src="{{AssetsURL}}/js/behaviour/page/file.min.js"></script>
+{{/Block}}
