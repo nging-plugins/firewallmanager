@@ -5,8 +5,8 @@ import (
 )
 
 const (
-	ProtocolIPv4 iptables.Protocol = ipiptables.ProtocolIPv4
-	ProtocolIPv6 iptables.Protocol = ipiptables.ProtocolIPv6
+	ProtocolIPv4 iptables.Protocol = iptables.ProtocolIPv4
+	ProtocolIPv6 iptables.Protocol = iptables.ProtocolIPv6
 )
 
 const (

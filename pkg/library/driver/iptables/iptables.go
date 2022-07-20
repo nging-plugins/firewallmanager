@@ -4,11 +4,13 @@ import (
 	"github.com/admpub/go-iptables/iptables"
 )
 
-func New() *IPTables {
-	return &IPTables{
+func New() (*IPTables, error) {
+	t := &IPTables{
 		IPProtocol: ProtocolIPv4,
-		IPTables:   iptables.New(),
 	}
+	var err error
+	t.IPTables, err = iptables.New(iptables.IPFamily(t.IPProtocol))
+	return t, err
 }
 
 type IPTables struct {

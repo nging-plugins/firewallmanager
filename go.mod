@@ -5,6 +5,7 @@ go 1.17
 replace github.com/admpub/nging/v4 => ../../admpub/nging
 
 require (
+	github.com/admpub/go-iptables v0.6.2
 	github.com/admpub/nging/v4 v4.1.1
 	github.com/webx-top/echo v2.26.8+incompatible
 )
