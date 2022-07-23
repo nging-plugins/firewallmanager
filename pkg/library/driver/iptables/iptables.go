@@ -1,9 +1,12 @@
 package iptables
 
 import (
+	"errors"
+	"os/exec"
 	"strings"
 
 	"github.com/admpub/go-iptables/iptables"
+	"github.com/admpub/packer"
 	"github.com/nging-plugins/firewallmanager/pkg/library/driver"
 )
 
@@ -13,6 +16,11 @@ func New() (*IPTables, error) {
 	}
 	var err error
 	t.IPTables, err = iptables.New(iptables.IPFamily(t.IPProtocol))
+	if err != nil {
+		if errors.Is(err, exec.ErrNotFound) {
+			err = packer.Install(`iptables`)
+		}
+	}
 	return t, err
 }
 

@@ -7,10 +7,12 @@ replace github.com/admpub/nging/v4 => ../../admpub/nging
 require (
 	github.com/admpub/go-iptables v0.6.2
 	github.com/admpub/nging/v4 v4.1.1
+	github.com/admpub/packer v0.0.1
 	github.com/webx-top/echo v2.26.8+incompatible
 )
 
 require (
+	github.com/JustinTimperio/osinfo v0.0.0-20210705143940-9e63396e3c2f // indirect
 	github.com/abh/errorutil v0.0.0-20130729183701-f9bd360d00b9 // indirect
 	github.com/admpub/ccs-gm v0.0.3 // indirect
 	github.com/admpub/checksum v1.0.1 // indirect
@@ -127,7 +129,7 @@ require (
 	golang.org/x/image v0.0.0-20220617043117-41969df76e82 // indirect
 	golang.org/x/net v0.0.0-20220708220712-1185a9018129 // indirect
 	golang.org/x/sync v0.0.0-20220601150217-0de741cfad7f // indirect
-	golang.org/x/sys v0.0.0-20220712014510-0a85c31ab51e // indirect
+	golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/xerrors v0.0.0-20220609144429-65e65417b02f // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
