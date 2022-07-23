@@ -1,7 +1,10 @@
 package iptables
 
 import (
+	"strings"
+
 	"github.com/admpub/go-iptables/iptables"
+	"github.com/nging-plugins/firewallmanager/pkg/library/driver"
 )
 
 func New() (*IPTables, error) {
@@ -18,19 +21,79 @@ type IPTables struct {
 	*iptables.IPTables
 }
 
-func (a *IPTables) Insert(table, chain string, pos int, rulespec ...string) error {
+func (a *IPTables) RuleFrom(rule *driver.Rule) []string {
+	args := []string{
+		`-p`, rule.Protocol,
+	}
+	// if len(rule.Interface) > 0 {
+	// 	args = append(args, `-i`, rule.Interface)
+	// }
+	if len(rule.RemoteIP) > 0 {
+		if strings.Contains(rule.RemoteIP, `-`) {
+			args = append(args, `-m`, `iprange`)
+			args = append(args, `--src-range`, rule.RemoteIP)
+		} else {
+			args = append(args, `-s`, rule.RemoteIP)
+		}
+	} else if len(rule.LocalIP) > 0 {
+		args = append(args, `-d`, rule.LocalIP)
+	}
+	if len(rule.RemotePort) > 0 {
+		if strings.Contains(rule.RemotePort, `,`) {
+			args = append(args, `-m`, `multiport`)
+		}
+		args = append(args, `--sport`, rule.RemotePort)
+	} else if len(rule.LocalPort) > 0 {
+		if strings.Contains(rule.LocalPort, `,`) {
+			args = append(args, `-m`, `multiport`)
+		}
+		args = append(args, `--dport`, rule.LocalPort)
+	}
+	args = append(args, `-j`, rule.Action)
+	return args
+}
+
+func (a *IPTables) Enabled(on bool) error {
+	return driver.ErrUnsupported
+}
+
+func (a *IPTables) Reset() error {
+	return driver.ErrUnsupported
+}
+
+func (a *IPTables) Import(wfwFile string) error {
+	return driver.ErrUnsupported
+}
+
+func (a *IPTables) Export(wfwFile string) error {
+	return driver.ErrUnsupported
+}
+
+func (a *IPTables) Insert(pos int, rule *driver.Rule) error {
+	table := rule.Type
+	chain := rule.Direction
+	rulespec := a.RuleFrom(rule)
 	return a.IPTables.Insert(table, chain, pos, rulespec...)
 }
 
-func (a *IPTables) Append(table, chain string, rulespec ...string) error {
+func (a *IPTables) Append(rule *driver.Rule) error {
+	table := rule.Type
+	chain := rule.Direction
+	rulespec := a.RuleFrom(rule)
 	return a.IPTables.AppendUnique(table, chain, rulespec...)
 }
 
-func (a *IPTables) Delete(table, chain string, rulespec ...string) error {
+func (a *IPTables) Delete(rule *driver.Rule) error {
+	table := rule.Type
+	chain := rule.Direction
+	rulespec := a.RuleFrom(rule)
 	return a.IPTables.DeleteIfExists(table, chain, rulespec...)
 }
 
-func (a *IPTables) Exists(table, chain string, rulespec ...string) (bool, error) {
+func (a *IPTables) Exists(rule *driver.Rule) (bool, error) {
+	table := rule.Type
+	chain := rule.Direction
+	rulespec := a.RuleFrom(rule)
 	return a.IPTables.Exists(table, chain, rulespec...)
 }
 
