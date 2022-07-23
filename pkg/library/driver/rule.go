@@ -1,11 +1,11 @@
 package driver
 
 type Rule struct {
-	Type      string `json:"type" xml:"type"`
+	Type      string `json:"type" xml:"type"` // filter / nat / etc.
 	Name      string `json:"name" xml:"name"`
-	Direction string `json:"direction" xml:"direction"`
-	Action    string `json:"action" xml:"action"`
-	Protocol  string `json:"protocol" xml:"protocol"`
+	Direction string `json:"direction" xml:"direction"` // INPUT / OUTPUT / etc.
+	Action    string `json:"action" xml:"action"`       // ACCEPT / DROP / etc.
+	Protocol  string `json:"protocol" xml:"protocol"`   // tcp / udp / etc.
 
 	// IP or Port
 	RemoteIP   string `json:"remoteIP" xml:"remoteIP"`

@@ -1,3 +1,4 @@
+// Package netsh for windows
 package netsh
 
 import (
