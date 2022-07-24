@@ -5,7 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"os/exec"
+	"strings"
 
 	"github.com/admpub/go-iptables/iptables"
 	"github.com/nging-plugins/firewallmanager/pkg/library/driver"
@@ -86,10 +86,18 @@ func (a *NetSH) Delete(rule *driver.Rule) error {
 }
 
 func (a *NetSH) Exists(rule *driver.Rule) (bool, error) {
-	return false, driver.ErrUnsupported
+	rulespec := []string{`firewall`, `show`, `rule`}
+	rulespec = append(rulespec, fmt.Sprintf(`name=%q`, rule.Name))
+	var stdout bytes.Buffer
+	err := a.run(rulespec, &stdout)
+	if err != nil {
+		return false, err
+	}
+	return strings.Contains(stdout.String(), rule.Name), nil
 }
 
 func (a *NetSH) List(table, chain string) ([]iptables.Stat, error) {
+	// netsh advfirewall firewall show rule name=all dir=in type=dynamic status=enabled
 	rulespec := []string{`firewall`, `show`, `rule`}
 	rulespec = append(rulespec, `name=all`)
 	var stdout bytes.Buffer
@@ -98,21 +106,5 @@ func (a *NetSH) List(table, chain string) ([]iptables.Stat, error) {
 }
 
 func (a *NetSH) run(args []string, stdout io.Writer) error {
-	var stderr bytes.Buffer
-	cmd := exec.Cmd{
-		Path:   a.path,
-		Args:   append([]string{`advfirewall`}, args...),
-		Stdout: stdout,
-		Stderr: &stderr,
-	}
-
-	if err := cmd.Run(); err != nil {
-		switch e := err.(type) {
-		case *exec.ExitError:
-			return e
-		default:
-			return err
-		}
-	}
-	return nil
+	return driver.RunCmd(a.path, append([]string{`advfirewall`}, args...), stdout)
 }

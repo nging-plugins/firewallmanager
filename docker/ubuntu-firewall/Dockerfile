@@ -6,6 +6,7 @@ ENV GO_INSTALL_FILE go${GO_VERSION}.linux-amd64.tar.gz
 RUN apt update
 RUN apt upgrade -y
 RUN apt install wget -y
+RUN apt install iptables ipset -y
 
 #RUN wget -c https://studygolang.com/dl/golang/${GO_INSTALL_FILE}
 RUN wget -c https://golang.google.cn/dl/${GO_INSTALL_FILE}

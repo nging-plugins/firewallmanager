@@ -70,11 +70,11 @@ func (a *IPTables) Reset() error {
 }
 
 func (a *IPTables) Import(wfwFile string) error {
-	return driver.ErrUnsupported
+	return driver.RunCmd(`iptables-restore`, []string{`<`, wfwFile}, nil)
 }
 
 func (a *IPTables) Export(wfwFile string) error {
-	return driver.ErrUnsupported
+	return driver.RunCmd(`iptables-save`, []string{`>`, wfwFile}, nil)
 }
 
 func (a *IPTables) Insert(pos int, rule *driver.Rule) error {
