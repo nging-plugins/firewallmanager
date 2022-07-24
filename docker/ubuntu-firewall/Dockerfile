@@ -29,5 +29,3 @@ ENTRYPOINT ["/root/go/bin/tower"]
 # CMD ["env"]
 
 # docker build . -t "test-ubuntu-firewall"
-# docker run --rm -it --privileged -p "18080:8080" -v "$GOPATH/src:/root/go/src" test-ubuntu-firewall
-# docker run --rm -it --privileged --entrypoint go -p "18080:8080" -v "$GOPATH/src:/root/go/src" test-ubuntu-firewall run . -tags sqlite -c /myconfig/config.yaml -p 8080
