@@ -98,6 +98,8 @@ func (a *NetSH) Exists(rule *driver.Rule) (bool, error) {
 
 func (a *NetSH) List(table, chain string) ([]iptables.Stat, error) {
 	// netsh advfirewall firewall show rule name=all dir=in type=dynamic status=enabled
+	// dir (direction) - in or out
+	// status - enabled or disabled
 	rulespec := []string{`firewall`, `show`, `rule`}
 	rulespec = append(rulespec, `name=all`)
 	var stdout bytes.Buffer

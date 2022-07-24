@@ -1,11 +1,12 @@
 FROM ubuntu:latest
+ARG GO_VERSION
 
-ENV GO_VERSION 1.18.4
+ENV GO_VERSION ${GO_VERSION:-1.18.4}
 ENV GO_INSTALL_FILE go${GO_VERSION}.linux-amd64.tar.gz
+ENV PATH "$PATH:/root/go/bin"
 
-RUN apt update
-RUN apt upgrade -y
-RUN apt install wget -y
+RUN apt update && apt upgrade -y
+RUN apt install wget gcc -y
 RUN apt install iptables ipset -y
 
 #RUN wget -c https://studygolang.com/dl/golang/${GO_INSTALL_FILE}
@@ -15,7 +16,18 @@ RUN ln -s /go/bin/go /usr/local/bin/go
 RUN ln -s /go/bin/gofmt /usr/local/bin/gofmt
 RUN rm -rf /${GO_INSTALL_FILE}
 
-VOLUME ["/root/go"]
+VOLUME ["/root/go/src"]
 
-ENTRYPOINT ["/usr/local/bin/go"]
-CMD ["env"]
+RUN go env -w GO111MODULE=on
+RUN go env -w GOPROXY=https://goproxy.cn,direct
+RUN go install github.com/webx-top/tower@latest
+
+WORKDIR /root/go/src/github.com/admpub/nging
+ENTRYPOINT ["/root/go/bin/tower"]
+
+# ENTRYPOINT ["/usr/local/bin/go"]
+# CMD ["env"]
+
+# docker build . -t "test-ubuntu-firewall"
+# docker run --rm -it --privileged -p "18080:8080" -v "$GOPATH/src:/root/go/src" test-ubuntu-firewall
+# docker run --rm -it --privileged --entrypoint go -p "18080:8080" -v "$GOPATH/src:/root/go/src" test-ubuntu-firewall run . -d /myconfig -p 8080
