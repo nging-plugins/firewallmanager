@@ -20,7 +20,7 @@ VOLUME ["/root/go/src"]
 
 RUN go env -w GO111MODULE=on
 RUN go env -w GOPROXY=https://goproxy.cn,direct
-RUN go install github.com/webx-top/tower@v1.5.3
+RUN go install github.com/webx-top/tower@v1.5.4
 
 WORKDIR /root/go/src/github.com/admpub/nging
 ENTRYPOINT ["/root/go/bin/tower"]
