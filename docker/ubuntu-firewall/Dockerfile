@@ -30,4 +30,4 @@ ENTRYPOINT ["/root/go/bin/tower"]
 
 # docker build . -t "test-ubuntu-firewall"
 # docker run --rm -it --privileged -p "18080:8080" -v "$GOPATH/src:/root/go/src" test-ubuntu-firewall
-# docker run --rm -it --privileged --entrypoint go -p "18080:8080" -v "$GOPATH/src:/root/go/src" test-ubuntu-firewall run . -d /myconfig -p 8080
+# docker run --rm -it --privileged --entrypoint go -p "18080:8080" -v "$GOPATH/src:/root/go/src" test-ubuntu-firewall run . -c /myconfig/config.yaml -p 8080
