@@ -6,9 +6,11 @@ replace github.com/admpub/nging/v4 => ../../admpub/nging
 
 require (
 	github.com/admpub/go-iptables v0.6.3
+	github.com/admpub/iptables_parser v0.0.0-20220725150031-15b26e62a1b5
+	github.com/admpub/log v1.3.2
 	github.com/admpub/nging/v4 v4.1.1
 	github.com/admpub/packer v0.0.1
-	github.com/webx-top/echo v2.26.8+incompatible
+	github.com/webx-top/echo v2.26.9+incompatible
 )
 
 require (
@@ -43,7 +45,6 @@ require (
 	github.com/admpub/ip2region v1.2.11 // indirect
 	github.com/admpub/json5 v0.0.1 // indirect
 	github.com/admpub/license_gen v0.1.0 // indirect
-	github.com/admpub/log v1.3.2 // indirect
 	github.com/admpub/mahonia v0.0.0-20151019004008-c528b747d92d // indirect
 	github.com/admpub/mail v0.0.0-20170408110349-d63147b0317b // indirect
 	github.com/admpub/marmot v0.0.0-20200702042226-2170d9ff59f5 // indirect
