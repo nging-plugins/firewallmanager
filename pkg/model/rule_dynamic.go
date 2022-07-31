@@ -22,7 +22,6 @@ import (
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
 
-	"github.com/admpub/nging/v4/application/library/common"
 	"github.com/nging-plugins/firewallmanager/pkg/dbschema"
 )
 
@@ -55,8 +54,9 @@ func (r *RuleDynamic) Edit(mw func(db.Result) db.Result, args ...interface{}) er
 }
 
 func (r *RuleDynamic) ListPage(cond *db.Compounds, sorts ...interface{}) ([]*dbschema.NgingFirewallRuleDynamic, error) {
-	_, err := common.NewLister(r, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(r.Context())
-	return r.Objects(), err
+	err := r.NgingFirewallRuleDynamic.ListPage(cond, sorts...)
+	if err != nil {
+		return nil, err
+	}
+	return r.Objects(), nil
 }
