@@ -16,26 +16,34 @@
 					<table class="table tabled-bordered">
 						<thead>
 							<tr>
-								<th></th>
-								<th></th>
-								<th></th>
-								<th></th>
-								<th></th>
-								<th></th>
-								<th></th>
+								<th><strong>{{`类型`|T}}</strong></th>
+								<th><strong>{{`位置`|T}}</strong></th>
+								<th><strong>{{`名称`|T}}</strong></th>
+								<th><strong>{{`方向`|T}}</strong></th>
+								<th><strong>{{`协议`|T}}</strong></th>
+								<th><strong>{{`远程IP`|T}}</strong></th>
+								<th><strong>{{`远程端口`|T}}</strong></th>
+								<th><strong>{{`本地IP`|T}}</strong></th>
+								<th><strong>{{`本地端口`|T}}</strong></th>
+								<th><strong>{{`操作`|T}}</strong></th>
+								<th><strong>{{`状态`|T}}</strong></th>
 								<th><strong>{{`操作`|T}}</strong></th>
 							</tr>
 						</thead>
 						<tbody>
 							{{- range $k, $v := range Stored.listData -}}
 							<tr>
-								<td></td>
-								<td></td>
-								<td></td>
-								<td></td>
-								<td></td>
-								<td></td>
-								<td></td>
+								<td>{{$v.Type}}</td>
+								<td>{{$v.Position}}</td>
+								<td>{{$v.Name}}</td>
+								<td>{{$v.Direction}}</td>
+								<td>{{$v.Protocol}}</td>
+								<td>{{$v.RemoteIp}}</td>
+								<td>{{$v.RemotePort}}</td>
+								<td>{{$v.LocalIp}}</td>
+								<td>{{$v.LocalPort}}</td>
+								<td>{{$v.Action}}</td>
+								<td>{{$v.Disabled}}</td>
 								<td></td>
 							</tr>
 							{{- end -}}
