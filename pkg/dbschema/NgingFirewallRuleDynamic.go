@@ -108,8 +108,8 @@ type NgingFirewallRuleDynamic struct {
 	Regexp             string `db:"regexp" bson:"regexp" comment:"正则规格(JSON数组)" json:"regexp" xml:"regexp"`
 	ActionType         string `db:"action_type" bson:"action_type" comment:"操作类型" json:"action_type" xml:"action_type"`
 	ActionArg          string `db:"action_arg" bson:"action_arg" comment:"操作参数" json:"action_arg" xml:"action_arg"`
-	AggregateDuration  string `db:"aggregate_duration" bson:"aggregate_duration" comment:"持续时长" json:"aggregate_duration" xml:"aggregate_duration"`
-	AggregateRegexp    string `db:"aggregate_regexp" bson:"aggregate_regexp" comment:"正则规格(JSON数组)" json:"aggregate_regexp" xml:"aggregate_regexp"`
+	AggregateDuration  string `db:"aggregate_duration" bson:"aggregate_duration" comment:"合计时长" json:"aggregate_duration" xml:"aggregate_duration"`
+	AggregateRegexp    string `db:"aggregate_regexp" bson:"aggregate_regexp" comment:"合计规格(JSON数组)" json:"aggregate_regexp" xml:"aggregate_regexp"`
 	OccurrenceNum      uint   `db:"occurrence_num" bson:"occurrence_num" comment:"在持续一段时间内的出现次数" json:"occurrence_num" xml:"occurrence_num"`
 	OccurrenceDuration string `db:"occurrence_duration" bson:"occurrence_duration" comment:"持续时长(如1h)" json:"occurrence_duration" xml:"occurrence_duration"`
 	Disabled           string `db:"disabled" bson:"disabled" comment:"是否(Y/N)禁用" json:"disabled" xml:"disabled"`

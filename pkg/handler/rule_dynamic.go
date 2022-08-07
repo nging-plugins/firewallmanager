@@ -41,6 +41,8 @@ func ruleDynamicAdd(ctx echo.Context) error {
 	}
 
 END:
+	ctx.Set(`activeURL`, `/firewall/rule/index`)
+	ctx.Set(`title`, ctx.T(`添加规则`))
 	return ctx.Render(`firewall/edit_dynamic`, common.Err(ctx, err))
 }
 
@@ -65,6 +67,8 @@ func ruleDynamicEdit(ctx echo.Context) error {
 	echo.StructToForm(ctx, m.NgingFirewallRuleDynamic, ``, echo.LowerCaseFirstLetter)
 
 END:
+	ctx.Set(`activeURL`, `/firewall/rule/index`)
+	ctx.Set(`title`, ctx.T(`修改规则`))
 	return ctx.Render(`firewall/edit_dynamic`, common.Err(ctx, err))
 }
 
@@ -74,6 +78,8 @@ func ruleDynamicDelete(ctx echo.Context) error {
 	err := m.Delete(nil, `id`, id)
 	if err == nil {
 		handler.SendOk(ctx, ctx.T(`删除成功`))
+	} else {
+		handler.SendErr(ctx, err)
 	}
-	return ctx.Render(`firewall/index`, common.Err(ctx, err))
+	return ctx.Redirect(handler.URLFor(`/firewall/rule/index`))
 }

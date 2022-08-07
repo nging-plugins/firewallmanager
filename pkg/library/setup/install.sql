@@ -29,8 +29,8 @@ CREATE TABLE `nging_firewall_rule_dynamic` (
   `regexp` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '正则规格(JSON数组)',
   `action_type` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'ban' COMMENT '操作类型',
   `action_arg` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '操作参数',
-  `aggregate_duration` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '持续时长',
-  `aggregate_regexp` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '正则规格(JSON数组)',
+  `aggregate_duration` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '合计时长',
+  `aggregate_regexp` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '合计规格(JSON数组)',
   `occurrence_num` int unsigned NOT NULL DEFAULT '0' COMMENT '在持续一段时间内的出现次数',
   `occurrence_duration` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '持续时长(如1h)',
   `disabled` enum('Y','N') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'N' COMMENT '是否(Y/N)禁用',
@@ -75,4 +75,4 @@ CREATE TABLE `nging_firewall_rule_static` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-07-31 16:14:56
+-- Dump completed on 2022-08-07 22:37:01

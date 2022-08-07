@@ -47,10 +47,12 @@ func ruleStaticAdd(ctx echo.Context) error {
 		if err != nil {
 			goto END
 		}
-		return ctx.Redirect(handler.URLFor(`/firewall/index`))
+		return ctx.Redirect(handler.URLFor(`/firewall/rule/index`))
 	}
 
 END:
+	ctx.Set(`activeURL`, `/firewall/rule/index`)
+	ctx.Set(`title`, ctx.T(`添加规则`))
 	return ctx.Render(`firewall/edit_static`, common.Err(ctx, err))
 }
 
@@ -70,11 +72,13 @@ func ruleStaticEdit(ctx echo.Context) error {
 		if err != nil {
 			goto END
 		}
-		return ctx.Redirect(handler.URLFor(`/firewall/index`))
+		return ctx.Redirect(handler.URLFor(`/firewall/rule/index`))
 	}
 	echo.StructToForm(ctx, m.NgingFirewallRuleStatic, ``, echo.LowerCaseFirstLetter)
 
 END:
+	ctx.Set(`activeURL`, `/firewall/rule/index`)
+	ctx.Set(`title`, ctx.T(`修改规则`))
 	return ctx.Render(`firewall/edit_static`, common.Err(ctx, err))
 }
 
@@ -84,6 +88,8 @@ func ruleStaticDelete(ctx echo.Context) error {
 	err := m.Delete(nil, `id`, id)
 	if err == nil {
 		handler.SendOk(ctx, ctx.T(`删除成功`))
+	} else {
+		handler.SendErr(ctx, err)
 	}
-	return ctx.Render(`firewall/index`, common.Err(ctx, err))
+	return ctx.Redirect(handler.URLFor(`/firewall/rule/index`))
 }
