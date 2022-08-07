@@ -6,7 +6,7 @@ import (
 	"github.com/nging-plugins/firewallmanager/pkg/handler"
 )
 
-const ID = `download`
+const ID = `firewall`
 
 var Module = module.Module{
 	TemplatePath: map[string]string{

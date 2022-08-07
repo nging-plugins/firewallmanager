@@ -13,8 +13,8 @@
 			</div>
 			<div class="content">
 				<div class="table-responsive">
-					<table class="table tabled-bordered">
-						<thead>
+					<table class="table no-border hover">
+						<thead class="no-border">
 							<tr>
 								<th><strong>{{`类型`|T}}</strong></th>
 								<th><strong>{{`位置`|T}}</strong></th>
@@ -30,8 +30,8 @@
 								<th><strong>{{`操作`|T}}</strong></th>
 							</tr>
 						</thead>
-						<tbody>
-							{{- range $k, $v := range Stored.listData -}}
+						<tbody class="no-border-y">
+							{{- range $k, $v := Stored.listData -}}
 							<tr>
 								<td>{{$v.Type}}</td>
 								<td>{{$v.Position}}</td>
@@ -49,8 +49,8 @@
 							{{- end -}}
 						</tbody>
 					</table>
-					{{Stored.navigation.Render}}
 				</div>
+				{{Stored.navigation.Render}}
 			</div>
 		</div>				
 	</div>

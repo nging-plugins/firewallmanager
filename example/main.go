@@ -26,6 +26,8 @@
 package main
 
 import (
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/admpub/log"
@@ -40,6 +42,7 @@ import (
 
 	_ "github.com/admpub/nging/v4/application"
 	_ "github.com/admpub/nging/v4/application/initialize/manager"
+	"github.com/admpub/nging/v4/application/library/config"
 	"github.com/admpub/nging/v4/application/library/module"
 	_ "github.com/admpub/nging/v4/application/library/sqlite"
 
@@ -63,6 +66,7 @@ var (
 )
 
 func main() {
+	config.FromCLI().Conf = filepath.Join(ngingDir(), `config/config.yaml`)
 	log.SetEmoji(com.IsMac)
 	defer log.Close()
 	echo.Set(`BUILD_TIME`, BUILD_TIME)
@@ -84,8 +88,16 @@ func exec() {
 	cmd.Execute()
 }
 
+func ngingDir() string {
+	return filepath.Join(os.Getenv(`GOPATH`), `src/github.com/admpub/nging`)
+}
+
+func ngingPluginsDir() string {
+	return filepath.Join(os.Getenv(`GOPATH`), `src/github.com/nging-plugins`)
+}
+
 func initModule() {
-	module.NgingPluginDir = `../`
+	module.NgingPluginDir = ngingPluginsDir()
 	module.Register(
 		&firewallmanager.Module,
 	)
