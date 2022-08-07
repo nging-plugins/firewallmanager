@@ -24,12 +24,17 @@ package main
 import (
 	"path/filepath"
 
-	"github.com/admpub/nging/v4/application/initialize/backend"
 	"github.com/admpub/nging/v4/application/library/bindata"
+	"github.com/admpub/nging/v4/application/library/buildinfo"
+	"github.com/admpub/nging/v4/application/library/buildinfo/nginginfo"
 )
 
 func init() {
-	backend.AssetsDir = filepath.Join(ngingDir(), backend.DefaultAssetsDir)
-	backend.TemplateDir = filepath.Join(ngingDir(), backend.DefaultTemplateDir)
+	nginginfo.SetNgingDir(buildinfo.NgingDir())
 	bindata.Initialize()
+	backendTemplateDir, err := filepath.Abs(filepath.Join(buildinfo.NgingPluginsDir(), `firewallmanager/template/backend`))
+	if err != nil {
+		panic(err)
+	}
+	nginginfo.WatchTemplateDir(backendTemplateDir)
 }

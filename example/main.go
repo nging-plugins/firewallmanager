@@ -26,9 +26,7 @@
 package main
 
 import (
-	"os"
 	"path/filepath"
-	"time"
 
 	"github.com/admpub/log"
 	"github.com/admpub/nging/v4/application/cmd"
@@ -36,12 +34,13 @@ import (
 	_ "github.com/admpub/nging/v4/upgrade"
 
 	"github.com/webx-top/com"
-	"github.com/webx-top/echo"
 
 	//register
 
 	_ "github.com/admpub/nging/v4/application"
 	_ "github.com/admpub/nging/v4/application/initialize/manager"
+	"github.com/admpub/nging/v4/application/library/buildinfo"
+	"github.com/admpub/nging/v4/application/library/buildinfo/nginginfo"
 	"github.com/admpub/nging/v4/application/library/config"
 	"github.com/admpub/nging/v4/application/library/module"
 	_ "github.com/admpub/nging/v4/application/library/sqlite"
@@ -66,20 +65,20 @@ var (
 )
 
 func main() {
-	config.FromCLI().Conf = filepath.Join(ngingDir(), `config/config.yaml`)
+	config.FromCLI().Conf = filepath.Join(buildinfo.NgingDir(), `config/config.yaml`)
 	log.SetEmoji(com.IsMac)
 	defer log.Close()
-	echo.Set(`BUILD_TIME`, BUILD_TIME)
-	echo.Set(`BUILD_OS`, BUILD_OS)
-	echo.Set(`BUILD_ARCH`, BUILD_ARCH)
-	echo.Set(`COMMIT`, COMMIT)
-	echo.Set(`LABEL`, LABEL)
-	echo.Set(`VERSION`, VERSION)
-	echo.Set(`PACKAGE`, PACKAGE)
-	echo.Set(`SCHEMA_VER`, schemaVer)
-	if com.FileExists(`config/install.sql`) {
-		com.Rename(`config/install.sql`, `config/install.sql.`+time.Now().Format(`20060102150405.000`))
-	}
+	buildinfo.New(
+		buildinfo.Time(BUILD_TIME),
+		buildinfo.OS(BUILD_OS),
+		buildinfo.Arch(BUILD_ARCH),
+		buildinfo.CloudGox(CLOUD_GOX),
+		buildinfo.Commit(COMMIT),
+		buildinfo.Label(LABEL),
+		buildinfo.Version(VERSION),
+		buildinfo.Package(PACKAGE),
+		buildinfo.SchemaVer(schemaVer),
+	).Apply()
 	initModule()
 	exec()
 }
@@ -88,16 +87,8 @@ func exec() {
 	cmd.Execute()
 }
 
-func ngingDir() string {
-	return filepath.Join(os.Getenv(`GOPATH`), `src/github.com/admpub/nging`)
-}
-
-func ngingPluginsDir() string {
-	return filepath.Join(os.Getenv(`GOPATH`), `src/github.com/nging-plugins`)
-}
-
 func initModule() {
-	module.NgingPluginDir = ngingPluginsDir()
+	nginginfo.SetNgingPluginsDir(buildinfo.NgingPluginsDir())
 	module.Register(
 		&firewallmanager.Module,
 	)
