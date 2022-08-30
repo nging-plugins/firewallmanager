@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/admpub/go-iptables/iptables"
-	"github.com/nging-plugins/firewallmanager/pkg/library/driver"
+	"github.com/nging-plugins/firewallmanager/application/library/driver"
 )
 
 func New() (*NetSH, error) {

@@ -21,15 +21,25 @@ package handler
 import (
 	"github.com/admpub/nging/v4/application/handler"
 	"github.com/admpub/nging/v4/application/library/common"
-	"github.com/nging-plugins/firewallmanager/pkg/model"
+	"github.com/nging-plugins/firewallmanager/application/model"
+	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
 )
 
-func ruleDynamicAdd(ctx echo.Context) error {
-	m := model.NewRuleDynamic(ctx)
+func ruleIndex(ctx echo.Context) error {
+	m := model.NewRuleStatic(ctx)
+	cond := db.NewCompounds()
+	sorts := common.Sorts(ctx, m.NgingFirewallRuleStatic)
+	list, err := m.ListPage(cond, sorts...)
+	ctx.Set(`listPage`, list)
+	return ctx.Render(`firewall/index`, common.Err(ctx, err))
+}
+
+func ruleStaticAdd(ctx echo.Context) error {
+	m := model.NewRuleStatic(ctx)
 	var err error
 	if ctx.IsPost() {
-		err = ctx.MustBind(m.NgingFirewallRuleDynamic)
+		err = ctx.MustBind(m.NgingFirewallRuleStatic)
 		if err != nil {
 			goto END
 		}
@@ -37,24 +47,24 @@ func ruleDynamicAdd(ctx echo.Context) error {
 		if err != nil {
 			goto END
 		}
-		return ctx.Redirect(handler.URLFor(`/firewall/index`))
+		return ctx.Redirect(handler.URLFor(`/firewall/rule/index`))
 	}
 
 END:
 	ctx.Set(`activeURL`, `/firewall/rule/index`)
 	ctx.Set(`title`, ctx.T(`添加规则`))
-	return ctx.Render(`firewall/edit_dynamic`, common.Err(ctx, err))
+	return ctx.Render(`firewall/edit_static`, common.Err(ctx, err))
 }
 
-func ruleDynamicEdit(ctx echo.Context) error {
-	m := model.NewRuleDynamic(ctx)
+func ruleStaticEdit(ctx echo.Context) error {
+	m := model.NewRuleStatic(ctx)
 	id := ctx.Paramx(`id`).Uint()
 	err := m.Get(nil, `id`, id)
 	if err != nil {
 		return err
 	}
 	if ctx.IsPost() {
-		err = ctx.MustBind(m.NgingFirewallRuleDynamic)
+		err = ctx.MustBind(m.NgingFirewallRuleStatic)
 		if err != nil {
 			goto END
 		}
@@ -62,18 +72,18 @@ func ruleDynamicEdit(ctx echo.Context) error {
 		if err != nil {
 			goto END
 		}
-		return ctx.Redirect(handler.URLFor(`/firewall/index`))
+		return ctx.Redirect(handler.URLFor(`/firewall/rule/index`))
 	}
-	echo.StructToForm(ctx, m.NgingFirewallRuleDynamic, ``, echo.LowerCaseFirstLetter)
+	echo.StructToForm(ctx, m.NgingFirewallRuleStatic, ``, echo.LowerCaseFirstLetter)
 
 END:
 	ctx.Set(`activeURL`, `/firewall/rule/index`)
 	ctx.Set(`title`, ctx.T(`修改规则`))
-	return ctx.Render(`firewall/edit_dynamic`, common.Err(ctx, err))
+	return ctx.Render(`firewall/edit_static`, common.Err(ctx, err))
 }
 
-func ruleDynamicDelete(ctx echo.Context) error {
-	m := model.NewRuleDynamic(ctx)
+func ruleStaticDelete(ctx echo.Context) error {
+	m := model.NewRuleStatic(ctx)
 	id := ctx.Paramx(`id`).Uint()
 	err := m.Delete(nil, `id`, id)
 	if err == nil {

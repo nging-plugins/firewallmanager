@@ -9,7 +9,7 @@ import (
 	parser "github.com/admpub/iptables_parser"
 	"github.com/admpub/log"
 	"github.com/admpub/packer"
-	"github.com/nging-plugins/firewallmanager/pkg/library/driver"
+	"github.com/nging-plugins/firewallmanager/application/library/driver"
 	"github.com/webx-top/com"
 )
 

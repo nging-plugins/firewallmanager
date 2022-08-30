@@ -3,7 +3,7 @@ package firewallmanager
 import (
 	"github.com/admpub/nging/v4/application/library/module"
 
-	"github.com/nging-plugins/firewallmanager/pkg/handler"
+	"github.com/nging-plugins/firewallmanager/application/handler"
 )
 
 const ID = `firewall`

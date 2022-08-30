@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/nging-plugins/firewallmanager/pkg/library/driver"
+	"github.com/nging-plugins/firewallmanager/application/library/driver"
 )
 
 func TestInstall(t *testing.T) {

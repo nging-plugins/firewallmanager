@@ -22,7 +22,7 @@ import (
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
 
-	"github.com/nging-plugins/firewallmanager/pkg/dbschema"
+	"github.com/nging-plugins/firewallmanager/application/dbschema"
 )
 
 func NewRuleDynamic(ctx echo.Context) *RuleDynamic {
