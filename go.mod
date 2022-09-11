@@ -10,8 +10,8 @@ require (
 	github.com/admpub/log v1.3.3
 	github.com/admpub/nging/v4 v4.1.1
 	github.com/admpub/packer v0.0.1
-	github.com/webx-top/com v0.6.1
-	github.com/webx-top/db v1.22.2
+	github.com/webx-top/com v0.6.2
+	github.com/webx-top/db v1.22.3
 	github.com/webx-top/echo v2.26.13+incompatible
 )
 
@@ -72,7 +72,7 @@ require (
 	github.com/admpub/timeago v1.2.1 // indirect
 	github.com/admpub/websocket v1.0.4 // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect
-	github.com/aws/aws-sdk-go v1.44.84 // indirect
+	github.com/aws/aws-sdk-go v1.44.91 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/boombuler/barcode v1.0.1 // indirect
@@ -86,7 +86,7 @@ require (
 	github.com/fcjr/aia-transport-go v1.2.2 // indirect
 	github.com/francoispqt/gojay v1.2.13 // indirect
 	github.com/friendsofgo/errors v0.9.2 // indirect
-	github.com/garyburd/redigo v1.6.3 // indirect
+	github.com/garyburd/redigo v1.6.4 // indirect
 	github.com/go-acme/lego/v4 v4.8.0 // indirect
 	github.com/go-errors/errors v1.4.2 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
@@ -104,7 +104,7 @@ require (
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.15.9 // indirect
 	github.com/klauspost/cpuid v1.3.1 // indirect
-	github.com/klauspost/cpuid/v2 v2.1.0 // indirect
+	github.com/klauspost/cpuid/v2 v2.1.1 // indirect
 	github.com/lufia/plan9stats v0.0.0-20220517141722-cf486979b281 // indirect
 	github.com/maruel/rs v1.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
@@ -112,10 +112,10 @@ require (
 	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/mattn/go-sqlite3 v1.14.15 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
-	github.com/microcosm-cc/bluemonday v1.0.19 // indirect
+	github.com/microcosm-cc/bluemonday v1.0.20 // indirect
 	github.com/miekg/dns v1.1.50 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
-	github.com/minio/minio-go/v7 v7.0.34 // indirect
+	github.com/minio/minio-go/v7 v7.0.36 // indirect
 	github.com/minio/sha256-simd v1.0.0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
@@ -131,7 +131,7 @@ require (
 	github.com/rivo/uniseg v0.3.4 // indirect
 	github.com/rs/xid v1.4.0 // indirect
 	github.com/rwcarlsen/goexif v0.0.0-20190401172101-9e8deecbddbd // indirect
-	github.com/shirou/gopsutil/v3 v3.22.7 // indirect
+	github.com/shirou/gopsutil/v3 v3.22.8 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/spf13/cobra v1.5.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
@@ -143,7 +143,7 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/volatiletech/inflect v0.0.1 // indirect
 	github.com/volatiletech/strmangle v0.0.4 // indirect
-	github.com/webx-top/captcha v0.0.1 // indirect
+	github.com/webx-top/captcha v0.1.0 // indirect
 	github.com/webx-top/chardet v0.0.1 // indirect
 	github.com/webx-top/client v0.7.1 // indirect
 	github.com/webx-top/codec v0.2.0 // indirect
@@ -154,12 +154,12 @@ require (
 	github.com/webx-top/tagfast v0.0.0-20161020041435-9a2065ce3dd2 // indirect
 	github.com/webx-top/validation v0.0.3 // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
-	golang.org/x/crypto v0.0.0-20220824171710-5757bc0c5503 // indirect
-	golang.org/x/image v0.0.0-20220722155232-062f8c9fd539 // indirect
+	golang.org/x/crypto v0.0.0-20220829220503-c86fa9a7ed90 // indirect
+	golang.org/x/image v0.0.0-20220902085622-e7cb96979f69 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
-	golang.org/x/net v0.0.0-20220822230855-b0a4917ee28c // indirect
+	golang.org/x/net v0.0.0-20220826154423-83b083e8dc8b // indirect
 	golang.org/x/sync v0.0.0-20220819030929-7fc1605a5dde // indirect
-	golang.org/x/sys v0.0.0-20220823224334-20c2bfdbfe24 // indirect
+	golang.org/x/sys v0.0.0-20220829200755-d48e67d00261 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.12 // indirect
 	golang.org/x/xerrors v0.0.0-20220609144429-65e65417b02f // indirect
