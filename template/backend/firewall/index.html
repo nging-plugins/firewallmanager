@@ -1,8 +1,8 @@
 {{Extend "layout"}}
-{{Block "title"}}{{"防火墙规则"|T}}{{/Block}}
+{{Block "title"}}{{"防火墙规则"|$.T}}{{/Block}}
 {{Block "breadcrumb"}}
 {{Super}}
-<li class="active">{{"防火墙规则"|T}}</li>
+<li class="active">{{"防火墙规则"|$.T}}</li>
 {{/Block}}
 {{Block "main"}}
 <div class="row">
@@ -10,31 +10,31 @@
 		<div class="block-flat">
 			<div class="header">
 				<span class="pull-right">
-					<a href="{{BackendURL}}/firewall/rule/static/add" class="btn btn-success">{{`添加规则`|T}}</a>
+					<a href="{{BackendURL}}/firewall/rule/static/add" class="btn btn-success">{{`添加规则`|$.T}}</a>
 				</span>
-				<h3>{{"防火墙规则"|T}}</h3>
+				<h3>{{"防火墙规则"|$.T}}</h3>
 			</div>
 			<div class="content">
 				<div class="table-responsive">
 					<table class="table no-border hover">
 						<thead class="no-border">
 							<tr>
-								<th><strong>{{`类型`|T}}</strong></th>
-								<th><strong>{{`位置`|T}}</strong></th>
-								<th><strong>{{`名称`|T}}</strong></th>
-								<th><strong>{{`方向`|T}}</strong></th>
-								<th><strong>{{`协议`|T}}</strong></th>
-								<th><strong>{{`远程IP`|T}}</strong></th>
-								<th><strong>{{`远程端口`|T}}</strong></th>
-								<th><strong>{{`本地IP`|T}}</strong></th>
-								<th><strong>{{`本地端口`|T}}</strong></th>
-								<th><strong>{{`操作`|T}}</strong></th>
-								<th><strong>{{`状态`|T}}</strong></th>
-								<th><strong>{{`操作`|T}}</strong></th>
+								<th><strong>{{`类型`|$.T}}</strong></th>
+								<th><strong>{{`位置`|$.T}}</strong></th>
+								<th><strong>{{`名称`|$.T}}</strong></th>
+								<th><strong>{{`方向`|$.T}}</strong></th>
+								<th><strong>{{`协议`|$.T}}</strong></th>
+								<th><strong>{{`远程IP`|$.T}}</strong></th>
+								<th><strong>{{`远程端口`|$.T}}</strong></th>
+								<th><strong>{{`本地IP`|$.T}}</strong></th>
+								<th><strong>{{`本地端口`|$.T}}</strong></th>
+								<th><strong>{{`操作`|$.T}}</strong></th>
+								<th><strong>{{`状态`|$.T}}</strong></th>
+								<th><strong>{{`操作`|$.T}}</strong></th>
 							</tr>
 						</thead>
 						<tbody class="no-border-y">
-							{{- range $k, $v := Stored.listData -}}
+							{{- range $k, $v := $.Stored.listData -}}
 							<tr>
 								<td>{{$v.Type}}</td>
 								<td>{{$v.Position}}</td>
@@ -53,7 +53,7 @@
 						</tbody>
 					</table>
 				</div>
-				{{Stored.navigation.Render}}
+				{{$.Stored.navigation.Render}}
 			</div>
 		</div>				
 	</div>
@@ -83,19 +83,19 @@
 		<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal">&times;</button>
-				<h4 class="modal-title">{{"Enter Url"|T}}</h4>
+				<h4 class="modal-title">{{"Enter Url"|$.T}}</h4>
 			</div>
 			<div class="modal-body">
 				<div class="form-group">
-					<label class="control-label sm-margin-top">{{"Url"|T}}:</label>
+					<label class="control-label sm-margin-top">{{"Url"|$.T}}:</label>
 					<div class="controls">
 						<input type="text" onchange="OnChangeUrl()" id="url_id" class="form-control" value="https://sciter.com/sdk/sciter-sdk.zip">
 					</div>
-					<label class="control-label sm-margin-top">{{"Save path"|T}}:</label>
+					<label class="control-label sm-margin-top">{{"Save path"|$.T}}:</label>
 					<div class="controls">
 						<input type="text" id="save_path_id" class="form-control typeahead" data-provide="typeahead" value="sciter-sdk.zip">
 					</div>
-					<label class="control-label sm-margin-top">{{"Parts count"|T}}:</label>
+					<label class="control-label sm-margin-top">{{"Parts count"|$.T}}:</label>
 					<select class="form-control" id="part_count_id">
 						<option>1</option>
 						<option>2</option>
@@ -104,7 +104,7 @@
 						<option>16</option>
 					</select>
 					<div id="select-pipes" style="display:none">
-					<label class="control-label sm-margin-top">{{"Pipes"|T}}:</label>
+					<label class="control-label sm-margin-top">{{"Pipes"|$.T}}:</label>
 					<div id="select-option-pipes"></div>
 					</div>
 				</div>
@@ -112,7 +112,7 @@
 			<div class="modal-footer">
 				<a class="btn btn-primary" onclick="AddDownload()" data-dismiss="modal">
 					<i class="glyphicon glyphicon-plus"></i>
-					{{"Add"|T}}
+					{{"Add"|$.T}}
 				</a>
 			</div>
 		</div>
