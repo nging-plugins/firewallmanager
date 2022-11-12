@@ -6,10 +6,10 @@ import (
 )
 
 var Types = echo.NewKVData().
-	Add(iptables.TableFilter, `filter`).
-	Add(iptables.TableNAT, `nat`).
-	Add(iptables.TableMangle, `mangle`).
-	Add(iptables.TableRaw, `raw`)
+	Add(iptables.TableFilter, `Filter`).
+	Add(iptables.TableNAT, `NAT`).
+	Add(iptables.TableMangle, `Mangle`).
+	Add(iptables.TableRaw, `Raw`)
 
 var Directions = echo.NewKVData().
 	Add(iptables.ChainInput, `入站`).
@@ -21,6 +21,12 @@ var IPProtocols = echo.NewKVData().
 	Add(`4`, `IPv4`).
 	Add(`6`, `IPv6`)
 
+var NetProtocols = echo.NewKVData().
+	Add(iptables.ProtocolTCP, `TCP`).
+	Add(iptables.ProtocolUDP, `UDP`).
+	Add(iptables.ProtocolICMP, `ICMP`).
+	Add(iptables.ProtocolAll, `ALL`)
+
 var Actions = echo.NewKVData().
 	Add(iptables.TargetAccept, `接受`).
 	Add(iptables.TargetDrop, `丢弃`).
@@ -31,5 +37,6 @@ func SetFormData(c echo.Context) {
 	c.Set(`types`, Types.Slice())
 	c.Set(`directions`, Directions.Slice())
 	c.Set(`ipProtocols`, IPProtocols.Slice())
+	c.Set(`netProtocols`, NetProtocols.Slice())
 	c.Set(`actions`, Actions.Slice())
 }

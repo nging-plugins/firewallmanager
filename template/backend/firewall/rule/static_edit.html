@@ -47,7 +47,7 @@
                         <label class="col-sm-1 control-label">{{"协议"|$.T}}</label>
                         <div class="col-sm-4">{{$protocol := $.Form `protocol`}}
                             <select name="protocol" id="protocol" class="form-control">
-                                {{- range $k, $v := $.Stored.ipProtocols -}}
+                                {{- range $k, $v := $.Stored.netProtocols -}}
                                 <option value="{{$v.K}}"{{if eq $protocol $v.K}} selected{{end}}>{{$v.V}}</option>
                                 {{- end -}}
                             </select>
