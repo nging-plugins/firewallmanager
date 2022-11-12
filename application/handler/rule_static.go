@@ -56,6 +56,12 @@ func ruleStaticAdd(ctx echo.Context) error {
 		if err != nil {
 			goto END
 		}
+		rule := m.AsRule()
+		var ipv = `4`
+		err = firewall.Engine(ipv).Insert(m.Position, &rule)
+		if err != nil {
+			goto END
+		}
 		return ctx.Redirect(handler.URLFor(`/firewall/rule/static`))
 	}
 
@@ -78,7 +84,17 @@ func ruleStaticEdit(ctx echo.Context) error {
 		if err != nil {
 			goto END
 		}
-		_, err = m.Add()
+		err = m.Edit(nil, `id`, id)
+		if err != nil {
+			goto END
+		}
+		rule := m.AsRule()
+		var ipv = `4`
+		err = firewall.Engine(ipv).Delete(&rule)
+		if err != nil {
+			goto END
+		}
+		err = firewall.Engine(ipv).Insert(m.Position, &rule)
 		if err != nil {
 			goto END
 		}
@@ -96,7 +112,15 @@ END:
 func ruleStaticDelete(ctx echo.Context) error {
 	m := model.NewRuleStatic(ctx)
 	id := ctx.Paramx(`id`).Uint()
-	err := m.Delete(nil, `id`, id)
+	err := m.Get(nil, `id`, id)
+	if err == nil {
+		err = m.Delete(nil, `id`, id)
+		if err == nil {
+			rule := m.AsRule()
+			var ipv = `4`
+			err = firewall.Engine(ipv).Delete(&rule)
+		}
+	}
 	if err == nil {
 		handler.SendOk(ctx, ctx.T(`删除成功`))
 	} else {

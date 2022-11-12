@@ -91,6 +91,9 @@ func (a *IPTables) Export(wfwFile string) error {
 }
 
 func (a *IPTables) Insert(pos int, rule *driver.Rule) error {
+	if pos < 0 {
+		return a.Append(rule)
+	}
 	rulespec := a.RuleFrom(rule)
 	table := rule.Type
 	chain := rule.Direction

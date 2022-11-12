@@ -23,6 +23,7 @@ import (
 	"github.com/webx-top/echo"
 
 	"github.com/nging-plugins/firewallmanager/application/dbschema"
+	"github.com/nging-plugins/firewallmanager/application/library/driver"
 )
 
 func NewRuleStatic(ctx echo.Context) *RuleStatic {
@@ -59,4 +60,21 @@ func (r *RuleStatic) ListPage(cond *db.Compounds, sorts ...interface{}) ([]*dbsc
 		return nil, err
 	}
 	return r.Objects(), nil
+}
+
+func (r *RuleStatic) AsRule() driver.Rule {
+	m := r
+	return driver.Rule{
+		Type:      m.Type,
+		Name:      m.Name,
+		Direction: m.Direction,
+		Action:    m.Action,
+		Protocol:  m.Protocol,
+
+		// IP or Port
+		RemoteIP:   m.RemoteIp,
+		LocalIP:    m.LocalIp,
+		RemotePort: m.RemotePort,
+		LocalPort:  m.LocalPort,
+	}
 }
