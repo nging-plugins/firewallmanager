@@ -7,3 +7,4 @@ docker run --rm -it\
  --privileged\
  --network host\
  -v "$GOPATH/src:/root/go/src" -v "$GOPATH/src:$GOPATH/src" $image
+# 在容器内通过 host.docker.internal 访问宿主机

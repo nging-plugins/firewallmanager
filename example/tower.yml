@@ -33,7 +33,7 @@ app {
 
 proxy {
   # 你的项目对外公开访问的端口
-  port : "18181"
+  port : ":28181"
 
   # 代理引擎。支持fast和standard
   engine : "standard"
