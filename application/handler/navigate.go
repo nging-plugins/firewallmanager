@@ -30,7 +30,7 @@ var LeftNavigate = &navigate.Item{
 		},
 		{
 			Display: true,
-			Name:    `静态规则`,
+			Name:    `动态规则`,
 			Action:  `rule/dynamic`,
 		},
 		{
