@@ -22,8 +22,18 @@ import (
 	"github.com/admpub/nging/v5/application/handler"
 	"github.com/admpub/nging/v5/application/library/common"
 	"github.com/nging-plugins/firewallmanager/application/model"
+	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
 )
+
+func ruleDynamicIndex(ctx echo.Context) error {
+	m := model.NewRuleDynamic(ctx)
+	cond := db.NewCompounds()
+	sorts := common.Sorts(ctx, m.NgingFirewallRuleDynamic)
+	list, err := m.ListPage(cond, sorts...)
+	ctx.Set(`listPage`, list)
+	return ctx.Render(`firewall/index`, common.Err(ctx, err))
+}
 
 func ruleDynamicAdd(ctx echo.Context) error {
 	m := model.NewRuleDynamic(ctx)

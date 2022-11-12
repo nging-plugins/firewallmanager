@@ -10,8 +10,8 @@ var LeftNavigate = &navigate.Item{
 	Children: &navigate.List{
 		{
 			Display: true,
-			Name:    `防火墙管理`,
-			Action:  `rule/index`,
+			Name:    `静态规则`,
+			Action:  `rule/static/index`,
 		},
 		{
 			Display: false,
@@ -27,6 +27,11 @@ var LeftNavigate = &navigate.Item{
 			Display: false,
 			Name:    `删除静态规则`,
 			Action:  `rule/static/delete`,
+		},
+		{
+			Display: true,
+			Name:    `静态规则`,
+			Action:  `rule/dynamic/index`,
 		},
 		{
 			Display: false,

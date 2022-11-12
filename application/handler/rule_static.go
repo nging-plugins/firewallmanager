@@ -26,7 +26,7 @@ import (
 	"github.com/webx-top/echo"
 )
 
-func ruleIndex(ctx echo.Context) error {
+func ruleStaticIndex(ctx echo.Context) error {
 	m := model.NewRuleStatic(ctx)
 	cond := db.NewCompounds()
 	sorts := common.Sorts(ctx, m.NgingFirewallRuleStatic)
