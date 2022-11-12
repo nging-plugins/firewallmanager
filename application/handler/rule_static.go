@@ -19,14 +19,21 @@
 package handler
 
 import (
-	"github.com/admpub/nging/v5/application/handler"
-	"github.com/admpub/nging/v5/application/library/common"
-	"github.com/nging-plugins/firewallmanager/application/model"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
+
+	"github.com/admpub/nging/v5/application/handler"
+	"github.com/admpub/nging/v5/application/library/common"
+	"github.com/nging-plugins/firewallmanager/application/library/firewall"
+	"github.com/nging-plugins/firewallmanager/application/model"
 )
 
 func ruleStaticIndex(ctx echo.Context) error {
+	rules, err := firewall.EngineIPv4().List(`filter`, `INPUT`)
+	if err != nil {
+		return err
+	}
+	return ctx.JSON(rules)
 	m := model.NewRuleStatic(ctx)
 	cond := db.NewCompounds()
 	sorts := common.Sorts(ctx, m.NgingFirewallRuleStatic)
@@ -53,6 +60,7 @@ func ruleStaticAdd(ctx echo.Context) error {
 END:
 	ctx.Set(`activeURL`, `/firewall/rule/static`)
 	ctx.Set(`title`, ctx.T(`添加规则`))
+	firewall.SetFormData(ctx)
 	return ctx.Render(`firewall/rule/static_edit`, common.Err(ctx, err))
 }
 
@@ -79,6 +87,7 @@ func ruleStaticEdit(ctx echo.Context) error {
 END:
 	ctx.Set(`activeURL`, `/firewall/rule/static`)
 	ctx.Set(`title`, ctx.T(`修改规则`))
+	firewall.SetFormData(ctx)
 	return ctx.Render(`firewall/rule/static_edit`, common.Err(ctx, err))
 }
 

@@ -9,7 +9,7 @@ import (
 )
 
 func TestInstall(t *testing.T) {
-	a, err := New()
+	a, err := New(ProtocolIPv4)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -17,7 +17,7 @@ func TestInstall(t *testing.T) {
 }
 
 func TestAppend(t *testing.T) {
-	a, err := New()
+	a, err := New(ProtocolIPv4)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -35,7 +35,7 @@ func TestAppend(t *testing.T) {
 }
 
 func TestList(t *testing.T) {
-	a, err := New()
+	a, err := New(ProtocolIPv4)
 	if err != nil {
 		t.Fatal(err)
 	}

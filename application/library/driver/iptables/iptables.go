@@ -10,14 +10,13 @@ import (
 	"github.com/admpub/log"
 	"github.com/admpub/packer"
 	"github.com/nging-plugins/firewallmanager/application/library/driver"
-	"github.com/webx-top/com"
 )
 
 var _ driver.Driver = (*IPTables)(nil)
 
-func New() (*IPTables, error) {
+func New(proto iptables.Protocol) (*IPTables, error) {
 	t := &IPTables{
-		IPProtocol: ProtocolIPv4,
+		IPProtocol: proto,
 	}
 	var err error
 	t.IPTables, err = iptables.New(iptables.IPFamily(t.IPProtocol))
@@ -131,7 +130,6 @@ func (a *IPTables) List(table, chain string) ([]*driver.Rule, error) {
 			log.Errorf("[iptables] failed to parse rule: %s: %v", row, err)
 			continue
 		}
-		com.Dump(tr)
 		rule := &driver.Rule{Type: table, Direction: chain}
 		switch r := tr.(type) {
 		case parser.Rule:
@@ -175,6 +173,8 @@ func (a *IPTables) List(table, chain string) ([]*driver.Rule, error) {
 			// }
 			rule.Action = r.Action
 			rule.Direction = r.Chain
+		// case parser.Comment:
+		// case parser.Header:
 		default:
 			log.Debugf("[iptables] something else happend: %v", r)
 		}
