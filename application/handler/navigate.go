@@ -6,7 +6,7 @@ var LeftNavigate = &navigate.Item{
 	Display: true,
 	Name:    `防火墙`,
 	Action:  `firewall`,
-	Icon:    `download`,
+	Icon:    `shield`,
 	Children: &navigate.List{
 		{
 			Display: true,
