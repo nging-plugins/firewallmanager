@@ -13,6 +13,8 @@ import (
 	"github.com/webx-top/com"
 )
 
+var _ driver.Driver = (*IPTables)(nil)
+
 func New() (*IPTables, error) {
 	t := &IPTables{
 		IPProtocol: ProtocolIPv4,

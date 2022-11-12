@@ -7,9 +7,10 @@ import (
 	"io"
 	"strings"
 
-	"github.com/admpub/go-iptables/iptables"
 	"github.com/nging-plugins/firewallmanager/application/library/driver"
 )
+
+var _ driver.Driver = (*NetSH)(nil)
 
 func New() (*NetSH, error) {
 	t := &NetSH{
@@ -96,7 +97,7 @@ func (a *NetSH) Exists(rule *driver.Rule) (bool, error) {
 	return strings.Contains(stdout.String(), rule.Name), nil
 }
 
-func (a *NetSH) List(table, chain string) ([]iptables.Stat, error) {
+func (a *NetSH) List(table, chain string) ([]*driver.Rule, error) {
 	// netsh advfirewall firewall show rule name=all dir=in type=dynamic status=enabled
 	// dir (direction) - in or out
 	// status - enabled or disabled
