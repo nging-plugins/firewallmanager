@@ -29,15 +29,17 @@ import (
 )
 
 func ruleStaticIndex(ctx echo.Context) error {
-	rules, err := firewall.EngineIPv4().List(`filter`, `INPUT`)
-	if err != nil {
-		return err
-	}
-	return ctx.JSON(rules)
 	m := model.NewRuleStatic(ctx)
 	cond := db.NewCompounds()
 	sorts := common.Sorts(ctx, m.NgingFirewallRuleStatic)
 	list, err := m.ListPage(cond, sorts...)
+	if ctx.Format() == echo.ContentTypeJSON {
+		rules, err := firewall.EngineIPv4().List(`filter`, `INPUT`)
+		if err != nil {
+			return err
+		}
+		ctx.Set(`rules`, rules)
+	}
 	ctx.Set(`listPage`, list)
 	return ctx.Render(`firewall/rule/static`, common.Err(ctx, err))
 }

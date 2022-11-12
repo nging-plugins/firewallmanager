@@ -30,6 +30,7 @@
 								<th><strong>{{`本地端口`|$.T}}</strong></th>
 								<th><strong>{{`操作`|$.T}}</strong></th>
 								<th><strong>{{`状态`|$.T}}</strong></th>
+								<th><strong>{{`时间`|$.T}}</strong></th>
 								<th><strong>{{`操作`|$.T}}</strong></th>
 							</tr>
 						</thead>
@@ -47,6 +48,12 @@
 								<td>{{$v.LocalPort}}</td>
 								<td>{{$v.Action}}</td>
 								<td>{{$v.Disabled}}</td>
+								<td>
+									{{`创建`|$.T}}: {{(Date $v.Created).Format "2006-01-02 15:04:05"}}
+									{{- if gt $v.Updated 0 -}}
+									<br />{{`更新`|$.T}}: {{(Date $v.Updated).Format "2006-01-02 15:04:05"}}
+									{{- end -}}
+								</td>
 								<td></td>
 							</tr>
 							{{- end -}}

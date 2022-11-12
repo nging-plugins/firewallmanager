@@ -19,34 +19,33 @@
 					<table class="table no-border hover">
 						<thead class="no-border">
 							<tr>
-								<th><strong>{{`类型`|$.T}}</strong></th>
-								<th><strong>{{`位置`|$.T}}</strong></th>
-								<th><strong>{{`名称`|$.T}}</strong></th>
-								<th><strong>{{`方向`|$.T}}</strong></th>
-								<th><strong>{{`协议`|$.T}}</strong></th>
-								<th><strong>{{`远程IP`|$.T}}</strong></th>
-								<th><strong>{{`远程端口`|$.T}}</strong></th>
-								<th><strong>{{`本地IP`|$.T}}</strong></th>
-								<th><strong>{{`本地端口`|$.T}}</strong></th>
-								<th><strong>{{`操作`|$.T}}</strong></th>
+								<th><strong>{{`资源类型`|$.T}}</strong></th>
+								<th><strong>{{`操作类型`|$.T}}</strong></th>
+								<th><strong>{{`操作参数`|$.T}}</strong></th>
+								<th><strong>{{`合计时长`|$.T}}</strong></th>
+								<th><strong>{{`连续次数`|$.T}}</strong></th>
+								<th><strong>{{`持续时长`|$.T}}</strong></th>
 								<th><strong>{{`状态`|$.T}}</strong></th>
+								<th><strong>{{`时间`|$.T}}</strong></th>
 								<th><strong>{{`操作`|$.T}}</strong></th>
 							</tr>
 						</thead>
 						<tbody class="no-border-y">
 							{{- range $k, $v := $.Stored.listData -}}
 							<tr>
-								<td>{{$v.Type}}</td>
-								<td>{{$v.Position}}</td>
-								<td>{{$v.Name}}</td>
-								<td>{{$v.Direction}}</td>
-								<td>{{$v.Protocol}}</td>
-								<td>{{$v.RemoteIp}}</td>
-								<td>{{$v.RemotePort}}</td>
-								<td>{{$v.LocalIp}}</td>
-								<td>{{$v.LocalPort}}</td>
-								<td>{{$v.Action}}</td>
+								<td>{{$v.SourceType}}</td>
+								<td>{{$v.ActionType}}</td>
+								<td>{{$v.ActionArg}}</td>
+								<td>{{$v.AggregateDuration}}</td>
+								<td>{{$v.OccurrenceNum}}</td>
+								<td>{{$v.OccurrenceDuration}}</td>
 								<td>{{$v.Disabled}}</td>
+								<td>
+									{{`创建`|$.T}}: {{(Date $v.Created).Format "2006-01-02 15:04:05"}}
+									{{- if gt $v.Updated 0 -}}
+									<br />{{`更新`|$.T}}: {{(Date $v.Updated).Format "2006-01-02 15:04:05"}}
+									{{- end -}}
+								</td>
 								<td></td>
 							</tr>
 							{{- end -}}

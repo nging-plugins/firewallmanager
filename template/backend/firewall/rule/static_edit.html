@@ -19,7 +19,7 @@
                         <label class="col-sm-2 control-label">{{"类型"|$.T}}</label>
                         <div class="col-sm-4">{{$type := $.Form `type`}}
                             <select name="type" id="type" class="form-control">
-                                {{- range $k, $v := $.Stored.typeList -}}
+                                {{- range $k, $v := $.Stored.types -}}
                                 <option value="{{$v.K}}"{{if eq $type $v.K}} selected{{end}}>{{$v.V}}</option>
                                 {{- end -}}
                             </select>
@@ -37,12 +37,20 @@
                     </div>
                     <div class="form-group">
                         <label class="col-sm-2 control-label">{{"方向"|$.T}}</label>
-                        <div class="col-sm-4">
-                            <input type="text" name="direction" id="direction" class="form-control" value="{{$.Form `direction`}}">
+                        <div class="col-sm-4">{{$direction := $.Form `direction`}}
+                            <select name="direction" id="direction" class="form-control">
+                                {{- range $k, $v := $.Stored.directions -}}
+                                <option value="{{$v.K}}"{{if eq $direction $v.K}} selected{{end}}>{{$v.V}}</option>
+                                {{- end -}}
+                            </select>
                         </div>
                         <label class="col-sm-1 control-label">{{"协议"|$.T}}</label>
-                        <div class="col-sm-4">
-                            <input type="text" name="protocol" id="protocol" class="form-control" value="{{$.Form `protocol`}}">
+                        <div class="col-sm-4">{{$protocol := $.Form `protocol`}}
+                            <select name="protocol" id="protocol" class="form-control">
+                                {{- range $k, $v := $.Stored.ipProtocols -}}
+                                <option value="{{$v.K}}"{{if eq $protocol $v.K}} selected{{end}}>{{$v.V}}</option>
+                                {{- end -}}
+                            </select>
                         </div>
                     </div>
                     <div class="form-group">
@@ -67,16 +75,20 @@
                     </div>
                     <div class="form-group">
                         <label class="col-sm-2 control-label">{{"操作"|$.T}}</label>
-                        <div class="col-sm-4">
-                            <input type="text" name="action" id="action" class="form-control" value="{{$.Form `action`}}">
+                        <div class="col-sm-4">{{$action := $.Form `action`}}
+                            <select name="action" id="action" class="form-control">
+                                {{- range $k, $v := $.Stored.actions -}}
+                                <option value="{{$v.K}}"{{if eq $action $v.K}} selected{{end}}>{{$v.V}}</option>
+                                {{- end -}}
+                            </select>
                         </div>
                         <label class="col-sm-1 control-label">{{"状态"|$.T}}</label>
                         <div class="col-sm-4">{{$v := $.Form "disabled"}}
                           <div class="radio radio-primary radio-inline">
-                            <input type="radio" value="N" id="disabled-N" name="disabled"{{if or (eq $v "N") (eq $v "")}} checked{{end}}><label for="disabled-N">{{"启用"|$.T}}</label>
+                            <input type="radio" value="N" id="disabled-N" name="disabled"{{if or (eq $v `N`) (eq $v ``)}} checked{{end}}><label for="disabled-N">{{"启用"|$.T}}</label>
                           </div>
                           <div class="radio radio-danger radio-inline">
-                            <input type="radio" value="Y" id="disabled-Y" name="disabled"{{if eq $v "Y"}} checked{{end}}><label for="disabled-Y">{{"禁用"|$.T}}</label>
+                            <input type="radio" value="Y" id="disabled-Y" name="disabled"{{if eq $v `Y`}} checked{{end}}><label for="disabled-Y">{{"禁用"|$.T}}</label>
                           </div>
                         </div>
                       </div>
@@ -100,22 +112,4 @@
 {{/Block}}
 
 {{Block "footer"}}
-{{Include "filemanager/file.script"}}
-<script>
-    function uploadURL(currentPath) {
-        return BACKEND_URL + '/download/file?do=upload&path=' + encodeURIComponent(currentPath);
-    }
-    function initDropzone(options) {
-        $('#multi-upload-dropzone').dropzone($.extend({}, options, {
-            url: uploadURL('{{$.Stored.path}}'),
-            dictDefaultMessage: '{{"可以把文件拖到这里来进行上传哦"|$.T}}'
-        }));
-        $('#multi-upload-zip-dropzone').dropzone($.extend({}, options, {
-            url: uploadURL('{{$.Stored.path}}') + '&pipe=unzip',
-            dictDefaultMessage: '{{"可以把文件拖到这里来进行上传哦"|$.T}}<p>{{"仅支持上传zip压缩包。成功解压到当前目录后，该压缩包会被自动删除"|$.T}}</p>',
-            acceptedFiles: 'application/zip,application/x-zip-compressed'
-        }));
-    }
-</script>
-<script type="text/javascript" src="{{AssetsURL}}/js/behaviour/page/file.min.js"></script>
 {{/Block}}
