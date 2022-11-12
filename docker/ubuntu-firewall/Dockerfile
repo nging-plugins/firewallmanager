@@ -4,6 +4,7 @@ ARG GO_VERSION
 ENV GO_VERSION ${GO_VERSION:-1.19.3}
 ENV GO_INSTALL_FILE go${GO_VERSION}.linux-amd64.tar.gz
 ENV PATH "$PATH:/root/go/bin"
+ENV GOPATH "/root/go"
 
 RUN apt update && apt upgrade -y
 RUN apt install wget gcc -y

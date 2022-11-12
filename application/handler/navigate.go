@@ -11,42 +11,42 @@ var LeftNavigate = &navigate.Item{
 		{
 			Display: true,
 			Name:    `静态规则`,
-			Action:  `rule/static/index`,
+			Action:  `rule/static`,
 		},
 		{
 			Display: false,
 			Name:    `添加静态规则`,
-			Action:  `rule/static/add`,
+			Action:  `rule/static_add`,
 		},
 		{
 			Display: false,
 			Name:    `修改静态规则`,
-			Action:  `rule/static/edit`,
+			Action:  `rule/static_edit`,
 		},
 		{
 			Display: false,
 			Name:    `删除静态规则`,
-			Action:  `rule/static/delete`,
+			Action:  `rule/static_delete`,
 		},
 		{
 			Display: true,
 			Name:    `静态规则`,
-			Action:  `rule/dynamic/index`,
+			Action:  `rule/dynamic`,
 		},
 		{
 			Display: false,
 			Name:    `添加动态规则`,
-			Action:  `rule/dynamic/add`,
+			Action:  `rule/dynamic_add`,
 		},
 		{
 			Display: false,
 			Name:    `修改动态规则`,
-			Action:  `rule/dynamic/edit`,
+			Action:  `rule/dynamic_edit`,
 		},
 		{
 			Display: false,
 			Name:    `删除动态规则`,
-			Action:  `rule/dynamic/delete`,
+			Action:  `rule/dynamic_delete`,
 		},
 	},
 }

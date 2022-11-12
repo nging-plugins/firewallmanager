@@ -12,14 +12,14 @@ func RegisterRoute(r *route.Collection) {
 }
 
 func registerRoute(g echo.RouteRegister) {
-	g.Route(`GET,POST`, `/rule/static/index`, ruleStaticIndex)
-	g.Route(`GET,POST`, `/rule/static/add`, ruleStaticAdd)
-	g.Route(`GET,POST`, `/rule/static/edit`, ruleStaticEdit)
-	g.Route(`GET,POST`, `/rule/static/delete`, ruleStaticDelete)
-	g.Route(`GET,POST`, `/rule/dynamic/index`, ruleDynamicIndex)
-	g.Route(`GET,POST`, `/rule/dynamic/add`, ruleDynamicAdd)
-	g.Route(`GET,POST`, `/rule/dynamic/edit`, ruleDynamicEdit)
-	g.Route(`GET,POST`, `/rule/dynamic/delete`, ruleDynamicDelete)
+	g.Route(`GET,POST`, `/rule/static`, ruleStaticIndex)
+	g.Route(`GET,POST`, `/rule/static_add`, ruleStaticAdd)
+	g.Route(`GET,POST`, `/rule/static_edit`, ruleStaticEdit)
+	g.Route(`GET,POST`, `/rule/static_delete`, ruleStaticDelete)
+	g.Route(`GET,POST`, `/rule/dynamic`, ruleDynamicIndex)
+	g.Route(`GET,POST`, `/rule/dynamic_add`, ruleDynamicAdd)
+	g.Route(`GET,POST`, `/rule/dynamic_edit`, ruleDynamicEdit)
+	g.Route(`GET,POST`, `/rule/dynamic_delete`, ruleDynamicDelete)
 }
 
 func init() {

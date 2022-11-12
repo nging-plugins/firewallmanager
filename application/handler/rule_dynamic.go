@@ -32,7 +32,7 @@ func ruleDynamicIndex(ctx echo.Context) error {
 	sorts := common.Sorts(ctx, m.NgingFirewallRuleDynamic)
 	list, err := m.ListPage(cond, sorts...)
 	ctx.Set(`listPage`, list)
-	return ctx.Render(`firewall/index`, common.Err(ctx, err))
+	return ctx.Render(`firewall/rule/dynamic`, common.Err(ctx, err))
 }
 
 func ruleDynamicAdd(ctx echo.Context) error {
@@ -47,13 +47,13 @@ func ruleDynamicAdd(ctx echo.Context) error {
 		if err != nil {
 			goto END
 		}
-		return ctx.Redirect(handler.URLFor(`/firewall/index`))
+		return ctx.Redirect(handler.URLFor(`/firewall/rule/dynamic`))
 	}
 
 END:
-	ctx.Set(`activeURL`, `/firewall/rule/index`)
+	ctx.Set(`activeURL`, `/firewall/rule/dynamic`)
 	ctx.Set(`title`, ctx.T(`添加规则`))
-	return ctx.Render(`firewall/edit_dynamic`, common.Err(ctx, err))
+	return ctx.Render(`firewall/rule/dynamic_edit`, common.Err(ctx, err))
 }
 
 func ruleDynamicEdit(ctx echo.Context) error {
@@ -72,14 +72,14 @@ func ruleDynamicEdit(ctx echo.Context) error {
 		if err != nil {
 			goto END
 		}
-		return ctx.Redirect(handler.URLFor(`/firewall/index`))
+		return ctx.Redirect(handler.URLFor(`/firewall/rule/dynamic`))
 	}
 	echo.StructToForm(ctx, m.NgingFirewallRuleDynamic, ``, echo.LowerCaseFirstLetter)
 
 END:
-	ctx.Set(`activeURL`, `/firewall/rule/index`)
+	ctx.Set(`activeURL`, `/firewall/rule/dynamic`)
 	ctx.Set(`title`, ctx.T(`修改规则`))
-	return ctx.Render(`firewall/edit_dynamic`, common.Err(ctx, err))
+	return ctx.Render(`firewall/rule/dynamic_edit`, common.Err(ctx, err))
 }
 
 func ruleDynamicDelete(ctx echo.Context) error {
@@ -91,5 +91,5 @@ func ruleDynamicDelete(ctx echo.Context) error {
 	} else {
 		handler.SendErr(ctx, err)
 	}
-	return ctx.Redirect(handler.URLFor(`/firewall/rule/index`))
+	return ctx.Redirect(handler.URLFor(`/firewall/rule/dynamic`))
 }
