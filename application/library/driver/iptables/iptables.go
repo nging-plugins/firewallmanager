@@ -2,13 +2,17 @@ package iptables
 
 import (
 	"errors"
+	"fmt"
 	"os/exec"
+	"strconv"
 	"strings"
 
 	"github.com/admpub/go-iptables/iptables"
 	parser "github.com/admpub/iptables_parser"
 	"github.com/admpub/log"
+	"github.com/admpub/nging/v5/application/library/errorslice"
 	"github.com/admpub/packer"
+	"github.com/admpub/pp"
 	"github.com/nging-plugins/firewallmanager/application/library/driver"
 )
 
@@ -107,6 +111,15 @@ func (a *IPTables) Append(rule *driver.Rule) error {
 	return a.IPTables.AppendUnique(table, chain, rulespec...)
 }
 
+// Update update rulespec in specified table/chain
+func (a *IPTables) Update(pos int, rule *driver.Rule) error {
+	rulespec := a.RuleFrom(rule)
+	table := rule.Type
+	chain := rule.Direction
+	cmd := append([]string{"-t", table, "-R", chain, strconv.Itoa(pos)}, rulespec...)
+	return a.IPTables.Run(cmd...)
+}
+
 func (a *IPTables) Delete(rule *driver.Rule) error {
 	rulespec := a.RuleFrom(rule)
 	table := rule.Type
@@ -126,13 +139,16 @@ func (a *IPTables) List(table, chain string) ([]*driver.Rule, error) {
 	if err != nil {
 		return nil, err
 	}
+	errs := errorslice.New()
 	var rules []*driver.Rule
 	for _, row := range rows {
 		tr, err := parser.NewFromString(row)
 		if err != nil {
-			log.Errorf("[iptables] failed to parse rule: %s: %v", row, err)
+			err = fmt.Errorf("[iptables] failed to parse rule: %s: %v", row, err)
+			errs.Add(err)
 			continue
 		}
+		pp.Println(tr)
 		rule := &driver.Rule{Type: table, Direction: chain}
 		switch r := tr.(type) {
 		case parser.Rule:
@@ -183,5 +199,5 @@ func (a *IPTables) List(table, chain string) ([]*driver.Rule, error) {
 		}
 		rules = append(rules, rule)
 	}
-	return rules, nil
+	return rules, errs.ToError()
 }

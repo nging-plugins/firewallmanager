@@ -34,12 +34,22 @@ func (a *NetSH) RuleFrom(rule *driver.Rule) []string {
 	case `OUTPUT`:
 		direction = `out`
 	}
+	localIP := `any`
+	remoteIP := `any`
+	if len(rule.LocalIP) > 0 {
+		localIP = rule.LocalIP
+	}
+	if len(rule.RemoteIP) > 0 {
+		remoteIP = rule.RemoteIP
+	}
 	return []string{
 		fmt.Sprintf(`name=%q`, rule.Name),
 		fmt.Sprintf(`dir=%s`, direction),
 		fmt.Sprintf(`action=%s`, action),
 		fmt.Sprintf(`protocol=%s`, rule.Protocol),
 		fmt.Sprintf(`localport=%s`, rule.LocalPort),
+		fmt.Sprintf(`localip=%s`, localIP),
+		fmt.Sprintf(`remoteip=%s`, remoteIP),
 	}
 }
 
@@ -77,6 +87,16 @@ func (a *NetSH) Insert(pos int, rule *driver.Rule) error {
 func (a *NetSH) Append(rule *driver.Rule) error {
 	rulespec := []string{`firewall`, `add`, `rule`}
 	rulespec = append(rulespec, a.RuleFrom(rule)...)
+	return a.run(rulespec, nil)
+}
+
+func (a *NetSH) Update(pos int, rule *driver.Rule) error {
+	//netsh advfirewall firewall set rule name="文件和打印机共享(回显请求 - ICMPv4-In)" new enable=yes action=allow localip=any remoteip=any
+	rulespec := []string{`firewall`, `set`, `rule`}
+	rules := a.RuleFrom(rule)
+	newRules := append([]string{rules[0]}, `new`)
+	newRules = append(newRules, rules[1:]...)
+	rulespec = append(rulespec, newRules...)
 	return a.run(rulespec, nil)
 }
 

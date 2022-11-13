@@ -31,7 +31,7 @@ func ruleDynamicIndex(ctx echo.Context) error {
 	cond := db.NewCompounds()
 	sorts := common.Sorts(ctx, m.NgingFirewallRuleDynamic)
 	list, err := m.ListPage(cond, sorts...)
-	ctx.Set(`listPage`, list)
+	ctx.Set(`listData`, list)
 	return ctx.Render(`firewall/rule/dynamic`, common.Err(ctx, err))
 }
 
@@ -48,6 +48,14 @@ func ruleDynamicAdd(ctx echo.Context) error {
 			goto END
 		}
 		return ctx.Redirect(handler.URLFor(`/firewall/rule/dynamic`))
+	} else {
+		id := ctx.Formx(`copyId`).Uint()
+		if id > 0 {
+			err = m.Get(nil, db.Cond{`id`: id})
+			if err == nil {
+				ctx.Request().Form().Set(`id`, `0`)
+			}
+		}
 	}
 
 END:
@@ -58,7 +66,7 @@ END:
 
 func ruleDynamicEdit(ctx echo.Context) error {
 	m := model.NewRuleDynamic(ctx)
-	id := ctx.Paramx(`id`).Uint()
+	id := ctx.Formx(`id`).Uint()
 	err := m.Get(nil, `id`, id)
 	if err != nil {
 		return err
@@ -84,7 +92,7 @@ END:
 
 func ruleDynamicDelete(ctx echo.Context) error {
 	m := model.NewRuleDynamic(ctx)
-	id := ctx.Paramx(`id`).Uint()
+	id := ctx.Formx(`id`).Uint()
 	err := m.Delete(nil, `id`, id)
 	if err == nil {
 		handler.SendOk(ctx, ctx.T(`删除成功`))

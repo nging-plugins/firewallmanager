@@ -8,6 +8,7 @@ type Driver interface {
 	Export(wfwFile string) error
 	Insert(pos int, rule *Rule) error
 	Append(rule *Rule) error
+	Update(pos int, rule *Rule) error
 	Delete(rule *Rule) error
 	Exists(rule *Rule) (bool, error)
 	List(table, chain string) ([]*Rule, error)

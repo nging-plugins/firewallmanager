@@ -6,10 +6,11 @@ replace github.com/admpub/nging/v5 => ../../admpub/nging
 
 require (
 	github.com/admpub/go-iptables v0.6.3
-	github.com/admpub/iptables_parser v0.0.0-20220725150031-15b26e62a1b5
+	github.com/admpub/iptables_parser v0.0.0-20221113113329-b2e71be4ff5e
 	github.com/admpub/log v1.3.3
 	github.com/admpub/nging/v5 v5.0.0
 	github.com/admpub/packer v0.0.1
+	github.com/admpub/pp v0.0.4
 	github.com/webx-top/com v0.8.1
 	github.com/webx-top/db v1.23.9
 	github.com/webx-top/echo v2.30.3+incompatible

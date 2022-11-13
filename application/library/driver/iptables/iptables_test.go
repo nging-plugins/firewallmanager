@@ -1,10 +1,10 @@
 package iptables
 
 import (
-	"encoding/json"
-	"fmt"
 	"testing"
 
+	"github.com/admpub/log"
+	"github.com/admpub/pp"
 	"github.com/nging-plugins/firewallmanager/application/library/driver"
 )
 
@@ -35,6 +35,7 @@ func TestAppend(t *testing.T) {
 }
 
 func TestList(t *testing.T) {
+	defer log.Close()
 	a, err := New(ProtocolIPv4)
 	if err != nil {
 		t.Fatal(err)
@@ -43,6 +44,5 @@ func TestList(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	b, _ := json.MarshalIndent(rows, ``, `  `)
-	fmt.Println(string(b))
+	pp.Println(rows)
 }

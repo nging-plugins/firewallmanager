@@ -40,7 +40,7 @@ func ruleStaticIndex(ctx echo.Context) error {
 		}
 		ctx.Set(`rules`, rules)
 	}
-	ctx.Set(`listPage`, list)
+	ctx.Set(`listData`, list)
 	return ctx.Render(`firewall/rule/static`, common.Err(ctx, err))
 }
 
@@ -63,6 +63,14 @@ func ruleStaticAdd(ctx echo.Context) error {
 			goto END
 		}
 		return ctx.Redirect(handler.URLFor(`/firewall/rule/static`))
+	} else {
+		id := ctx.Formx(`copyId`).Uint()
+		if id > 0 {
+			err = m.Get(nil, db.Cond{`id`: id})
+			if err == nil {
+				ctx.Request().Form().Set(`id`, `0`)
+			}
+		}
 	}
 
 END:
@@ -74,7 +82,7 @@ END:
 
 func ruleStaticEdit(ctx echo.Context) error {
 	m := model.NewRuleStatic(ctx)
-	id := ctx.Paramx(`id`).Uint()
+	id := ctx.Formx(`id`).Uint()
 	err := m.Get(nil, `id`, id)
 	if err != nil {
 		return err
@@ -90,11 +98,7 @@ func ruleStaticEdit(ctx echo.Context) error {
 		}
 		rule := m.AsRule()
 		var ipv = `4`
-		err = firewall.Engine(ipv).Delete(&rule)
-		if err != nil {
-			goto END
-		}
-		err = firewall.Engine(ipv).Insert(m.Position, &rule)
+		err = firewall.Engine(ipv).Update(m.Position, &rule)
 		if err != nil {
 			goto END
 		}
@@ -111,7 +115,7 @@ END:
 
 func ruleStaticDelete(ctx echo.Context) error {
 	m := model.NewRuleStatic(ctx)
-	id := ctx.Paramx(`id`).Uint()
+	id := ctx.Formx(`id`).Uint()
 	err := m.Get(nil, `id`, id)
 	if err == nil {
 		err = m.Delete(nil, `id`, id)
