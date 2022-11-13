@@ -12,7 +12,6 @@ import (
 	"github.com/admpub/log"
 	"github.com/admpub/nging/v5/application/library/errorslice"
 	"github.com/admpub/packer"
-	"github.com/admpub/pp"
 	"github.com/nging-plugins/firewallmanager/application/library/driver"
 )
 
@@ -148,7 +147,7 @@ func (a *IPTables) List(table, chain string) ([]*driver.Rule, error) {
 			errs.Add(err)
 			continue
 		}
-		pp.Println(tr)
+		//pp.Println(tr)
 		rule := &driver.Rule{Type: table, Direction: chain}
 		switch r := tr.(type) {
 		case parser.Rule:
