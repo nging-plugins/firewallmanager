@@ -119,11 +119,11 @@ type NgingFirewallRuleDynamic struct {
 
 // - base function
 
-func (a *NgingFirewallRuleDynamic) Trans() *factory.Transaction {
+func (a *NgingFirewallRuleDynamic) Trans() factory.Transactioner {
 	return a.base.Trans()
 }
 
-func (a *NgingFirewallRuleDynamic) Use(trans *factory.Transaction) factory.Model {
+func (a *NgingFirewallRuleDynamic) Use(trans factory.Transactioner) factory.Model {
 	a.base.Use(trans)
 	return a
 }
@@ -150,6 +150,10 @@ func (a *NgingFirewallRuleDynamic) Context() echo.Context {
 func (a *NgingFirewallRuleDynamic) SetConnID(connID int) factory.Model {
 	a.base.SetConnID(connID)
 	return a
+}
+
+func (a *NgingFirewallRuleDynamic) ConnID() int {
+	return a.base.ConnID()
 }
 
 func (a *NgingFirewallRuleDynamic) SetNamer(namer func(factory.Model) string) factory.Model {
@@ -223,7 +227,7 @@ func (a *NgingFirewallRuleDynamic) Name_() string {
 
 func (a *NgingFirewallRuleDynamic) CPAFrom(source factory.Model) factory.Model {
 	a.SetContext(source.Context())
-	a.Use(source.Trans())
+	a.SetConnID(source.ConnID())
 	a.SetNamer(source.Namer())
 	return a
 }
