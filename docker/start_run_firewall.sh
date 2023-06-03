@@ -4,7 +4,7 @@ if [ "$1" != "" ]; then
 fi
 docker run --rm -it\
  --workdir /root/go/src/github.com/nging-plugins/firewallmanager\
- --privileged\
+ --privileged --network=host\
  --entrypoint go\
  -v "$GOPATH/src:/root/go/src" $image\
  test -v --count=1 ./application/library/driver/iptables

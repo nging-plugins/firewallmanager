@@ -4,7 +4,7 @@ if [ "$1" != "" ]; then
 fi
 docker run --rm -it\
  --workdir /root/go/src/github.com/admpub/gerberos\
- --privileged\
+ --privileged --network=host\
  --entrypoint go\
  -v "$GOPATH/src:/root/go/src" $image\
  run cmd/gerberos/main.go\
