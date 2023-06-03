@@ -21,6 +21,7 @@ package handler
 import (
 	"github.com/admpub/nging/v5/application/handler"
 	"github.com/admpub/nging/v5/application/library/common"
+	"github.com/nging-plugins/firewallmanager/application/library/firewall"
 	"github.com/nging-plugins/firewallmanager/application/model"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
@@ -61,6 +62,8 @@ func ruleDynamicAdd(ctx echo.Context) error {
 END:
 	ctx.Set(`activeURL`, `/firewall/rule/dynamic`)
 	ctx.Set(`title`, ctx.T(`添加规则`))
+	ctx.Set(`sourceList`, firewall.DynamicRuleSources.Slice())
+	ctx.Set(`actionList`, firewall.DynamicRuleActions.Slice())
 	return ctx.Render(`firewall/rule/dynamic_edit`, common.Err(ctx, err))
 }
 
@@ -87,6 +90,8 @@ func ruleDynamicEdit(ctx echo.Context) error {
 END:
 	ctx.Set(`activeURL`, `/firewall/rule/dynamic`)
 	ctx.Set(`title`, ctx.T(`修改规则`))
+	ctx.Set(`sourceList`, firewall.DynamicRuleSources.Slice())
+	ctx.Set(`actionList`, firewall.DynamicRuleActions.Slice())
 	return ctx.Render(`firewall/rule/dynamic_edit`, common.Err(ctx, err))
 }
 
