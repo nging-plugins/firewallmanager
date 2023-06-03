@@ -18,15 +18,21 @@ const (
 )
 
 const (
-	// 表
-	TableFilter = `filter` //过滤数据包。三个链：INPUT、FORWARD、OUTPUT
-	TableNAT    = `nat`    //用于网络地址转换（IP、端口）。 三个链：PREROUTING、POSTROUTING、OUTPUT
-	TableMangle = `mangle` //修改数据包的服务类型、TTL、并且可以配置路由实现QOS。五个链：PREROUTING、POSTROUTING、INPUT、OUTPUT、FORWARD
-	TableRaw    = `raw`    //决定数据包是否被状态跟踪机制处理。两个链：OUTPUT、PREROUTING
+	// 规则表之间的顺序
+	// raw → mangle → nat → filter
+	// 规则表表
+	TableFilter = `filter` // 过滤数据包。三个链：INPUT、FORWARD、OUTPUT
+	TableNAT    = `nat`    // 用于网络地址转换（IP、端口）。 三个链：PREROUTING、POSTROUTING、OUTPUT
+	TableMangle = `mangle` // 修改数据包的服务类型、TTL、并且可以配置路由实现QOS。五个链：PREROUTING、POSTROUTING、INPUT、OUTPUT、FORWARD
+	TableRaw    = `raw`    // 决定数据包是否被状态跟踪机制处理。两个链：OUTPUT、PREROUTING
 )
 
 const (
-	// 链
+	// 规则链之间的顺序
+	// ● 入站: PREROUTING → INPUT
+	// ● 出站: OUTPUT → POSTROUTING
+	// ● 转发: PREROUTING → FORWARD → POSTROUTIN
+	// 规则链
 	ChainInput       = `INPUT`       // 进来的数据包应用此规则链中的策略
 	ChainOutput      = `OUTPUT`      // 外出的数据包应用此规则链中的策略
 	ChainForward     = `FORWARD`     // 转发数据包时应用此规则链中的策略
