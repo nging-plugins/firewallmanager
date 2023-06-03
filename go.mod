@@ -5,7 +5,7 @@ go 1.17
 replace github.com/admpub/nging/v5 => ../../admpub/nging
 
 require (
-	github.com/admpub/go-iptables v0.6.3
+	github.com/admpub/go-iptables v0.6.4
 	github.com/admpub/iptables_parser v0.0.0-20221113113329-b2e71be4ff5e
 	github.com/admpub/log v1.3.3
 	github.com/admpub/nging/v5 v5.0.1
@@ -13,7 +13,7 @@ require (
 	github.com/admpub/pp v0.0.7
 	github.com/webx-top/com v0.9.4
 	github.com/webx-top/db v1.23.17
-	github.com/webx-top/echo v2.35.2+incompatible
+	github.com/webx-top/echo v2.35.3+incompatible
 )
 
 require (
@@ -73,7 +73,7 @@ require (
 	github.com/admpub/timeago v1.2.1 // indirect
 	github.com/admpub/websocket v1.0.4 // indirect
 	github.com/andybalholm/brotli v1.0.5 // indirect
-	github.com/aws/aws-sdk-go v1.44.271 // indirect
+	github.com/aws/aws-sdk-go v1.44.275 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/boombuler/barcode v1.0.1 // indirect
@@ -111,19 +111,19 @@ require (
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.16.5 // indirect
 	github.com/klauspost/cpuid v1.3.1 // indirect
-	github.com/klauspost/cpuid/v2 v2.2.4 // indirect
+	github.com/klauspost/cpuid/v2 v2.2.5 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect
 	github.com/lufia/plan9stats v0.0.0-20230326075908-cb1d2100619a // indirect
 	github.com/maruel/rs v1.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/mattn/go-runewidth v0.0.14 // indirect
-	github.com/mattn/go-sqlite3 v1.14.16 // indirect
+	github.com/mattn/go-sqlite3 v1.14.17 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.24 // indirect
 	github.com/miekg/dns v1.1.54 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
-	github.com/minio/minio-go/v7 v7.0.55 // indirect
+	github.com/minio/minio-go/v7 v7.0.56 // indirect
 	github.com/minio/sha256-simd v1.0.1 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
@@ -140,13 +140,13 @@ require (
 	github.com/rs/xid v1.5.0 // indirect
 	github.com/rwcarlsen/goexif v0.0.0-20190401172101-9e8deecbddbd // indirect
 	github.com/segmentio/fasthash v1.0.3 // indirect
-	github.com/shirou/gopsutil/v3 v3.23.4 // indirect
+	github.com/shirou/gopsutil/v3 v3.23.5 // indirect
 	github.com/shoenig/go-m1cpu v0.1.6 // indirect
 	github.com/sirupsen/logrus v1.9.2 // indirect
 	github.com/spf13/cobra v1.7.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/tklauser/go-sysconf v0.3.11 // indirect
-	github.com/tklauser/numcpus v0.6.0 // indirect
+	github.com/tklauser/numcpus v0.6.1 // indirect
 	github.com/tuotoo/qrcode v0.0.0-20220425170535-52ccc2bebf5d // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/volatiletech/inflect v0.0.1 // indirect
@@ -170,7 +170,7 @@ require (
 	golang.org/x/sync v0.2.0 // indirect
 	golang.org/x/sys v0.8.0 // indirect
 	golang.org/x/text v0.9.0 // indirect
-	golang.org/x/tools v0.9.1 // indirect
+	golang.org/x/tools v0.9.3 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect

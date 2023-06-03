@@ -7,4 +7,4 @@ docker run --rm -it\
  --privileged\
  --entrypoint go\
  -v "$GOPATH/src:/root/go/src" $image\
- test -v --count=1 ./pkg/library/driver/iptables
+ test -v --count=1 ./application/library/driver/iptables
