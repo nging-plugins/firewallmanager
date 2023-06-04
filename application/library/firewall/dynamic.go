@@ -143,12 +143,12 @@ func DynamicRuleFromDB(c echo.Context, row *dbschema.NgingFirewallRuleDynamic) (
 		}
 	}
 	rule.Regexp = args
-	rule.Action = []string{row.SourceType}
+	rule.Action = []string{row.ActionType}
 	if len(row.ActionArg) > 0 {
 		rule.Action = append(rule.Action, row.ActionArg)
 	}
-	rule.Aggregate = []string{}
 	if len(row.AggregateDuration) > 0 && len(row.AggregateRegexp) > 0 {
+		rule.Aggregate = []string{}
 		rule.Aggregate = append(rule.Aggregate, row.AggregateDuration)
 		args = []string{}
 		err = json.Unmarshal([]byte(row.AggregateRegexp), &args)
@@ -159,8 +159,8 @@ func DynamicRuleFromDB(c echo.Context, row *dbschema.NgingFirewallRuleDynamic) (
 		}
 		rule.Aggregate = append(rule.Aggregate, args...)
 	}
-	rule.Occurrences = []string{}
 	if row.OccurrenceNum > 0 && len(row.OccurrenceDuration) > 0 {
+		rule.Occurrences = []string{}
 		rule.Occurrences = append(rule.Occurrences, param.AsString(row.OccurrenceNum))
 		rule.Occurrences = append(rule.Occurrences, row.OccurrenceDuration)
 	}
