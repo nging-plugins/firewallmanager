@@ -5,7 +5,7 @@ go 1.17
 replace github.com/admpub/nging/v5 => ../../admpub/nging
 
 require (
-	github.com/admpub/gerberos v0.0.4
+	github.com/admpub/gerberos v0.0.5
 	github.com/admpub/go-iptables v0.6.4
 	github.com/admpub/iptables_parser v0.0.0-20221113113329-b2e71be4ff5e
 	github.com/admpub/log v1.3.3

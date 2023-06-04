@@ -19,14 +19,14 @@
 					<table class="table no-border hover">
 						<thead class="no-border">
 							<tr>
+								<th style="width:60px"><strong>{{"状态"|$.T}}</strong></th>
 								<th><strong>{{`规则名`|$.T}}</strong></th>
-								<th><strong>{{`资源类型`|$.T}}</strong></th>
+								<th><strong>{{`数据来源`|$.T}}</strong></th>
 								<th><strong>{{`操作类型`|$.T}}</strong></th>
 								<th><strong>{{`操作参数`|$.T}}</strong></th>
-								<th><strong>{{`合计时长`|$.T}}</strong></th>
-								<th><strong>{{`连续次数`|$.T}}</strong></th>
-								<th><strong>{{`持续时长`|$.T}}</strong></th>
-								<th><strong>{{`状态`|$.T}}</strong></th>
+								<th><strong>{{`聚合时长`|$.T}}</strong></th>
+								<th><strong>{{`发生时长`|$.T}}</strong></th>
+								<th><strong>{{`发生次数`|$.T}}</strong></th>
 								<th><strong>{{`时间`|$.T}}</strong></th>
 								<th><strong>{{`操作`|$.T}}</strong></th>
 							</tr>
@@ -34,14 +34,18 @@
 						<tbody class="no-border-y">
 							{{- range $k, $v := $.Stored.listData -}}
 							<tr>
+								<td>
+									<div class="checkbox checkbox-success no-margin-y">
+										<input id="checkbox-{{$k}}" class="styled switch-disabled" type="checkbox" data-id="{{$v.Id}}"{{if eq $v.Disabled "N"}} checked="checked"{{end}} value="N" /><label for="checkbox-{{$k}}">{{"启用"|$.T}}</label>
+									</div>
+								</td>
 								<td>{{$v.Name}}</td>
 								<td>{{$v.SourceType}}</td>
 								<td>{{$v.ActionType}}</td>
 								<td>{{$v.ActionArg}}</td>
 								<td>{{$v.AggregateDuration}}</td>
-								<td>{{$v.OccurrenceNum}}</td>
 								<td>{{$v.OccurrenceDuration}}</td>
-								<td>{{$v.Disabled}}</td>
+								<td>{{$v.OccurrenceNum}}</td>
 								<td>
 									{{`创建`|$.T}}: {{(Date $v.Created).Format "2006-01-02 15:04:05"}}
 									{{- if gt $v.Updated 0 -}}
@@ -126,4 +130,9 @@
 {{/Block}}
 
 {{Block "footer"}}
+<script>
+$(function(){
+	App.bindSwitch('input.switch-disabled','click','firewall/rule/dynamic_edit');
+});
+</script>
 {{/Block}}

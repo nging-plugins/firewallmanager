@@ -19,7 +19,7 @@ var dynamicRuleSourceFormElements = map[string]echo.KVList{
 	},
 	`process`: {
 		echo.NewKV(`name`, `可执行文件`).SetHKV(`inputType`, `text`).SetHKV(`required`, true),
-		echo.NewKV(`args`, `参数`).SetHKV(`inputType`, `text`),
+		echo.NewKV(`args`, `命令参数`).SetHKV(`inputType`, `text`),
 	},
 }
 
@@ -31,12 +31,12 @@ var DynamicRuleSources = echo.NewKVData().
 
 var dynamicRuleActionFormElements = map[string]echo.KVList{
 	`ban`: {
-		echo.NewKV(`duration`, `时长`).SetHKV(`inputType`, `text`).SetHKV(`required`, true),
+		echo.NewKV(`duration`, `时长`).SetHKV(`inputType`, `text`).SetHKV(`required`, true).SetHKV(`pattern`, `^(\d[smh])*$`).SetHKV(`helpBlock`, `指定时长，由数字和单位字母(h-时/m-分/s-秒)组成`).SetHKV(`placeholder`, `例如: 24h(24小时)`),
 	},
 	`log`: {
-		echo.NewKV(`extended`, `是否记录附加信息`).SetHKV(`inputType`, `select`).SetHKV(`options`, echo.KVList{
-			echo.NewKV(`simple`, `简化版日志`),
-			echo.NewKV(`extended`, `扩展版日志`),
+		echo.NewKV(`extended`, `日志类型`).SetHKV(`inputType`, `select`).SetHKV(`options`, echo.KVList{
+			echo.NewKV(`simple`, `基础版日志(记录时间和IP)`),
+			echo.NewKV(`extended`, `扩展版日志(基础版日志+匹配到的行和规则)`),
 		}).SetHKV(`required`, true),
 	},
 }

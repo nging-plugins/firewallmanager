@@ -19,6 +19,7 @@
 					<table class="table no-border hover">
 						<thead class="no-border">
 							<tr>
+								<th style="width:60px"><strong>{{"状态"|$.T}}</strong></th>
 								<th><strong>{{`类型`|$.T}}</strong></th>
 								<th><strong>{{`位置`|$.T}}</strong></th>
 								<th><strong>{{`规则名`|$.T}}</strong></th>
@@ -29,7 +30,6 @@
 								<th><strong>{{`本地IP`|$.T}}</strong></th>
 								<th><strong>{{`本地端口`|$.T}}</strong></th>
 								<th><strong>{{`操作`|$.T}}</strong></th>
-								<th><strong>{{`状态`|$.T}}</strong></th>
 								<th><strong>{{`时间`|$.T}}</strong></th>
 								<th><strong>{{`操作`|$.T}}</strong></th>
 							</tr>
@@ -37,6 +37,11 @@
 						<tbody class="no-border-y">
 							{{- range $k, $v := $.Stored.listData -}}
 							<tr>
+								<td>
+									<div class="checkbox checkbox-success no-margin-y">
+										<input id="checkbox-{{$k}}" class="styled switch-disabled" type="checkbox" data-id="{{$v.Id}}"{{if eq $v.Disabled "N"}} checked="checked"{{end}} value="N" /><label for="checkbox-{{$k}}">{{"启用"|$.T}}</label>
+									</div>
+								</td>
 								<td>{{$v.Type}}</td>
 								<td>{{$v.Position}}</td>
 								<td>{{$v.Name}}</td>
@@ -47,7 +52,6 @@
 								<td>{{$v.LocalIp}}</td>
 								<td>{{$v.LocalPort}}</td>
 								<td>{{$v.Action}}</td>
-								<td>{{$v.Disabled}}</td>
 								<td>
 									{{`创建`|$.T}}: {{(Date $v.Created).Format "2006-01-02 15:04:05"}}
 									{{- if gt $v.Updated 0 -}}
@@ -132,4 +136,9 @@
 {{/Block}}
 
 {{Block "footer"}}
+<script>
+$(function(){
+	App.bindSwitch('input.switch-disabled','click','firewall/rule/static_edit');
+});
+</script>
 {{/Block}}

@@ -2,6 +2,7 @@ package firewall
 
 import (
 	"encoding/json"
+	"fmt"
 	"strings"
 
 	"github.com/admpub/gerberos"
@@ -22,6 +23,42 @@ func RegisterDynamicRuleSource(k string, v string, formElements echo.KVList) {
 
 func RegisterDynamicRuleAction(k string, v string, formElements echo.KVList) {
 	DynamicRuleActions.Add(k, v, echo.KVOptHKV(`formElements`, formElements))
+}
+
+func setFromValues(c echo.Context, key string, values ...string) {
+	for i, v := range values {
+		if i == 0 {
+			c.Request().Form().Set(key, v)
+		} else {
+			c.Request().Form().Add(key, v)
+		}
+	}
+}
+
+func SetDynamicRuleForm(c echo.Context, rule *dbschema.NgingFirewallRuleDynamic) error {
+	var args []string
+	if len(rule.SourceArgs) > 0 {
+		err := json.Unmarshal([]byte(rule.SourceArgs), &args)
+		if err == nil {
+			setFromValues(c, `sourceArgs`, args...)
+		}
+	}
+
+	args = []string{}
+	if len(rule.Regexp) > 0 {
+		err := json.Unmarshal([]byte(rule.Regexp), &args)
+		if err == nil {
+			setFromValues(c, `regexp`, strings.Join(args, "\n"))
+		}
+	}
+	if len(rule.AggregateRegexp) > 0 {
+		args = []string{}
+		err := json.Unmarshal([]byte(rule.AggregateRegexp), &args)
+		if err == nil {
+			setFromValues(c, `aggregateRegexp`, strings.Join(args, "\n"))
+		}
+	}
+	return nil
 }
 
 func DynamicRuleParseForm(c echo.Context, rule *dbschema.NgingFirewallRuleDynamic) error {
@@ -85,19 +122,25 @@ func DynamicRuleParseForm(c echo.Context, rule *dbschema.NgingFirewallRuleDynami
 
 func DynamicRuleFromDB(c echo.Context, row *dbschema.NgingFirewallRuleDynamic) (rule gerberos.Rule, err error) {
 	var args []string
-	err = json.Unmarshal([]byte(row.SourceArgs), &args)
-	if err != nil {
-		err = common.JSONBytesParseError(err, []byte(row.SourceArgs))
-		return
+	if len(row.SourceArgs) > 0 {
+		err = json.Unmarshal([]byte(row.SourceArgs), &args)
+		if err != nil {
+			err = common.JSONBytesParseError(err, []byte(row.SourceArgs))
+			err = fmt.Errorf(`failed to parse SourceArgs: %w`, err)
+			return
+		}
 	}
 	rule.Source = []string{row.SourceType}
 	rule.Source = append(rule.Source, args...)
 
 	args = []string{}
-	err = json.Unmarshal([]byte(row.Regexp), &args)
-	if err != nil {
-		err = common.JSONBytesParseError(err, []byte(row.Regexp))
-		return
+	if len(row.Regexp) > 0 {
+		err = json.Unmarshal([]byte(row.Regexp), &args)
+		if err != nil {
+			err = common.JSONBytesParseError(err, []byte(row.Regexp))
+			err = fmt.Errorf(`failed to parse Regexp: %w`, err)
+			return
+		}
 	}
 	rule.Regexp = args
 	rule.Action = []string{row.SourceType}
@@ -111,6 +154,7 @@ func DynamicRuleFromDB(c echo.Context, row *dbschema.NgingFirewallRuleDynamic) (
 		err = json.Unmarshal([]byte(row.AggregateRegexp), &args)
 		if err != nil {
 			err = common.JSONBytesParseError(err, []byte(row.AggregateRegexp))
+			err = fmt.Errorf(`failed to parse AggregateRegexp: %w`, err)
 			return
 		}
 		rule.Aggregate = append(rule.Aggregate, args...)

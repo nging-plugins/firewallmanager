@@ -49,11 +49,11 @@ func GetFirewallConfig() *firewallConfig.Config {
 	return cm.FirewallConfig()
 }
 
-func StartOnce() {
+func StartOnce(writer ...io.Writer) {
 	if config.FromCLI().IsRunning(Name) {
 		return
 	}
-	Get().Start()
+	Get().Start(writer...)
 }
 
 func Stop() {
@@ -95,6 +95,12 @@ func (c *firewallCmd) boot() error {
 		SaveFilePath: cfg.SaveFilePath,
 		Rules:        map[string]*gerberos.Rule{},
 	}
+	if len(gerberosCfg.Backend) == 0 {
+		backends := firewall.DynamicRuleBackends.Slice()
+		if len(backends) > 0 {
+			gerberosCfg.Backend = backends[0].K
+		}
+	}
 
 	ctx := defaults.NewMockContext()
 	ruleM := model.NewRuleDynamic(ctx)
@@ -111,6 +117,7 @@ func (c *firewallCmd) boot() error {
 			gerberosCfg.Rules[param.AsString(row.Id)] = &rule
 		}
 	}
+	echo.Dump(gerberosCfg)
 
 	// Runner
 	rn := gerberos.NewRunner(gerberosCfg)

@@ -41,7 +41,7 @@ func ruleDynamicAdd(ctx echo.Context) error {
 	m := model.NewRuleDynamic(ctx)
 	var err error
 	if ctx.IsPost() {
-		err = ctx.MustBind(m.NgingFirewallRuleDynamic)
+		err = firewall.DynamicRuleParseForm(ctx, m.NgingFirewallRuleDynamic)
 		if err != nil {
 			goto END
 		}
@@ -50,7 +50,8 @@ func ruleDynamicAdd(ctx echo.Context) error {
 			goto END
 		}
 		if m.Disabled == `N` {
-			cmder.StartOnce()
+			wOut, wErr, _ := handler.NoticeWriter(ctx, ctx.T(`防火墙服务`))
+			cmder.StartOnce(wOut, wErr)
 		}
 		return ctx.Redirect(handler.URLFor(`/firewall/rule/dynamic`))
 	} else {
@@ -59,6 +60,7 @@ func ruleDynamicAdd(ctx echo.Context) error {
 			err = m.Get(nil, db.Cond{`id`: id})
 			if err == nil {
 				ctx.Request().Form().Set(`id`, `0`)
+				firewall.SetDynamicRuleForm(ctx, m.NgingFirewallRuleDynamic)
 			}
 		}
 	}
@@ -68,6 +70,7 @@ END:
 	ctx.Set(`title`, ctx.T(`添加规则`))
 	ctx.Set(`sourceList`, firewall.DynamicRuleSources.Slice())
 	ctx.Set(`actionList`, firewall.DynamicRuleActions.Slice())
+	ctx.Set(`rule`, m.NgingFirewallRuleDynamic)
 	return ctx.Render(`firewall/rule/dynamic_edit`, common.Err(ctx, err))
 }
 
@@ -79,7 +82,7 @@ func ruleDynamicEdit(ctx echo.Context) error {
 		return err
 	}
 	if ctx.IsPost() {
-		err = ctx.MustBind(m.NgingFirewallRuleDynamic)
+		err = firewall.DynamicRuleParseForm(ctx, m.NgingFirewallRuleDynamic)
 		if err != nil {
 			goto END
 		}
@@ -89,7 +92,8 @@ func ruleDynamicEdit(ctx echo.Context) error {
 			goto END
 		}
 		if m.Disabled == `N` {
-			cmder.StartOnce()
+			wOut, wErr, _ := handler.NoticeWriter(ctx, ctx.T(`防火墙服务`))
+			cmder.StartOnce(wOut, wErr)
 		} else {
 			exists, _ := m.ExistsAvailable()
 			if !exists {
@@ -97,14 +101,42 @@ func ruleDynamicEdit(ctx echo.Context) error {
 			}
 		}
 		return ctx.Redirect(handler.URLFor(`/firewall/rule/dynamic`))
+	} else if ctx.IsAjax() {
+		disabled := ctx.Query(`disabled`)
+		if len(disabled) > 0 {
+			m.Disabled = disabled
+			data := ctx.Data()
+			err = m.UpdateField(nil, `disabled`, disabled, db.Cond{`id`: id})
+			if err != nil {
+				data.SetError(err)
+				return ctx.JSON(data)
+			}
+			if m.Disabled == `Y` {
+				exists, _ := m.ExistsAvailable()
+				if !exists {
+					cmder.Stop()
+				}
+			} else {
+				wOut, wErr, _ := handler.NoticeWriter(ctx, ctx.T(`防火墙服务`))
+				cmder.StartOnce(wOut, wErr)
+			}
+			if err != nil {
+				data.SetError(err)
+				return ctx.JSON(data)
+			}
+			data.SetInfo(ctx.T(`操作成功`))
+			return ctx.JSON(data)
+		}
 	}
 	echo.StructToForm(ctx, m.NgingFirewallRuleDynamic, ``, echo.LowerCaseFirstLetter)
+	firewall.SetDynamicRuleForm(ctx, m.NgingFirewallRuleDynamic)
 
 END:
 	ctx.Set(`activeURL`, `/firewall/rule/dynamic`)
 	ctx.Set(`title`, ctx.T(`修改规则`))
 	ctx.Set(`sourceList`, firewall.DynamicRuleSources.Slice())
 	ctx.Set(`actionList`, firewall.DynamicRuleActions.Slice())
+	ctx.Set(`rule`, m.NgingFirewallRuleDynamic)
 	return ctx.Render(`firewall/rule/dynamic_edit`, common.Err(ctx, err))
 }
 

@@ -57,20 +57,9 @@ func ruleStaticAdd(ctx echo.Context) error {
 			goto END
 		}
 		rule := m.AsRule()
-		if rule.IPVersion == `all` {
-			err = firewall.Engine(`4`).Insert(m.Position, &rule)
-			if err != nil {
-				goto END
-			}
-			err = firewall.Engine(`6`).Insert(m.Position, &rule)
-			if err != nil {
-				goto END
-			}
-		} else {
-			err = firewall.Engine(rule.IPVersion).Insert(m.Position, &rule)
-			if err != nil {
-				goto END
-			}
+		err = firewall.Insert(m.Position, &rule)
+		if err != nil {
+			goto END
 		}
 		return ctx.Redirect(handler.URLFor(`/firewall/rule/static`))
 	} else {
@@ -108,22 +97,34 @@ func ruleStaticEdit(ctx echo.Context) error {
 			goto END
 		}
 		rule := m.AsRule()
-		if rule.IPVersion == `all` {
-			err = firewall.Engine(`4`).Update(m.Position, &rule)
-			if err != nil {
-				goto END
-			}
-			err = firewall.Engine(`6`).Update(m.Position, &rule)
-			if err != nil {
-				goto END
-			}
-		} else {
-			err = firewall.Engine(rule.IPVersion).Update(m.Position, &rule)
-			if err != nil {
-				goto END
-			}
+		err = firewall.Update(m.Position, &rule)
+		if err != nil {
+			goto END
 		}
 		return ctx.Redirect(handler.URLFor(`/firewall/rule/static`))
+	} else if ctx.IsAjax() {
+		disabled := ctx.Query(`disabled`)
+		if len(disabled) > 0 {
+			m.Disabled = disabled
+			data := ctx.Data()
+			err = m.UpdateField(nil, `disabled`, disabled, db.Cond{`id`: id})
+			if err != nil {
+				data.SetError(err)
+				return ctx.JSON(data)
+			}
+			rule := m.AsRule()
+			if m.Disabled == `Y` {
+				err = firewall.Delete(&rule)
+			} else {
+				err = firewall.Update(m.Position, &rule)
+			}
+			if err != nil {
+				data.SetError(err)
+				return ctx.JSON(data)
+			}
+			data.SetInfo(ctx.T(`操作成功`))
+			return ctx.JSON(data)
+		}
 	}
 	echo.StructToForm(ctx, m.NgingFirewallRuleStatic, ``, echo.LowerCaseFirstLetter)
 
@@ -142,8 +143,7 @@ func ruleStaticDelete(ctx echo.Context) error {
 		err = m.Delete(nil, `id`, id)
 		if err == nil {
 			rule := m.AsRule()
-			var ipv = `4`
-			err = firewall.Engine(ipv).Delete(&rule)
+			err = firewall.Delete(&rule)
 		}
 	}
 	if err == nil {
