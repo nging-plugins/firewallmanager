@@ -46,6 +46,10 @@ func (r *RuleDynamic) Add() (interface{}, error) {
 	return r.NgingFirewallRuleDynamic.Insert()
 }
 
+func (r *RuleDynamic) ExistsAvailable() (bool, error) {
+	return r.NgingFirewallRuleDynamic.Exists(nil, `disabled`, `N`)
+}
+
 func (r *RuleDynamic) Edit(mw func(db.Result) db.Result, args ...interface{}) error {
 	if err := r.check(); err != nil {
 		return err

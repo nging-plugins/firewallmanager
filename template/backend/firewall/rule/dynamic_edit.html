@@ -16,11 +16,17 @@
             <div class="content">
                 <form class="form-horizontal group-border-dashed" method="POST">
                     <div class="form-group">
+                        <label class="col-sm-2 control-label">{{"名称"|$.T}}</label>
+                        <div class="col-sm-9">
+                            <input type="text" name="name" id="name" class="form-control" value="{{$.Form `name`}}">
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <label class="col-sm-2 control-label">{{"数据来源"|$.T}}</label>
                         <div class="col-sm-4">{{$sourceType := $.Form `type`}}
                             <select name="sourceType" id="sourceType" class="form-control" required>
                                 {{- range $k, $v := $.Stored.sourceList -}}
-                                <option value="{{$v.K}}"{{if eq $sourceType $v.K}} selected{{end}}>{{$v.V}}</option>
+                                <option value="{{$v.K}}"{{if eq $sourceType $v.K}} selected{{end}} data-form-elements='{{$v.H.formElements|JSONEncode}}'>{{$v.V}}</option>
                                 {{- end -}}
                             </select>
                         </div>
@@ -32,28 +38,38 @@
                     <div class="form-group">
                         <label class="col-sm-2 control-label">{{"匹配规则"|$.T}}</label>
                         <div class="col-sm-9">
-                            <input type="text" name="regexp" id="regexp" class="form-control" value="{{$.Form `regexp`}}" required>
+                            <textarea name="regexp" id="regexp" class="form-control" required style="resize:vertical" rows="1">{{$.Form `regexp`}}</textarea>
                             <div class="help-block">
-                                {{`请输入正则表达式。必须带占位符`|$.T}}
-                                <code>%ip%</code>
+                                {{`请输入正则表达式，支持多个，每行一个。每个正则表达式必须带占位符`|$.T}}
+                                <code class="clickable" onclick="App.insertAtCursor($('#regexp')[0],$(this).text());">%ip%</code>
                                 {{`它代表IP地址 (IPv4 和 IPv6)。`|$.T}}<br />
                                 {{`如果指定了“聚合规则”，则必须在这里也加上占位符`|$.T}}
-                                <code>%id%</code>。
+                                <code class="clickable" onclick="App.insertAtCursor($('#regexp')[0],$(this).text());">%id%</code>。
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-2 control-label">{{"聚合规则"|$.T}}</label>
                         <div class="col-sm-9">
-                            <span class="input-group">
-                                <span class="input-group-addon">{{`时长`|$.T}}</span>
-                                <input type="text" name="aggregateDuration" id="aggregateDuration" class="form-control" value="{{$.Form `aggregateDuration`}}" placeholder="{{`指定时长。例如：5s(5秒), 1m(1分钟)`|$.T}}" pattern="^(\d[smhd])*$">
-                                <span class="input-group-addon">{{`内匹配到`|$.T}}</span>
-                                <input type="text" name="aggregateRegexp" id="aggregateRegexp" class="form-control" value="{{$.Form `aggregateRegexp`}}" placeholder="{{`正则表达式规则`|$.T}}">
-                            </span>
-                            {{`指定规则时，必须带占位符`|$.T}}<code>%id%</code>。<br />
+                            <div class="fieldset bg-fc">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">{{"时长"|$.T}}</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" name="aggregateDuration" id="aggregateDuration" class="form-control" value="{{$.Form `aggregateDuration`}}" placeholder="{{`指定时长。例如：5s(5秒), 1m(1分钟)`|$.T}}" pattern="^(\d[smhd])*$">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">{{"匹配规则"|$.T}}</label>
+                                    <div class="col-sm-9">
+                                        <textarea name="aggregateRegexp" id="aggregateRegexp" class="form-control" placeholder="{{`正则表达式规则`|$.T}}" rows="1">{{$.Form `aggregateRegexp`}}</textarea>
+                                        <div class="help-block">
+                            {{`请输入正则表达式，支持多个，每行一个。指定规则时，必须带占位符`|$.T}}<code class="clickable" onclick="App.insertAtCursor($('#aggregateRegexp')[0],$(this).text());">%id%</code>。<br />
                             {{`在匹配到上面的“匹配规则”后，在指定时长内匹配到这里指定的规则时，每匹配一次算一次。`|$.T}}<br />
                             {{`例如：在匹配到上面的“匹配规则”后，在 5 秒内匹配到这里的规则 3 次，则算 3 次`|$.T}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="form-group">
@@ -66,7 +82,9 @@
                                 <input type="number" name="occurrenceNum" id="occurrenceNum" class="form-control" value="{{$.Form `occurrenceNum`}}" placeholder="{{`次数`|$.T}}" min="0" step="1">
                                 <span class="input-group-addon">{{`次`|$.T}}</span>
                             </span>
-                            {{`例如：持续次数设置为 5，持续时长设置为 10s。则代表在10秒内匹配到5次，就会执行该操作，并重置计数器。`|$.T}}
+                            <div class="help-block">
+                                {{`例如：持续次数设置为 5，持续时长设置为 10s。则代表在10秒内匹配到5次，就会执行该操作，并重置计数器。`|$.T}}
+                            </div>
                         </div>
                     </div>
                     <div class="form-group">
@@ -74,7 +92,7 @@
                         <div class="col-sm-4">{{$actionType := $.Form `actionType`}}
                             <select name="actionType" id="actionType" class="form-control" required>
                                 {{- range $k, $v := $.Stored.actionList -}}
-                                <option value="{{$v.K}}"{{if eq $actionType $v.K}} selected{{end}}>{{$v.V}}</option>
+                                <option value="{{$v.K}}"{{if eq $actionType $v.K}} selected{{end}} data-form-elements='{{$v.H.formElements|JSONEncode}}'>{{$v.V}}</option>
                                 {{- end -}}
                             </select>
                         </div>
@@ -114,4 +132,20 @@
 {{/Block}}
 
 {{Block "footer"}}
+<script src="{{AssetsURL}}/js/textarea/autosize.min.js?t={{BuildTime}}"></script>
+<script type="text/javascript">
+function onSourceTypeChange(event){
+    var formElements = $(this).children('option:selected').data('form-elements');
+    console.dir(formElements);
+}
+function onActionTypeChange(event){
+    var formElements = $(this).children('option:selected').data('form-elements');
+    console.dir(formElements);
+}
+$(function(){
+$('#regexp,#aggregateRegexp').autosize();
+$('#sourceType').on('change',onSourceTypeChange).trigger('change');
+$('#actionType').on('change',onActionTypeChange).trigger('change');
+});
+</script>
 {{/Block}}

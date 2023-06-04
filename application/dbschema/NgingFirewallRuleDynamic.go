@@ -103,6 +103,7 @@ type NgingFirewallRuleDynamic struct {
 	objects []*NgingFirewallRuleDynamic
 
 	Id                 uint   `db:"id,omitempty,pk" bson:"id,omitempty" comment:"ID" json:"id" xml:"id"`
+	Name               string `db:"name" bson:"name" comment:"规则名称" json:"name" xml:"name"`
 	SourceType         string `db:"source_type" bson:"source_type" comment:"资源类型" json:"source_type" xml:"source_type"`
 	SourceArgs         string `db:"source_args" bson:"source_args" comment:"资源参数(JSON数组)" json:"source_args" xml:"source_args"`
 	Regexp             string `db:"regexp" bson:"regexp" comment:"正则规格(JSON数组)" json:"regexp" xml:"regexp"`
@@ -653,6 +654,7 @@ func (a *NgingFirewallRuleDynamic) Exists(mw func(db.Result) db.Result, args ...
 
 func (a *NgingFirewallRuleDynamic) Reset() *NgingFirewallRuleDynamic {
 	a.Id = 0
+	a.Name = ``
 	a.SourceType = ``
 	a.SourceArgs = ``
 	a.Regexp = ``
@@ -672,6 +674,7 @@ func (a *NgingFirewallRuleDynamic) AsMap(onlyFields ...string) param.Store {
 	r := param.Store{}
 	if len(onlyFields) == 0 {
 		r["Id"] = a.Id
+		r["Name"] = a.Name
 		r["SourceType"] = a.SourceType
 		r["SourceArgs"] = a.SourceArgs
 		r["Regexp"] = a.Regexp
@@ -690,6 +693,8 @@ func (a *NgingFirewallRuleDynamic) AsMap(onlyFields ...string) param.Store {
 		switch field {
 		case "Id":
 			r["Id"] = a.Id
+		case "Name":
+			r["Name"] = a.Name
 		case "SourceType":
 			r["SourceType"] = a.SourceType
 		case "SourceArgs":
@@ -724,6 +729,8 @@ func (a *NgingFirewallRuleDynamic) FromRow(row map[string]interface{}) {
 		switch key {
 		case "id":
 			a.Id = param.AsUint(value)
+		case "name":
+			a.Name = param.AsString(value)
 		case "source_type":
 			a.SourceType = param.AsString(value)
 		case "source_args":
@@ -774,6 +781,8 @@ func (a *NgingFirewallRuleDynamic) Set(key interface{}, value ...interface{}) {
 		switch kk {
 		case "Id":
 			a.Id = param.AsUint(vv)
+		case "Name":
+			a.Name = param.AsString(vv)
 		case "SourceType":
 			a.SourceType = param.AsString(vv)
 		case "SourceArgs":
@@ -806,6 +815,7 @@ func (a *NgingFirewallRuleDynamic) AsRow(onlyFields ...string) param.Store {
 	r := param.Store{}
 	if len(onlyFields) == 0 {
 		r["id"] = a.Id
+		r["name"] = a.Name
 		r["source_type"] = a.SourceType
 		r["source_args"] = a.SourceArgs
 		r["regexp"] = a.Regexp
@@ -824,6 +834,8 @@ func (a *NgingFirewallRuleDynamic) AsRow(onlyFields ...string) param.Store {
 		switch field {
 		case "id":
 			r["id"] = a.Id
+		case "name":
+			r["name"] = a.Name
 		case "source_type":
 			r["source_type"] = a.SourceType
 		case "source_args":

@@ -64,6 +64,9 @@ func (r *RuleStatic) ListPage(cond *db.Compounds, sorts ...interface{}) ([]*dbsc
 
 func (r *RuleStatic) AsRule() driver.Rule {
 	m := r
+	if len(m.IpVersion) > 0 {
+		m.IpVersion = `4`
+	}
 	return driver.Rule{
 		Type:      m.Type,
 		Name:      m.Name,

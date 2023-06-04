@@ -21,6 +21,7 @@ package handler
 import (
 	"github.com/admpub/nging/v5/application/handler"
 	"github.com/admpub/nging/v5/application/library/common"
+	"github.com/nging-plugins/firewallmanager/application/library/cmder"
 	"github.com/nging-plugins/firewallmanager/application/library/firewall"
 	"github.com/nging-plugins/firewallmanager/application/model"
 	"github.com/webx-top/db"
@@ -47,6 +48,9 @@ func ruleDynamicAdd(ctx echo.Context) error {
 		_, err = m.Add()
 		if err != nil {
 			goto END
+		}
+		if m.Disabled == `N` {
+			cmder.StartOnce()
 		}
 		return ctx.Redirect(handler.URLFor(`/firewall/rule/dynamic`))
 	} else {
@@ -79,9 +83,18 @@ func ruleDynamicEdit(ctx echo.Context) error {
 		if err != nil {
 			goto END
 		}
-		_, err = m.Add()
+		m.Id = id
+		err = m.Edit(nil, `id`, id)
 		if err != nil {
 			goto END
+		}
+		if m.Disabled == `N` {
+			cmder.StartOnce()
+		} else {
+			exists, _ := m.ExistsAvailable()
+			if !exists {
+				cmder.Stop()
+			}
 		}
 		return ctx.Redirect(handler.URLFor(`/firewall/rule/dynamic`))
 	}

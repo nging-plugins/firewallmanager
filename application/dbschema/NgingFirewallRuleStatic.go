@@ -113,6 +113,7 @@ type NgingFirewallRuleStatic struct {
 	LocalIp    string `db:"local_ip" bson:"local_ip" comment:"本地IP" json:"local_ip" xml:"local_ip"`
 	LocalPort  string `db:"local_port" bson:"local_port" comment:"本地端口" json:"local_port" xml:"local_port"`
 	Action     string `db:"action" bson:"action" comment:"操作" json:"action" xml:"action"`
+	IpVersion  string `db:"ip_version" bson:"ip_version" comment:"IP版本" json:"ip_version" xml:"ip_version"`
 	Disabled   string `db:"disabled" bson:"disabled" comment:"是否(Y/N)禁用" json:"disabled" xml:"disabled"`
 	Created    uint   `db:"created" bson:"created" comment:"创建时间" json:"created" xml:"created"`
 	Updated    uint   `db:"updated" bson:"updated" comment:"更新时间" json:"updated" xml:"updated"`
@@ -347,6 +348,9 @@ func (a *NgingFirewallRuleStatic) Insert() (pk interface{}, err error) {
 	if len(a.Action) == 0 {
 		a.Action = "ACCEPT"
 	}
+	if len(a.IpVersion) == 0 {
+		a.IpVersion = "4"
+	}
 	if len(a.Disabled) == 0 {
 		a.Disabled = "N"
 	}
@@ -384,6 +388,9 @@ func (a *NgingFirewallRuleStatic) Update(mw func(db.Result) db.Result, args ...i
 	if len(a.Action) == 0 {
 		a.Action = "ACCEPT"
 	}
+	if len(a.IpVersion) == 0 {
+		a.IpVersion = "4"
+	}
 	if len(a.Disabled) == 0 {
 		a.Disabled = "N"
 	}
@@ -412,6 +419,9 @@ func (a *NgingFirewallRuleStatic) Updatex(mw func(db.Result) db.Result, args ...
 	}
 	if len(a.Action) == 0 {
 		a.Action = "ACCEPT"
+	}
+	if len(a.IpVersion) == 0 {
+		a.IpVersion = "4"
 	}
 	if len(a.Disabled) == 0 {
 		a.Disabled = "N"
@@ -442,6 +452,9 @@ func (a *NgingFirewallRuleStatic) UpdateByFields(mw func(db.Result) db.Result, f
 	}
 	if len(a.Action) == 0 {
 		a.Action = "ACCEPT"
+	}
+	if len(a.IpVersion) == 0 {
+		a.IpVersion = "4"
 	}
 	if len(a.Disabled) == 0 {
 		a.Disabled = "N"
@@ -476,6 +489,9 @@ func (a *NgingFirewallRuleStatic) UpdatexByFields(mw func(db.Result) db.Result, 
 	}
 	if len(a.Action) == 0 {
 		a.Action = "ACCEPT"
+	}
+	if len(a.IpVersion) == 0 {
+		a.IpVersion = "4"
 	}
 	if len(a.Disabled) == 0 {
 		a.Disabled = "N"
@@ -531,6 +547,11 @@ func (a *NgingFirewallRuleStatic) UpdateFields(mw func(db.Result) db.Result, kvs
 			kvset["action"] = "ACCEPT"
 		}
 	}
+	if val, ok := kvset["ip_version"]; ok && val != nil {
+		if v, ok := val.(string); ok && len(v) == 0 {
+			kvset["ip_version"] = "4"
+		}
+	}
 	if val, ok := kvset["disabled"]; ok && val != nil {
 		if v, ok := val.(string); ok && len(v) == 0 {
 			kvset["disabled"] = "N"
@@ -574,6 +595,11 @@ func (a *NgingFirewallRuleStatic) UpdatexFields(mw func(db.Result) db.Result, kv
 	if val, ok := kvset["action"]; ok && val != nil {
 		if v, ok := val.(string); ok && len(v) == 0 {
 			kvset["action"] = "ACCEPT"
+		}
+	}
+	if val, ok := kvset["ip_version"]; ok && val != nil {
+		if v, ok := val.(string); ok && len(v) == 0 {
+			kvset["ip_version"] = "4"
 		}
 	}
 	if val, ok := kvset["disabled"]; ok && val != nil {
@@ -630,6 +656,9 @@ func (a *NgingFirewallRuleStatic) Upsert(mw func(db.Result) db.Result, args ...i
 		if len(a.Action) == 0 {
 			a.Action = "ACCEPT"
 		}
+		if len(a.IpVersion) == 0 {
+			a.IpVersion = "4"
+		}
 		if len(a.Disabled) == 0 {
 			a.Disabled = "N"
 		}
@@ -651,6 +680,9 @@ func (a *NgingFirewallRuleStatic) Upsert(mw func(db.Result) db.Result, args ...i
 		}
 		if len(a.Action) == 0 {
 			a.Action = "ACCEPT"
+		}
+		if len(a.IpVersion) == 0 {
+			a.IpVersion = "4"
 		}
 		if len(a.Disabled) == 0 {
 			a.Disabled = "N"
@@ -726,6 +758,7 @@ func (a *NgingFirewallRuleStatic) Reset() *NgingFirewallRuleStatic {
 	a.LocalIp = ``
 	a.LocalPort = ``
 	a.Action = ``
+	a.IpVersion = ``
 	a.Disabled = ``
 	a.Created = 0
 	a.Updated = 0
@@ -746,6 +779,7 @@ func (a *NgingFirewallRuleStatic) AsMap(onlyFields ...string) param.Store {
 		r["LocalIp"] = a.LocalIp
 		r["LocalPort"] = a.LocalPort
 		r["Action"] = a.Action
+		r["IpVersion"] = a.IpVersion
 		r["Disabled"] = a.Disabled
 		r["Created"] = a.Created
 		r["Updated"] = a.Updated
@@ -775,6 +809,8 @@ func (a *NgingFirewallRuleStatic) AsMap(onlyFields ...string) param.Store {
 			r["LocalPort"] = a.LocalPort
 		case "Action":
 			r["Action"] = a.Action
+		case "IpVersion":
+			r["IpVersion"] = a.IpVersion
 		case "Disabled":
 			r["Disabled"] = a.Disabled
 		case "Created":
@@ -811,6 +847,8 @@ func (a *NgingFirewallRuleStatic) FromRow(row map[string]interface{}) {
 			a.LocalPort = param.AsString(value)
 		case "action":
 			a.Action = param.AsString(value)
+		case "ip_version":
+			a.IpVersion = param.AsString(value)
 		case "disabled":
 			a.Disabled = param.AsString(value)
 		case "created":
@@ -863,6 +901,8 @@ func (a *NgingFirewallRuleStatic) Set(key interface{}, value ...interface{}) {
 			a.LocalPort = param.AsString(vv)
 		case "Action":
 			a.Action = param.AsString(vv)
+		case "IpVersion":
+			a.IpVersion = param.AsString(vv)
 		case "Disabled":
 			a.Disabled = param.AsString(vv)
 		case "Created":
@@ -887,6 +927,7 @@ func (a *NgingFirewallRuleStatic) AsRow(onlyFields ...string) param.Store {
 		r["local_ip"] = a.LocalIp
 		r["local_port"] = a.LocalPort
 		r["action"] = a.Action
+		r["ip_version"] = a.IpVersion
 		r["disabled"] = a.Disabled
 		r["created"] = a.Created
 		r["updated"] = a.Updated
@@ -916,6 +957,8 @@ func (a *NgingFirewallRuleStatic) AsRow(onlyFields ...string) param.Store {
 			r["local_port"] = a.LocalPort
 		case "action":
 			r["action"] = a.Action
+		case "ip_version":
+			r["ip_version"] = a.IpVersion
 		case "disabled":
 			r["disabled"] = a.Disabled
 		case "created":

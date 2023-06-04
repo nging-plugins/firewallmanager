@@ -24,6 +24,7 @@ DROP TABLE IF EXISTS `nging_firewall_rule_dynamic`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `nging_firewall_rule_dynamic` (
   `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '规则名称',
   `source_type` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'file' COMMENT '资源类型',
   `source_args` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '资源参数(JSON数组)',
   `regexp` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '正则规格(JSON数组)',
@@ -59,6 +60,7 @@ CREATE TABLE `nging_firewall_rule_static` (
   `local_ip` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '本地IP',
   `local_port` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '本地端口',
   `action` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'ACCEPT' COMMENT '操作',
+  `ip_version` enum('4','6','all') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '4' COMMENT 'IP版本',
   `disabled` enum('Y','N') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'N' COMMENT '是否(Y/N)禁用',
   `created` int unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
   `updated` int unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
@@ -75,4 +77,4 @@ CREATE TABLE `nging_firewall_rule_static` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-05-16 22:42:33
+-- Dump completed on 2023-06-04 16:54:26

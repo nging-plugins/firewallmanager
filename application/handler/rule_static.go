@@ -34,7 +34,7 @@ func ruleStaticIndex(ctx echo.Context) error {
 	sorts := common.Sorts(ctx, m.NgingFirewallRuleStatic)
 	list, err := m.ListPage(cond, sorts...)
 	if ctx.Format() == echo.ContentTypeJSON {
-		rules, err := firewall.EngineIPv4().List(`filter`, `INPUT`)
+		rules, err := firewall.Engine(`4`).List(`filter`, `INPUT`)
 		if err != nil {
 			return err
 		}
@@ -57,10 +57,20 @@ func ruleStaticAdd(ctx echo.Context) error {
 			goto END
 		}
 		rule := m.AsRule()
-		var ipv = `4`
-		err = firewall.Engine(ipv).Insert(m.Position, &rule)
-		if err != nil {
-			goto END
+		if rule.IPVersion == `all` {
+			err = firewall.Engine(`4`).Insert(m.Position, &rule)
+			if err != nil {
+				goto END
+			}
+			err = firewall.Engine(`6`).Insert(m.Position, &rule)
+			if err != nil {
+				goto END
+			}
+		} else {
+			err = firewall.Engine(rule.IPVersion).Insert(m.Position, &rule)
+			if err != nil {
+				goto END
+			}
 		}
 		return ctx.Redirect(handler.URLFor(`/firewall/rule/static`))
 	} else {
@@ -92,15 +102,26 @@ func ruleStaticEdit(ctx echo.Context) error {
 		if err != nil {
 			goto END
 		}
+		m.Id = id
 		err = m.Edit(nil, `id`, id)
 		if err != nil {
 			goto END
 		}
 		rule := m.AsRule()
-		var ipv = `4`
-		err = firewall.Engine(ipv).Update(m.Position, &rule)
-		if err != nil {
-			goto END
+		if rule.IPVersion == `all` {
+			err = firewall.Engine(`4`).Update(m.Position, &rule)
+			if err != nil {
+				goto END
+			}
+			err = firewall.Engine(`6`).Update(m.Position, &rule)
+			if err != nil {
+				goto END
+			}
+		} else {
+			err = firewall.Engine(rule.IPVersion).Update(m.Position, &rule)
+			if err != nil {
+				goto END
+			}
 		}
 		return ctx.Redirect(handler.URLFor(`/firewall/rule/static`))
 	}
