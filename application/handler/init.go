@@ -12,14 +12,20 @@ func RegisterRoute(r *route.Collection) {
 }
 
 func registerRoute(g echo.RouteRegister) {
-	g.Route(`GET,POST`, `/rule/static`, ruleStaticIndex)
-	g.Route(`GET,POST`, `/rule/static_add`, ruleStaticAdd)
-	g.Route(`GET,POST`, `/rule/static_edit`, ruleStaticEdit)
-	g.Route(`GET,POST`, `/rule/static_delete`, ruleStaticDelete)
-	g.Route(`GET,POST`, `/rule/dynamic`, ruleDynamicIndex)
-	g.Route(`GET,POST`, `/rule/dynamic_add`, ruleDynamicAdd)
-	g.Route(`GET,POST`, `/rule/dynamic_edit`, ruleDynamicEdit)
-	g.Route(`GET,POST`, `/rule/dynamic_delete`, ruleDynamicDelete)
+	ruleG := g.Group(`/rule`)
+	ruleG.Route(`GET,POST`, `/static`, ruleStaticIndex)
+	ruleG.Route(`GET,POST`, `/static_add`, ruleStaticAdd)
+	ruleG.Route(`GET,POST`, `/static_edit`, ruleStaticEdit)
+	ruleG.Route(`GET,POST`, `/static_delete`, ruleStaticDelete)
+	ruleG.Route(`GET,POST`, `/dynamic`, ruleDynamicIndex)
+	ruleG.Route(`GET,POST`, `/dynamic_add`, ruleDynamicAdd)
+	ruleG.Route(`GET,POST`, `/dynamic_edit`, ruleDynamicEdit)
+	ruleG.Route(`GET,POST`, `/dynamic_delete`, ruleDynamicDelete)
+
+	serviceG := g.Group(`/service`)
+	serviceG.Route(`GET,POST`, `/restart`, Restart)
+	serviceG.Route(`GET,POST`, `/stop`, Stop)
+	serviceG.Route(`GET,POST`, `/log`, Log)
 }
 
 func init() {

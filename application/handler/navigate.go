@@ -48,5 +48,23 @@ var LeftNavigate = &navigate.Item{
 			Name:    `删除动态规则`,
 			Action:  `rule/dynamic_delete`,
 		},
+		{
+			Display: false,
+			Name:    `重启服务`,
+			Action:  `service/restart`,
+			Icon:    ``,
+		},
+		{
+			Display: false,
+			Name:    `关闭服务`,
+			Action:  `service/stop`,
+			Icon:    ``,
+		},
+		{
+			Display: false,
+			Name:    `查看动态`,
+			Action:  `service/log`,
+			Icon:    ``,
+		},
 	},
 }

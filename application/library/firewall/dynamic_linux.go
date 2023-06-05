@@ -8,7 +8,7 @@ import (
 
 var DynamicRuleBackends = echo.NewKVData().
 	Add(`ipset`, `ipset`).
-	Add(`nft`, `nft`)
+	Add(`nft`, `nftables`)
 
 var dynamicRuleSourceFormElements = map[string]echo.KVList{
 	`file`: {

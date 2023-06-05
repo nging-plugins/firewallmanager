@@ -13,6 +13,7 @@ require (
 	github.com/admpub/once v0.0.1
 	github.com/admpub/packer v0.0.2
 	github.com/admpub/pp v0.0.7
+	github.com/nging-plugins/servermanager v1.3.5
 	github.com/webx-top/com v0.9.4
 	github.com/webx-top/db v1.23.17
 	github.com/webx-top/echo v2.35.3+incompatible
@@ -28,6 +29,7 @@ require (
 	github.com/admpub/checksum v1.1.0 // indirect
 	github.com/admpub/color v1.8.1 // indirect
 	github.com/admpub/confl v0.2.2 // indirect
+	github.com/admpub/conpty v0.2.0 // indirect
 	github.com/admpub/copier v0.1.1 // indirect
 	github.com/admpub/cron v0.0.1 // indirect
 	github.com/admpub/decimal v1.3.1 // indirect
@@ -44,9 +46,13 @@ require (
 	github.com/admpub/go-isatty v0.0.11 // indirect
 	github.com/admpub/go-password v0.1.3 // indirect
 	github.com/admpub/go-pretty/v6 v6.0.4 // indirect
+	github.com/admpub/go-ps v0.0.1 // indirect
 	github.com/admpub/go-reuseport v0.0.4 // indirect
+	github.com/admpub/go-sshclient v0.0.1 // indirect
 	github.com/admpub/go-utility v0.0.1 // indirect
 	github.com/admpub/godotenv v1.4.3 // indirect
+	github.com/admpub/goforever v0.1.1 // indirect
+	github.com/admpub/gopty v0.1.2 // indirect
 	github.com/admpub/httpscerts v0.0.0-20180907121630-a2990e2af45c // indirect
 	github.com/admpub/humanize v0.0.0-20190501023926-5f826e92c8ca // indirect
 	github.com/admpub/i18n v0.2.1 // indirect
@@ -70,6 +76,7 @@ require (
 	github.com/admpub/securecookie v1.1.2 // indirect
 	github.com/admpub/service v0.0.5 // indirect
 	github.com/admpub/sessions v0.1.3 // indirect
+	github.com/admpub/sockjs-go/v3 v3.0.1 // indirect
 	github.com/admpub/sonyflake v0.0.1 // indirect
 	github.com/admpub/tail v1.1.0 // indirect
 	github.com/admpub/timeago v1.2.1 // indirect
@@ -83,6 +90,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/coscms/forms v1.12.1 // indirect
 	github.com/coscms/go-imgparse v0.0.0-20150925144422-3e3a099f7856 // indirect
+	github.com/creack/pty v1.1.18 // indirect
 	github.com/disintegration/imaging v1.6.2 // indirect
 	github.com/dsoprea/go-logging v0.0.0-20200710184922-b02d349568dd // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
@@ -105,9 +113,11 @@ require (
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/gorilla/css v1.0.0 // indirect
+	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79 // indirect
 	github.com/h2non/filetype v1.1.3 // indirect
 	github.com/hashicorp/go-version v1.6.0 // indirect
+	github.com/iamacarpet/go-winpty v1.0.4 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
@@ -132,6 +142,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/muesli/smartcrop v0.3.0 // indirect
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 // indirect
+	github.com/nging-plugins/sshmanager v1.3.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/power-devops/perfstat v0.0.0-20221212215047-62379fc7944b // indirect
 	github.com/prometheus/client_golang v1.15.1 // indirect

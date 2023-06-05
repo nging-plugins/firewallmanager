@@ -102,7 +102,9 @@ func (c *firewallCmd) boot() error {
 			gerberosCfg.Backend = backends[0].K
 		}
 	}
-
+	if gerberosCfg.Backend == `nftables` {
+		gerberosCfg.Backend = `nft`
+	}
 	ctx := defaults.NewMockContext()
 	ruleM := model.NewRuleDynamic(ctx)
 	_, err = ruleM.ListByOffset(nil, nil, 0, -1, `disabled`, `N`)

@@ -49,6 +49,9 @@ import (
 
 	// module
 	"github.com/nging-plugins/firewallmanager"
+	"github.com/nging-plugins/servermanager"
+
+	_ "github.com/nging-plugins/firewallmanager/application/registry/servermanager"
 )
 
 var (
@@ -91,5 +94,6 @@ func initModule() {
 	nginginfo.SetNgingPluginsDir(buildinfo.NgingPluginsDir())
 	module.Register(
 		&firewallmanager.Module,
+		&servermanager.Module,
 	)
 }
