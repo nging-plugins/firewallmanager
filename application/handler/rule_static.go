@@ -24,6 +24,7 @@ import (
 
 	"github.com/admpub/nging/v5/application/handler"
 	"github.com/admpub/nging/v5/application/library/common"
+	"github.com/admpub/nging/v5/application/library/errorslice"
 	"github.com/nging-plugins/firewallmanager/application/library/firewall"
 	"github.com/nging-plugins/firewallmanager/application/model"
 )
@@ -148,6 +149,40 @@ func ruleStaticDelete(ctx echo.Context) error {
 	}
 	if err == nil {
 		handler.SendOk(ctx, ctx.T(`删除成功`))
+	} else {
+		handler.SendErr(ctx, err)
+	}
+	return ctx.Redirect(handler.URLFor(`/firewall/rule/static`))
+}
+
+func ruleStaticApply(ctx echo.Context) error {
+	errs := errorslice.New()
+	m := model.NewRuleStatic(ctx)
+	_, err := m.ListByOffset(nil, nil, 0, -1, `disabled`, `Y`)
+	if err == nil {
+		for _, row := range m.Objects() {
+			rule := m.AsRule(row)
+			err = firewall.Delete(&rule)
+			if err != nil {
+				errs.Add(err)
+			}
+		}
+	}
+	_, err = m.ListByOffset(nil, nil, 0, -1, `disabled`, `N`)
+	if err == nil {
+		for _, row := range m.Objects() {
+			rule := m.AsRule(row)
+			err = firewall.Insert(m.Position, &rule)
+			if err != nil {
+				errs.Add(err)
+			}
+		}
+	}
+	if err == nil {
+		err = errs.ToError()
+	}
+	if err == nil {
+		handler.SendOk(ctx, ctx.T(`规则应用成功`))
 	} else {
 		handler.SendErr(ctx, err)
 	}

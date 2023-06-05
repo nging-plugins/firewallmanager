@@ -17,6 +17,7 @@ func registerRoute(g echo.RouteRegister) {
 	ruleG.Route(`GET,POST`, `/static_add`, ruleStaticAdd)
 	ruleG.Route(`GET,POST`, `/static_edit`, ruleStaticEdit)
 	ruleG.Route(`GET,POST`, `/static_delete`, ruleStaticDelete)
+	ruleG.Route(`GET,POST`, `/static_apply`, ruleStaticApply)
 	ruleG.Route(`GET,POST`, `/dynamic`, ruleDynamicIndex)
 	ruleG.Route(`GET,POST`, `/dynamic_add`, ruleDynamicAdd)
 	ruleG.Route(`GET,POST`, `/dynamic_edit`, ruleDynamicEdit)

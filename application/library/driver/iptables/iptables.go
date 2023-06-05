@@ -94,13 +94,13 @@ func (a *IPTables) Export(wfwFile string) error {
 }
 
 func (a *IPTables) Insert(pos int, rule *driver.Rule) error {
-	if pos < 0 {
+	if pos <= 0 {
 		return a.Append(rule)
 	}
 	rulespec := a.RuleFrom(rule)
 	table := rule.Type
 	chain := rule.Direction
-	return a.IPTables.Insert(table, chain, pos, rulespec...)
+	return a.IPTables.InsertUnique(table, chain, pos, rulespec...)
 }
 
 func (a *IPTables) Append(rule *driver.Rule) error {
@@ -140,6 +140,15 @@ func (a *IPTables) List(table, chain string) ([]*driver.Rule, error) {
 	}
 	errs := errorslice.New()
 	var rules []*driver.Rule
+	var ipVersion string
+	switch a.IPProtocol {
+	case ProtocolIPv6:
+		ipVersion = `6`
+	case ProtocolIPv4:
+		fallthrough
+	default:
+		ipVersion = `4`
+	}
 	for _, row := range rows {
 		tr, err := parser.NewFromString(row)
 		if err != nil {
@@ -148,7 +157,7 @@ func (a *IPTables) List(table, chain string) ([]*driver.Rule, error) {
 			continue
 		}
 		//pp.Println(tr)
-		rule := &driver.Rule{Type: table, Direction: chain}
+		rule := &driver.Rule{Type: table, Direction: chain, IPVersion: ipVersion}
 		switch r := tr.(type) {
 		case parser.Rule:
 			log.Debugf("[iptables] rule parsed: %v", r)

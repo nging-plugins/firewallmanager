@@ -62,8 +62,11 @@ func (r *RuleStatic) ListPage(cond *db.Compounds, sorts ...interface{}) ([]*dbsc
 	return r.Objects(), nil
 }
 
-func (r *RuleStatic) AsRule() driver.Rule {
-	m := r
+func (r *RuleStatic) AsRule(row ...*dbschema.NgingFirewallRuleStatic) driver.Rule {
+	m := r.NgingFirewallRuleStatic
+	if len(row) > 0 && row[0] != nil {
+		m = row[0]
+	}
 	if len(m.IpVersion) > 0 {
 		m.IpVersion = `4`
 	}
