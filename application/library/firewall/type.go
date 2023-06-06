@@ -5,6 +5,8 @@ import (
 	"github.com/webx-top/echo"
 )
 
+var TablesChains = iptables.TablesChains
+
 var Types = echo.NewKVData().
 	Add(iptables.TableFilter, `Filter`).
 	Add(iptables.TableNAT, `NAT`).
@@ -14,6 +16,7 @@ var Types = echo.NewKVData().
 var Directions = echo.NewKVData().
 	Add(iptables.ChainInput, `入站`).
 	Add(iptables.ChainOutput, `出站`).
+	Add(iptables.ChainForward, `转发`).
 	Add(iptables.ChainPreRouting, `入站前`).
 	Add(iptables.ChainPostRouting, `出站后`)
 
@@ -39,4 +42,5 @@ func SetFormData(c echo.Context) {
 	c.Set(`ipProtocols`, IPProtocols.Slice())
 	c.Set(`netProtocols`, NetProtocols.Slice())
 	c.Set(`actions`, Actions.Slice())
+	c.Set(`tablesChains`, TablesChains)
 }

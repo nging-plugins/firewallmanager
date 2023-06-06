@@ -55,9 +55,9 @@ func ipTablesIndex(ctx echo.Context) error {
 		return err
 	}
 	ctx.Set(`listData`, rules)
-	ctx.Set(`tableList`, iptables.TableList)
+	ctx.Set(`tableList`, firewall.Types.Slice())
 	ctx.Set(`chainList`, chainList)
-	ctx.Set(`ipVerList`, firewall.IPVersions.Slice())
+	ctx.Set(`ipVerList`, firewall.IPProtocols.Slice())
 	// ctx.Set(`targetList`, iptables.TargetList)
 	// ctx.Set(`protocolList`, iptables.ProtocolList)
 	ctx.Set(`fieldList`, ipTablesFieldList)

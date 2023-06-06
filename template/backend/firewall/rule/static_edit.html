@@ -112,4 +112,16 @@
 {{/Block}}
 
 {{Block "footer"}}
+<script>
+var tablesChains={{$.Stored.tablesChains}};
+$(function(){
+$('#type').on('change',function(event){
+    var v=this.value;
+    $('#direction').children('option').prop('disabled',true);
+    for(var i in tablesChains[v]){
+        $('#direction').children('option[value="'+tablesChains[v][i]+'"]').prop('disabled',false);
+    }
+}).trigger('change');
+});
+</script>
 {{/Block}}
