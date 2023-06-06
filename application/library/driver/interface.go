@@ -11,5 +11,6 @@ type Driver interface {
 	Update(pos int, rule *Rule) error
 	Delete(rule *Rule) error
 	Exists(rule *Rule) (bool, error)
+	Stats(table, chain string) ([]map[string]string, error)
 	List(table, chain string) ([]*Rule, error)
 }

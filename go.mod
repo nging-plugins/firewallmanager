@@ -6,7 +6,7 @@ replace github.com/admpub/nging/v5 => ../../admpub/nging
 
 require (
 	github.com/admpub/gerberos v0.0.5
-	github.com/admpub/go-iptables v0.6.4
+	github.com/admpub/go-iptables v0.6.5
 	github.com/admpub/iptables_parser v0.0.0-20221113113329-b2e71be4ff5e
 	github.com/admpub/log v1.3.3
 	github.com/admpub/nging/v5 v5.0.1
@@ -105,7 +105,7 @@ require (
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-playground/validator/v10 v10.14.0 // indirect
+	github.com/go-playground/validator/v10 v10.14.1 // indirect
 	github.com/go-sql-driver/mysql v1.7.1 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/gofrs/uuid v4.4.0+incompatible // indirect

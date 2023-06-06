@@ -11,6 +11,8 @@ func RegisterRoute(r *route.Collection) {
 	r.Backend.RegisterToGroup(`/firewall`, registerRoute)
 }
 
+var routeRegisters route.Registers
+
 func registerRoute(g echo.RouteRegister) {
 	ruleG := g.Group(`/rule`)
 	ruleG.Route(`GET,POST`, `/static`, ruleStaticIndex)
@@ -27,6 +29,8 @@ func registerRoute(g echo.RouteRegister) {
 	serviceG.Route(`GET,POST`, `/restart`, Restart)
 	serviceG.Route(`GET,POST`, `/stop`, Stop)
 	serviceG.Route(`GET,POST`, `/log`, Log)
+
+	routeRegisters.Apply(g)
 }
 
 func init() {

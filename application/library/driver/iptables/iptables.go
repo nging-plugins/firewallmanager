@@ -86,11 +86,29 @@ func (a *IPTables) Reset() error {
 }
 
 func (a *IPTables) Import(wfwFile string) error {
-	return driver.RunCmd(`iptables-restore`, []string{`<`, wfwFile}, nil)
+	var restoreBin string
+	switch a.IPProtocol {
+	case ProtocolIPv6:
+		restoreBin = `ip6tables-restore`
+	case ProtocolIPv4:
+		fallthrough
+	default:
+		restoreBin = `iptables-restore`
+	}
+	return driver.RunCmd(restoreBin, []string{`<`, wfwFile}, nil)
 }
 
 func (a *IPTables) Export(wfwFile string) error {
-	return driver.RunCmd(`iptables-save`, []string{`>`, wfwFile}, nil)
+	var saveBin string
+	switch a.IPProtocol {
+	case ProtocolIPv6:
+		saveBin = `ip6tables-save`
+	case ProtocolIPv4:
+		fallthrough
+	default:
+		saveBin = `iptables-save`
+	}
+	return driver.RunCmd(saveBin, []string{`>`, wfwFile}, nil)
 }
 
 func (a *IPTables) Insert(pos int, rule *driver.Rule) error {
@@ -120,10 +138,15 @@ func (a *IPTables) Update(pos int, rule *driver.Rule) error {
 }
 
 func (a *IPTables) Delete(rule *driver.Rule) error {
-	rulespec := a.RuleFrom(rule)
+	var rulespec []string
+	if rule.Number > 0 {
+		rulespec = append(rulespec, strconv.FormatUint(rule.Number, 10))
+	} else {
+		rulespec = a.RuleFrom(rule)
+	}
 	table := rule.Type
 	chain := rule.Direction
-	return a.IPTables.DeleteIfExists(table, chain, rulespec...)
+	return a.IPTables.Delete(table, chain, rulespec...)
 }
 
 func (a *IPTables) Exists(rule *driver.Rule) (bool, error) {
@@ -131,6 +154,10 @@ func (a *IPTables) Exists(rule *driver.Rule) (bool, error) {
 	table := rule.Type
 	chain := rule.Direction
 	return a.IPTables.Exists(table, chain, rulespec...)
+}
+
+func (a *IPTables) Stats(table, chain string) ([]map[string]string, error) {
+	return a.IPTables.StatsWithLineNumber(table, chain)
 }
 
 func (a *IPTables) List(table, chain string) ([]*driver.Rule, error) {

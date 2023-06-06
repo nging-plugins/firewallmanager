@@ -1,0 +1,78 @@
+{{Extend "layout"}}
+{{Block "title"}}{{"IPTable管理"|$.T}}{{/Block}}
+{{Block "breadcrumb"}}
+{{Super}}
+<li class="active">{{"IPTable管理"|$.T}}</li>
+{{/Block}}
+{{Block "main"}}
+<div class="row">
+	<div class="col-md-12">
+		<div class="block-flat">
+			<div class="header">
+				<span class="pull-right">
+					<a href="{{BackendURL}}/firewall/iptables/add" class="btn btn-success">{{`添加规则`|$.T}}</a>
+				</span>
+				<h3>{{"IPTable管理"|$.T}}</h3>
+			</div>
+			<div class="content">
+                <div class="btn-group">
+                {{- range $k, $v := $.Stored.ipVerList -}}
+                <a href="{{BackendURL}}/firewall/iptables/index?ipVer={{$v.K}}" class="btn {{if eq $.Stored.ipVer $v.K}}btn-primary{{else}}btn-default{{end}}">{{$v.V}}</a>
+                {{- end -}}
+                </div>
+                <div class="btn-group">
+                {{- range $k, $table := $.Stored.tableList -}}
+                <a href="{{BackendURL}}/firewall/iptables/index?ipVer={{$.Stored.ipVer}}&table={{$table}}" class="btn {{if eq $.Stored.table $table}}btn-primary{{else}}btn-default{{end}}">{{$table}}</a>
+                {{- end -}}
+                </div>
+                <div class="btn-group">
+                {{- range $k, $chain := $.Stored.chainList -}}
+                <a href="{{BackendURL}}/firewall/iptables/index?ipVer={{$.Stored.ipVer}}&table={{$.Stored.table}}&chain={{$chain}}" class="btn {{if eq $.Stored.chain $chain}}btn-primary{{else}}btn-default{{end}}">{{$chain}}</a>
+                {{- end -}}
+                </div>
+				<div class="table-responsive">
+					<table class="table no-border hover">
+						<thead class="no-border">
+							<tr>
+								<th style="width:30px"><strong></strong></th>
+                                {{- range $k, $v := $.Stored.fieldList -}}
+								<th><strong>{{$v}}</strong></th>
+                                {{- end -}}
+							</tr>
+						</thead>
+						<tbody class="no-border-y">
+							{{- range $k, $v := $.Stored.listData -}}
+							<tr>
+								<td>
+									<div class="checkbox checkbox-success no-margin-y">
+										<input id="checkbox-{{$k}}" class="styled switch-disabled" type="checkbox" data-id="{{$v.num}}"{{if eq $v.Disabled "N"}} checked="checked"{{end}} value="N" /><label for="checkbox-{{$k}}">&nbsp;</label>
+									</div>
+								</td>
+
+                                {{- range $fk, $fv := $.Stored.fieldList -}}
+								<td><strong>{{index $v $fv}}</strong></td>
+                                {{- end -}}
+								<td class="label-group">
+									<a class="label label-default" href="{{BackendURL}}/firewall/iptables/add?copyId={{$v.num}}&ipVer={{$.Stored.ipVer}}&table={{$.Stored.table}}&chain={{$.Stored.chain}}" title="{{`复制`|$.T}}" data-toggle="tooltip"><i class="fa fa-copy"></i></a>
+									<a class="label label-success" href="{{BackendURL}}/firewall/iptables/edit?id={{$v.num}}&ipVer={{$.Stored.ipVer}}&table={{$.Stored.table}}&chain={{$.Stored.chain}}" title="{{`编辑`|$.T}}" data-toggle="tooltip"><i class="fa fa-pencil"></i></a>
+									<a class="label label-danger" href="{{BackendURL}}/firewall/iptables/delete?id={{$v.num}}&ipVer={{$.Stored.ipVer}}&table={{$.Stored.table}}&chain={{$.Stored.chain}}" onclick="return confirm('{{`真的要删除吗？`|$.T}}');" title="{{`删除`|$.T}}" data-toggle="tooltip"><i class="fa fa-times"></i></a>
+								</td>
+							</tr>
+							{{- end -}}
+						</tbody>
+					</table>
+				</div>
+				{{$.Stored.navigation.Render}}
+			</div>
+		</div>				
+	</div>
+</div>
+{{/Block}}
+
+{{Block "footer"}}
+<script>
+$(function(){
+	App.bindSwitch('input.switch-disabled','click','firewall/iptables/edit?ipVer={{$.Stored.ipVer}}&table={{$.Stored.table}}&chain={{$.Stored.chain}}');
+});
+</script>
+{{/Block}}

@@ -1,6 +1,7 @@
 package driver
 
 type Rule struct {
+	Number    uint64 `json:"num,omitempty" xml:"num,omitempty"`
 	Type      string `json:"type" xml:"type"` // filter / nat / etc.
 	Name      string `json:"name" xml:"name"`
 	Direction string `json:"direction" xml:"direction"` // INPUT / OUTPUT / etc.

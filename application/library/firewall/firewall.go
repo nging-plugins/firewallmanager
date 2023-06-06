@@ -1,6 +1,11 @@
 package firewall
 
-import "github.com/nging-plugins/firewallmanager/application/library/driver"
+import (
+	"github.com/nging-plugins/firewallmanager/application/library/driver"
+	"github.com/webx-top/echo"
+)
+
+var IPVersions = echo.NewKVData().Add(`4`, `IPv4`).Add(`6`, `IPv6`)
 
 func Insert(pos int, rule *driver.Rule) (err error) {
 	if rule.IPVersion == `all` {

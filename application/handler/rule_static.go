@@ -34,13 +34,6 @@ func ruleStaticIndex(ctx echo.Context) error {
 	cond := db.NewCompounds()
 	sorts := common.Sorts(ctx, m.NgingFirewallRuleStatic)
 	list, err := m.ListPage(cond, sorts...)
-	if ctx.Format() == echo.ContentTypeJSON {
-		rules, err := firewall.Engine(`4`).List(`filter`, `INPUT`)
-		if err != nil {
-			return err
-		}
-		ctx.Set(`rules`, rules)
-	}
 	ctx.Set(`listData`, list)
 	return ctx.Render(`firewall/rule/static`, common.Err(ctx, err))
 }

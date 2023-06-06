@@ -117,6 +117,11 @@ func (a *NetSH) Exists(rule *driver.Rule) (bool, error) {
 	return strings.Contains(stdout.String(), rule.Name), nil
 }
 
+func (a *NetSH) Stats(table, chain string) ([]map[string]string, error) {
+	//TODO
+	return nil, nil
+}
+
 func (a *NetSH) List(table, chain string) ([]*driver.Rule, error) {
 	// netsh advfirewall firewall show rule name=all dir=in type=dynamic status=enabled
 	// dir (direction) - in or out
@@ -125,6 +130,7 @@ func (a *NetSH) List(table, chain string) ([]*driver.Rule, error) {
 	rulespec = append(rulespec, `name=all`)
 	var stdout bytes.Buffer
 	err := a.run(rulespec, &stdout)
+	//TODO
 	return nil, err
 }
 

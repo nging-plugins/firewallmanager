@@ -17,6 +17,8 @@ const (
 	ProtocolAll  = `all`
 )
 
+var ProtocolList = []string{ProtocolAll, ProtocolTCP, ProtocolUDP, ProtocolICMP}
+
 const (
 	// 规则表之间的顺序
 	// raw → mangle → nat → filter
@@ -26,6 +28,15 @@ const (
 	TableMangle = `mangle` // 修改数据包的服务类型、TTL、并且可以配置路由实现QOS。五个链：PREROUTING、POSTROUTING、INPUT、OUTPUT、FORWARD
 	TableRaw    = `raw`    // 决定数据包是否被状态跟踪机制处理。两个链：OUTPUT、PREROUTING
 )
+
+var TableList = []string{TableFilter, TableNAT, TableMangle, TableRaw}
+
+var TablesChains = map[string][]string{
+	TableRaw:    {ChainOutput, ChainPreRouting},
+	TableMangle: {ChainPreRouting, ChainInput, ChainOutput, ChainForward, ChainPostRouting},
+	TableNAT:    {ChainPreRouting, ChainOutput, ChainPostRouting},
+	TableFilter: {ChainInput, ChainOutput, ChainForward},
+}
 
 const (
 	// 规则链之间的顺序
@@ -40,6 +51,8 @@ const (
 	ChainPostRouting = `POSTROUTING` // 对数据包作路由选择后应用此链中的规则（所有的数据包出来的时侯都先由这个链处理）
 )
 
+var ChainList = []string{ChainPreRouting, ChainInput, ChainOutput, ChainForward, ChainPostRouting}
+
 const (
 	// 防火墙处理数据包的四种方式
 	TargetAccept = `ACCEPT` // 允许数据包通过
@@ -47,3 +60,5 @@ const (
 	TargetReject = `REJECT` // 拒绝数据包通过，必要时会给数据发送端一个响应的信息
 	TargetLog    = `LOG`    // 在/var/log/messages文件中记录日志信息，然后将数据包传递给下一条规则
 )
+
+var TargetList = []string{TargetAccept, TargetDrop, TargetReject, TargetLog}

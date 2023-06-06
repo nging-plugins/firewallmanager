@@ -59,6 +59,10 @@ func (unsupportedDriver) Exists(rule *driver.Rule) (bool, error) {
 	return false, ErrUnsupportedOperatingSystem
 }
 
+func (unsupportedDriver) Stats(table, chain string) ([]map[string]string, error) {
+	return nil, nil
+}
+
 func (unsupportedDriver) List(table, chain string) ([]*driver.Rule, error) {
 	return nil, ErrUnsupportedOperatingSystem
 }
