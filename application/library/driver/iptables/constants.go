@@ -1,3 +1,21 @@
+/*
+   Nging is a toolbox for webmasters
+   Copyright (C) 2018-present  Wenhui Shen <swh@admpub.com>
+
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Affero General Public License as published
+   by the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU Affero General Public License for more details.
+
+   You should have received a copy of the GNU Affero General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 package iptables
 
 import (
@@ -54,11 +72,54 @@ const (
 var ChainList = []string{ChainPreRouting, ChainInput, ChainOutput, ChainForward, ChainPostRouting}
 
 const (
+	StateNew         = `NEW`         // 新连接
+	StateEstablished = `ESTABLISHED` // 后续对话连接
+	StateRelated     = `RELATED`     // 关联到其他连接的连接
+	StateInvalid     = `INVALID`     // 无效连接(没有任何状态)
+	StateUntracked   = `UNTRACKED`   // 无法找到相关的连接
+)
+
+var StateList = []string{StateNew, StateEstablished, StateRelated, StateInvalid, StateUntracked}
+
+const (
 	// 防火墙处理数据包的四种方式
 	TargetAccept = `ACCEPT` // 允许数据包通过
 	TargetDrop   = `DROP`   // 直接丢弃数据包，不给任何回应信息
 	TargetReject = `REJECT` // 拒绝数据包通过，必要时会给数据发送端一个响应的信息
-	TargetLog    = `LOG`    // 在/var/log/messages文件中记录日志信息，然后将数据包传递给下一条规则
+	TargetLog    = `LOG`    // 在 /var/log/messages 文件中记录日志信息，然后将数据包传递给下一条规则
 )
 
 var TargetList = []string{TargetAccept, TargetDrop, TargetReject, TargetLog}
+
+const (
+	RejectWithICMPPortUnreachable  = `icmp-port-unreachable` // default
+	RejectWithICMPNetUnreachable   = `icmp-net-unreachable`
+	RejectWithICMPHostUnreachable  = `icmp-host-unreachable`
+	RejectWithICMPProtoUnreachable = `icmp-proto-unreachable`
+	RejectWithICMPNetProhibited    = `icmp-net-prohibited`
+	RejectWithICMPHostProhibited   = `icmp-host-prohibited`
+	RejectWithICMPAdminProhibited  = `icmp-admin-prohibited`
+)
+
+var RejectWithList = []string{
+	RejectWithICMPPortUnreachable, RejectWithICMPNetUnreachable,
+	RejectWithICMPHostUnreachable, RejectWithICMPProtoUnreachable,
+	RejectWithICMPNetProhibited, RejectWithICMPHostProhibited,
+	RejectWithICMPAdminProhibited,
+}
+
+const (
+	TCPFlagALL = `ALL` // = SYN,ACK,FIN,RST,URG,PSH
+	TCPFlagSYN = `SYN`
+	TCPFlagACK = `ACK`
+	TCPFlagFIN = `FIN`
+	TCPFlagRST = `RST`
+	TCPFlagURG = `URG`
+	TCPFlagPSH = `PSH`
+)
+
+var (
+	DefaultTCPFlagsWithACK = []string{`ALL`, TCPFlagSYN + `,` + TCPFlagACK}
+	DefaultTCPFlags        = []string{`ALL`, TCPFlagSYN}
+	DefaultTCPFlagsSimple  = []string{`--syn`} // = DefaultTCPFlags
+)

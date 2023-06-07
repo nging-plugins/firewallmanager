@@ -16,10 +16,28 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-package config
+package model
 
-type Config struct {
-	Verbose      bool
-	Backend      string
-	SaveFilePath string
+import (
+	"github.com/nging-plugins/firewallmanager/application/dbschema"
+	"github.com/nging-plugins/firewallmanager/application/library/driver"
+)
+
+func AsRule(m *dbschema.NgingFirewallRuleStatic) driver.Rule {
+	if len(m.IpVersion) > 0 {
+		m.IpVersion = `4`
+	}
+	return driver.Rule{
+		Type:      m.Type,
+		Name:      m.Name,
+		Direction: m.Direction,
+		Action:    m.Action,
+		Protocol:  m.Protocol,
+
+		// IP or Port
+		RemoteIP:   m.RemoteIp,
+		LocalIP:    m.LocalIp,
+		RemotePort: m.RemotePort,
+		LocalPort:  m.LocalPort,
+	}
 }

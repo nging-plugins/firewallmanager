@@ -25,6 +25,7 @@ import (
 	"github.com/admpub/nging/v5/application/handler"
 	"github.com/admpub/nging/v5/application/library/common"
 	"github.com/admpub/nging/v5/application/library/errorslice"
+	"github.com/nging-plugins/firewallmanager/application/library/driver"
 	"github.com/nging-plugins/firewallmanager/application/library/firewall"
 	"github.com/nging-plugins/firewallmanager/application/model"
 )
@@ -51,7 +52,7 @@ func ruleStaticAdd(ctx echo.Context) error {
 			goto END
 		}
 		rule := m.AsRule()
-		err = firewall.Insert(m.Position, &rule)
+		err = firewall.Insert(0, &rule)
 		if err != nil {
 			goto END
 		}
@@ -81,6 +82,7 @@ func ruleStaticEdit(ctx echo.Context) error {
 		return err
 	}
 	if ctx.IsPost() {
+		old := *m.NgingFirewallRuleStatic
 		err = ctx.MustBind(m.NgingFirewallRuleStatic)
 		if err != nil {
 			goto END
@@ -90,8 +92,13 @@ func ruleStaticEdit(ctx echo.Context) error {
 		if err != nil {
 			goto END
 		}
+		oldRule := model.AsRule(&old)
+		err = firewall.Delete(&oldRule)
+		if err != nil {
+			goto END
+		}
 		rule := m.AsRule()
-		err = firewall.Update(m.Position, &rule)
+		err = firewall.Insert(0, &rule)
 		if err != nil {
 			goto END
 		}
@@ -110,7 +117,7 @@ func ruleStaticEdit(ctx echo.Context) error {
 			if m.Disabled == `Y` {
 				err = firewall.Delete(&rule)
 			} else {
-				err = firewall.Update(m.Position, &rule)
+				err = firewall.Update(0, &rule)
 			}
 			if err != nil {
 				data.SetError(err)
@@ -161,11 +168,38 @@ func ruleStaticApply(ctx echo.Context) error {
 			}
 		}
 	}
-	_, err = m.ListByOffset(nil, nil, 0, -1, `disabled`, `N`)
+	err = firewall.Insert(0, &driver.Rule{
+		Type:      `filter`,
+		Direction: `INPUT`,
+		LocalPort: `28181,53`,
+		Action:    `ACCEPT`,
+		Protocol:  `tcp`,
+	})
+	if err != nil {
+		return err
+	}
+	err = firewall.Insert(0, &driver.Rule{
+		Type:      `filter`,
+		Direction: `INPUT`,
+		LocalPort: `5001:5050`,
+		Action:    `ACCEPT`,
+		Protocol:  `tcp`,
+	})
+	if err != nil {
+		return err
+	}
+
+	// err = firewall.AsWhitelist(`all`, `filter`, `INPUT`)
+	// if err != nil {
+	// 	return err
+	// }
+	_, err = m.ListByOffset(nil, func(r db.Result) db.Result {
+		return r.OrderBy(`-position`, `-id`)
+	}, 0, -1, `disabled`, `N`)
 	if err == nil {
 		for _, row := range m.Objects() {
 			rule := m.AsRule(row)
-			err = firewall.Insert(m.Position, &rule)
+			err = firewall.Insert(0, &rule)
 			if err != nil {
 				errs.Add(err)
 			}

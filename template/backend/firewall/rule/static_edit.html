@@ -57,22 +57,46 @@
                         <label class="col-sm-2 control-label">{{"远程IP"|$.T}}</label>
                         <div class="col-sm-4">
                             <input type="text" name="remoteIp" id="remoteIp" class="form-control" value="{{$.Form `remoteIp`}}">
+                            <div class="help-block">{{`支持指定单个IP或者IP范围，例如“192.168.0.100-192.168.0.255”`|$.T}}</div>
                         </div>
                         <label class="col-sm-1 control-label">{{"远程端口"|$.T}}</label>
                         <div class="col-sm-4">
-                            <input type="text" name="remotePort" id="remotePort" class="form-control" value="{{$.Form `remotePort`}}">
+                            <input type="text" name="remotePort" id="remotePort" class="form-control" value="{{$.Form `remotePort`}}" pattern="^([0-9]+([:-][0-9]+)?|[0-9]+[:-]|[:-][0-9]+|[0-9]+(,[0-9]+)*)$">
+                            <div class="help-block">{{`支持指定单个端口或者端口范围，例如“10000-20000”或者“10000:20000”表示从端口10000到20000；或者指定端口列表，例如“10000,10001”。端口返回和端口列表不能同时存在。`|$.T}}</div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-2 control-label">{{"服务IP"|$.T}}</label>
                         <div class="col-sm-4">
                             <input type="text" name="localIp" id="localIp" class="form-control" value="{{$.Form `localIp`}}">
+                            <div class="help-block">{{`支持指定单个IP或者IP范围，例如“192.168.0.100-192.168.0.255”`|$.T}}</div>
                         </div>
                         <label class="col-sm-1 control-label">{{"服务端口"|$.T}}</label>
                         <div class="col-sm-4">
-                            <input type="text" name="localPort" id="localPort" class="form-control" value="{{$.Form `localPort`}}">
+                            <input type="text" name="localPort" id="localPort" class="form-control" value="{{$.Form `localPort`}}" pattern="^([0-9]+([:-][0-9]+)?|[0-9]+[:-]|[:-][0-9]+|[0-9]+(,[0-9]+)*)$">
+                            <div class="help-block">{{`支持指定单个端口或者端口范围，例如“10000-20000”或者“10000:20000”表示从端口10000到20000；或者指定端口列表，例如“10000,10001”。端口返回和端口列表不能同时存在。`|$.T}}</div>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">{{"入站网口"|$.T}}</label>
+                        <div class="col-sm-4">
+                            <input type="text" name="interface" id="interface" class="form-control" value="{{$.Form `interface`}}">
+                            <div class="help-block">{{`入站网口和出站网口同时只能设置一个`|$.T}}</div>
+                        </div>
+                        <label class="col-sm-1 control-label">{{"出站网口"|$.T}}</label>
+                        <div class="col-sm-4">
+                            <input type="text" name="outerface" id="outerface" class="form-control" value="{{$.Form `outerface`}}">
+                            <div class="help-block">{{`入站网口和出站网口同时只能设置一个`|$.T}}</div>
+                        </div>
+                    </div>
+                    <!-- <div class="form-group">
+                        <label class="col-sm-2 control-label">{{"连接状态"|$.T}}</label>
+                        <div class="col-sm-9">
+                            <div class="checkbox checkbox-primary checkbox-inline">
+                                <input type="checkbox" value="SYN" id="state-SYN" name="state[]" checked><label for="disabled-SYN">SYN</label>
+                            </div>
+                        </div>
+                    </div> -->
                     <div class="form-group">
                         <label class="col-sm-2 control-label">{{"操作"|$.T}}</label>
                         <div class="col-sm-4">{{$action := $.Form `action`}}

@@ -67,20 +67,5 @@ func (r *RuleStatic) AsRule(row ...*dbschema.NgingFirewallRuleStatic) driver.Rul
 	if len(row) > 0 && row[0] != nil {
 		m = row[0]
 	}
-	if len(m.IpVersion) > 0 {
-		m.IpVersion = `4`
-	}
-	return driver.Rule{
-		Type:      m.Type,
-		Name:      m.Name,
-		Direction: m.Direction,
-		Action:    m.Action,
-		Protocol:  m.Protocol,
-
-		// IP or Port
-		RemoteIP:   m.RemoteIp,
-		LocalIP:    m.LocalIp,
-		RemotePort: m.RemotePort,
-		LocalPort:  m.LocalPort,
-	}
+	return AsRule(m)
 }

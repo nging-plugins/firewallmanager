@@ -1,3 +1,21 @@
+/*
+   Nging is a toolbox for webmasters
+   Copyright (C) 2018-present  Wenhui Shen <swh@admpub.com>
+
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Affero General Public License as published
+   by the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU Affero General Public License for more details.
+
+   You should have received a copy of the GNU Affero General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 package iptables
 
 import (
@@ -49,9 +67,11 @@ func (a *IPTables) RuleFrom(rule *driver.Rule) []string {
 	args := []string{
 		`-p`, rule.Protocol,
 	}
-	// if len(rule.Interface) > 0 {
-	// 	args = append(args, `-i`, rule.Interface)
-	// }
+	if len(rule.Interface) > 0 {
+		args = append(args, `-i`, rule.Interface) // 只能用于 PREROUTING、INPUT、FORWARD
+	} else if len(rule.Outerface) > 0 {
+		args = append(args, `-o`, rule.Outerface) // 只能用于 FORWARD、OUTPUT、POSTROUTING
+	}
 	if len(rule.RemoteIP) > 0 {
 		if strings.Contains(rule.RemoteIP, `-`) {
 			args = append(args, `-m`, `iprange`)
@@ -65,13 +85,29 @@ func (a *IPTables) RuleFrom(rule *driver.Rule) []string {
 	if len(rule.RemotePort) > 0 {
 		if strings.Contains(rule.RemotePort, `,`) {
 			args = append(args, `-m`, `multiport`)
+			args = append(args, `--sports`, rule.RemotePort)
+		} else {
+			rule.RemotePort = strings.ReplaceAll(rule.RemotePort, `-`, `:`)
+			args = append(args, `--sport`, rule.RemotePort) // 支持用“:”指定端口范围，例如 “22:25” 指端口 22-25，或者 “:22” 指端口 0-22 或者 “22:” 指端口 22-65535
 		}
-		args = append(args, `--sport`, rule.RemotePort)
 	} else if len(rule.LocalPort) > 0 {
 		if strings.Contains(rule.LocalPort, `,`) {
 			args = append(args, `-m`, `multiport`)
+			args = append(args, `--dports`, rule.LocalPort)
+		} else {
+			rule.LocalPort = strings.ReplaceAll(rule.LocalPort, `-`, `:`)
+			args = append(args, `--dport`, rule.LocalPort)
 		}
-		args = append(args, `--dport`, rule.LocalPort)
+	}
+	if len(rule.State) > 0 {
+		args = append(args, `-m`, `state`)
+		args = append(args, `--state`)
+		states := strings.SplitN(rule.State, ` `, 2)
+		if len(states) != 2 {
+			args = append(args, TCPFlagALL, rule.State)
+		} else {
+			args = append(args, states...)
+		}
 	}
 	args = append(args, `-j`, rule.Action)
 	return args
@@ -113,7 +149,7 @@ func (a *IPTables) Export(wfwFile string) error {
 
 func (a *IPTables) Insert(pos int, rule *driver.Rule) error {
 	if pos <= 0 {
-		return a.Append(rule)
+		pos = 1
 	}
 	rulespec := a.RuleFrom(rule)
 	table := rule.Type
@@ -128,12 +164,21 @@ func (a *IPTables) Append(rule *driver.Rule) error {
 	return a.IPTables.AppendUnique(table, chain, rulespec...)
 }
 
+func (a *IPTables) AsWhitelist(table, chain string) error {
+	return a.IPTables.AppendUnique(table, chain, `-j`, TargetReject)
+}
+
 // Update update rulespec in specified table/chain
 func (a *IPTables) Update(pos int, rule *driver.Rule) error {
+	if pos <= 0 {
+		return driver.ErrInvalidRuleNumber
+	}
 	rulespec := a.RuleFrom(rule)
 	table := rule.Type
 	chain := rule.Direction
-	cmd := append([]string{"-t", table, "-R", chain, strconv.Itoa(pos)}, rulespec...)
+	args := []string{"-t", table, "-R", chain}
+	args = append(args, strconv.Itoa(pos))
+	cmd := append(args, rulespec...)
 	return a.IPTables.Run(cmd...)
 }
 
