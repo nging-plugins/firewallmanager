@@ -18,7 +18,7 @@
                     <div class="form-group">
                         <label class="col-sm-2 control-label">{{"类型"|$.T}}</label>
                         <div class="col-sm-4">{{$type := $.Form `type`}}
-                            <select name="type" id="type" class="form-control">
+                            <select name="type" id="type" class="form-control" required>
                                 {{- range $k, $v := $.Stored.types -}}
                                 <option value="{{$v.K}}"{{if eq $type $v.K}} selected{{end}}>{{$v.V}}</option>
                                 {{- end -}}
@@ -27,18 +27,19 @@
                         <label class="col-sm-1 control-label">{{"位置"|$.T}}</label>
                         <div class="col-sm-4">
                             <input type="number" name="position" id="position" class="form-control" value="{{$.Form `position`}}">
+                            <div class="help-block">{{`数字越小越靠前`|$.T}}</div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-2 control-label">{{"名称"|$.T}}</label>
                         <div class="col-sm-9">
-                            <input type="text" name="name" id="name" class="form-control" value="{{$.Form `name`}}">
+                            <input type="text" name="name" id="name" class="form-control" value="{{$.Form `name`}}" required>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-2 control-label">{{"方向"|$.T}}</label>
                         <div class="col-sm-4">{{$direction := $.Form `direction`}}
-                            <select name="direction" id="direction" class="form-control">
+                            <select name="direction" id="direction" class="form-control" required>
                                 {{- range $k, $v := $.Stored.directions -}}
                                 <option value="{{$v.K}}"{{if eq $direction $v.K}} selected{{end}}>{{$v.V}}</option>
                                 {{- end -}}
@@ -46,7 +47,7 @@
                         </div>
                         <label class="col-sm-1 control-label">{{"协议"|$.T}}</label>
                         <div class="col-sm-4">{{$protocol := $.Form `protocol`}}
-                            <select name="protocol" id="protocol" class="form-control">
+                            <select name="protocol" id="protocol" class="form-control" required>
                                 {{- range $k, $v := $.Stored.netProtocols -}}
                                 <option value="{{$v.K}}"{{if eq $protocol $v.K}} selected{{end}}>{{$v.V}}</option>
                                 {{- end -}}
@@ -62,7 +63,7 @@
                         <label class="col-sm-1 control-label">{{"远程端口"|$.T}}</label>
                         <div class="col-sm-4">
                             <input type="text" name="remotePort" id="remotePort" class="form-control" value="{{$.Form `remotePort`}}" pattern="^([0-9]+([:-][0-9]+)?|[0-9]+[:-]|[:-][0-9]+|[0-9]+(,[0-9]+)*)$">
-                            <div class="help-block">{{`支持指定单个端口或者端口范围，例如“10000-20000”或者“10000:20000”表示从端口10000到20000；或者指定端口列表，例如“10000,10001”。端口返回和端口列表不能同时存在。`|$.T}}</div>
+                            <div class="help-block">{{`支持指定单个端口或者端口范围，例如“10000-20000”或者“10000:20000”表示从端口10000到20000；或者指定端口列表，例如“10000,10001”。端口范围和端口列表不能同时存在。`|$.T}}</div>
                         </div>
                     </div>
                     <div class="form-group">
@@ -74,7 +75,7 @@
                         <label class="col-sm-1 control-label">{{"服务端口"|$.T}}</label>
                         <div class="col-sm-4">
                             <input type="text" name="localPort" id="localPort" class="form-control" value="{{$.Form `localPort`}}" pattern="^([0-9]+([:-][0-9]+)?|[0-9]+[:-]|[:-][0-9]+|[0-9]+(,[0-9]+)*)$">
-                            <div class="help-block">{{`支持指定单个端口或者端口范围，例如“10000-20000”或者“10000:20000”表示从端口10000到20000；或者指定端口列表，例如“10000,10001”。端口返回和端口列表不能同时存在。`|$.T}}</div>
+                            <div class="help-block">{{`支持指定单个端口或者端口范围，例如“10000-20000”或者“10000:20000”表示从端口10000到20000；或者指定端口列表，例如“10000,10001”。端口范围和端口列表不能同时存在。`|$.T}}</div>
                         </div>
                     </div>
                     <div class="form-group">
@@ -100,7 +101,7 @@
                     <div class="form-group">
                         <label class="col-sm-2 control-label">{{"操作"|$.T}}</label>
                         <div class="col-sm-4">{{$action := $.Form `action`}}
-                            <select name="action" id="action" class="form-control">
+                            <select name="action" id="action" class="form-control" required>
                                 {{- range $k, $v := $.Stored.actions -}}
                                 <option value="{{$v.K}}"{{if eq $action $v.K}} selected{{end}}>{{$v.V}}</option>
                                 {{- end -}}
