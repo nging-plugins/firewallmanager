@@ -25,7 +25,6 @@ import (
 	"github.com/admpub/nging/v5/application/handler"
 	"github.com/admpub/nging/v5/application/library/common"
 	"github.com/admpub/nging/v5/application/library/errorslice"
-	"github.com/nging-plugins/firewallmanager/application/library/driver"
 	"github.com/nging-plugins/firewallmanager/application/library/firewall"
 	"github.com/nging-plugins/firewallmanager/application/model"
 )
@@ -168,26 +167,26 @@ func ruleStaticApply(ctx echo.Context) error {
 			}
 		}
 	}
-	err = firewall.Insert(0, &driver.Rule{
-		Type:      `filter`,
-		Direction: `INPUT`,
-		LocalPort: `28181,53`,
-		Action:    `ACCEPT`,
-		Protocol:  `tcp`,
-	})
-	if err != nil {
-		return err
-	}
-	err = firewall.Insert(0, &driver.Rule{
-		Type:      `filter`,
-		Direction: `INPUT`,
-		LocalPort: `5001:5050`,
-		Action:    `ACCEPT`,
-		Protocol:  `tcp`,
-	})
-	if err != nil {
-		return err
-	}
+	// err = firewall.Insert(0, &driver.Rule{
+	// 	Type:      `filter`,
+	// 	Direction: `INPUT`,
+	// 	LocalPort: `28181`,
+	// 	Action:    `ACCEPT`,
+	// 	Protocol:  `tcp`,
+	// })
+	// if err != nil {
+	// 	return err
+	// }
+	// err = firewall.Insert(0, &driver.Rule{
+	// 	Type:      `filter`,
+	// 	Direction: `INPUT`,
+	// 	LocalPort: `5001:5050`,
+	// 	Action:    `ACCEPT`,
+	// 	Protocol:  `tcp`,
+	// })
+	// if err != nil {
+	// 	return err
+	// }
 
 	// err = firewall.AsWhitelist(`all`, `filter`, `INPUT`)
 	// if err != nil {
