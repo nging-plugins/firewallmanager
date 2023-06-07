@@ -45,6 +45,9 @@ import (
 
 const Name = `firewall`
 const DefaultPidFile = `firewall.pid`
+const DefaultChainName = `NgingDynamic`
+const DefaultTable4Name = `NgingIPv4`
+const DefaultTable6Name = `NgingIPv6`
 
 func init() {
 	cmder.Register(Name, New())
@@ -52,9 +55,9 @@ func init() {
 	extend.Register(Name, func() interface{} {
 		return &firewallConfig.Config{}
 	})
-	gerberos.DefaultChainName = `NgingDynamic`
-	gerberos.DefaultTable4Name = `NgingIPv4`
-	gerberos.DefaultTable6Name = `NgingIPv6`
+	gerberos.DefaultChainName = DefaultChainName
+	gerberos.DefaultTable4Name = DefaultTable4Name
+	gerberos.DefaultTable6Name = DefaultTable6Name
 }
 
 func Initer() interface{} {

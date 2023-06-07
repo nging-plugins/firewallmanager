@@ -21,14 +21,16 @@
 package handler
 
 import (
+	"github.com/webx-top/com"
+	"github.com/webx-top/echo"
+	
 	"github.com/admpub/nging/v5/application/handler"
 	"github.com/admpub/nging/v5/application/library/common"
 	"github.com/admpub/nging/v5/application/registry/navigate"
+	"github.com/nging-plugins/firewallmanager/application/library/cmder"
 	"github.com/nging-plugins/firewallmanager/application/library/driver"
 	"github.com/nging-plugins/firewallmanager/application/library/driver/iptables"
 	"github.com/nging-plugins/firewallmanager/application/library/firewall"
-	"github.com/webx-top/com"
-	"github.com/webx-top/echo"
 )
 
 func init() {
@@ -41,6 +43,10 @@ func init() {
 		Display: true,
 		Name:    `IPTables`,
 		Action:  `iptables/index`,
+	}, &navigate.Item{
+		Display: false,
+		Name:    `删除IPTables规则`,
+		Action:  `iptables/delete`,
 	})
 }
 
@@ -82,7 +88,12 @@ func ipTablesIndex(ctx echo.Context) error {
 	ctx.Set(`table`, table)
 	ctx.Set(`chain`, chain)
 	ctx.Set(`ipVer`, ipVer)
+	ctx.SetFunc(`canDelete`, ipTablesCanDelete)
 	return ctx.Render(`firewall/iptables/index`, common.Err(ctx, err))
+}
+
+func ipTablesCanDelete(target string) bool {
+	return target != cmder.DefaultChainName
 }
 
 func ipTablesDelete(ctx echo.Context) error {
