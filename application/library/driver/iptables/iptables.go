@@ -80,7 +80,12 @@ func (a *IPTables) RuleFrom(rule *driver.Rule) []string {
 			args = append(args, `-s`, rule.RemoteIP)
 		}
 	} else if len(rule.LocalIP) > 0 {
-		args = append(args, `-d`, rule.LocalIP)
+		if strings.Contains(rule.LocalIP, `-`) {
+			args = append(args, `-m`, `iprange`)
+			args = append(args, `--dst-range`, rule.LocalIP)
+		} else {
+			args = append(args, `-d`, rule.LocalIP)
+		}
 	}
 	if len(rule.RemotePort) > 0 {
 		if strings.Contains(rule.RemotePort, `,`) {

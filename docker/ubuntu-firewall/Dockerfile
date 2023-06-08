@@ -1,14 +1,17 @@
 FROM ubuntu:latest
 ARG GO_VERSION
+ARG FIREWALL
 
-ENV GO_VERSION ${GO_VERSION:-1.20.4}
+ENV GO_VERSION ${GO_VERSION:-1.20.5}
+ENV FIREWALL ${FIREWALL:-iptables}
 ENV GO_INSTALL_FILE go${GO_VERSION}.linux-amd64.tar.gz
 ENV PATH "$PATH:/root/go/bin"
 ENV GOPATH "/root/go"
 
-RUN apt update && apt upgrade -y
+RUN apt update 
+#RUN apt upgrade -y
 RUN apt install wget gcc -y
-RUN apt install iptables ipset -y
+RUN if [ "$FIREWALL" = "nftables" ]; then apt install nftables -y; else apt install iptables ipset -y; fi
 
 #RUN wget -c https://studygolang.com/dl/golang/${GO_INSTALL_FILE}
 RUN wget -c https://golang.google.cn/dl/${GO_INSTALL_FILE}
@@ -30,3 +33,4 @@ ENTRYPOINT ["/root/go/bin/tower"]
 # CMD ["env"]
 
 # docker build . -t "test-ubuntu-firewall"
+# docker build . -t "test-ubuntu-firewall-nftables" --build-arg FIREWALL=nftables
