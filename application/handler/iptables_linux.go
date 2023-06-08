@@ -23,9 +23,10 @@ package handler
 import (
 	"github.com/webx-top/com"
 	"github.com/webx-top/echo"
-	
+
 	"github.com/admpub/nging/v5/application/handler"
 	"github.com/admpub/nging/v5/application/library/common"
+	"github.com/admpub/nging/v5/application/library/config"
 	"github.com/admpub/nging/v5/application/registry/navigate"
 	"github.com/nging-plugins/firewallmanager/application/library/cmder"
 	"github.com/nging-plugins/firewallmanager/application/library/driver"
@@ -89,6 +90,11 @@ func ipTablesIndex(ctx echo.Context) error {
 	ctx.Set(`chain`, chain)
 	ctx.Set(`ipVer`, ipVer)
 	ctx.SetFunc(`canDelete`, ipTablesCanDelete)
+	ctx.SetFunc(`genURLQuery`, func(m interface{}) string {
+		b, _ := json.Marshal(m)
+		crypted := config.FromFile().Encode(b)
+		return com.URLSafeBase64(crypted, true)
+	})
 	return ctx.Render(`firewall/iptables/index`, common.Err(ctx, err))
 }
 
@@ -99,10 +105,41 @@ func ipTablesCanDelete(target string) bool {
 func ipTablesDelete(ctx echo.Context) error {
 	id := ctx.Formx(`id`).Uint64()
 	ipVer, table, chain, _ := ipTablesGetTableAndChain(ctx)
-	err := firewall.Engine(ipVer).Delete(&driver.Rule{
-		Number:    id,
+	idt := ctx.Form(`idt`)
+	if len(idt) == 0 {
+		return ctx.NewError(code.InvalidParameter, `参数无效`).SetZone(`idt`)
+	}
+	idt = com.URLSafeBase64(idt, false)
+	idt = config.FromFile().Decode(idt)
+	if len(idt) == 0 {
+		return ctx.NewError(code.InvalidParameter, `参数无效，解密失败`).SetZone(`idt`)
+	}
+	data := map[string]string{}
+	err := json.Unmarshal([]byte(idt), &data)
+	if err != nil {
+		return ctx.NewError(code.InvalidParameter, `参数无效，解析失败`).SetZone(`idt`)
+	}
+	//`num`, `pkts`, `bytes`, `target`, `prot`, `opt`, `in`, `out`, `source`, `destination`, `options`
+	err = firewall.Engine(ipVer).Delete(&driver.Rule{
+		//Number:    id,
 		Type:      table,
 		Direction: chain,
+		Action:    data[`target`],
+		Protocol:  data[`prot`],
+
+		// interface 网口
+		Interface: data[`in`],
+		Outerface: data[`out`],
+
+		// state
+		// Stat:``,
+
+		// IP or Port
+		RemoteIP:   data[`source`],
+		LocalIP:    data[`destination`],
+		RemotePort: ``,
+		LocalPort:  ``,
+		IPVersion:  ipVer,
 	})
 	if err == nil {
 		handler.SendOk(ctx, ctx.T(`删除成功`))
