@@ -259,7 +259,12 @@ func (a *NFTables) List(tableName, chainName string) ([]*driver.Rule, error) {
 		ipVersion = `6`
 	}
 	for _, row := range rows {
-		rule := &driver.Rule{Type: tableName, Direction: chainName, IPVersion: ipVersion, Number: row.Position}
+		rule := &driver.Rule{
+			Type:      tableName,
+			Direction: chainName,
+			IPVersion: ipVersion,
+			Number:    row.Position,
+		}
 		rules = append(rules, rule)
 	}
 	return rules, errs.ToError()
