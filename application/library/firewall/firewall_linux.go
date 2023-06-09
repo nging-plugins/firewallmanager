@@ -34,7 +34,7 @@ var engonceIPv6 sync.Once
 
 func initEngineIPv4() {
 	var err error
-	engineIPv4, err = iptables.New(iptables.ProtocolIPv4)
+	engineIPv4, err = iptables.New(iptables.ProtocolIPv4, false)
 	if err != nil {
 		panic(err)
 	}
@@ -47,7 +47,7 @@ func EngineIPv4() driver.Driver {
 
 func initEngineIPv6() {
 	var err error
-	engineIPv6, err = iptables.New(iptables.ProtocolIPv6)
+	engineIPv6, err = iptables.New(iptables.ProtocolIPv6, false)
 	if err != nil {
 		panic(err)
 	}

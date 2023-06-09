@@ -35,15 +35,16 @@ import (
 
 var _ driver.Driver = (*IPTables)(nil)
 
-func New(proto iptables.Protocol) (*IPTables, error) {
+func New(proto iptables.Protocol, autoInstall bool) (*IPTables, error) {
 	t := &IPTables{
 		IPProtocol: proto,
 	}
 	var err error
 	t.IPTables, err = iptables.New(iptables.IPFamily(t.IPProtocol))
-	if err != nil {
-		if errors.Is(err, exec.ErrNotFound) {
-			err = packer.Install(`iptables`)
+	if err != nil && autoInstall && errors.Is(err, exec.ErrNotFound) {
+		err = packer.Install(`iptables`)
+		if err == nil {
+			t.IPTables, err = iptables.New(iptables.IPFamily(t.IPProtocol))
 		}
 	}
 	return t, err
@@ -67,19 +68,19 @@ func (a *IPTables) RuleFrom(rule *driver.Rule) []string {
 	args := []string{
 		`-p`, rule.Protocol,
 	}
-	if len(rule.Interface) > 0 {
+	if len(rule.Interface) > 0 && rule.Interface != `*` {
 		args = append(args, `-i`, rule.Interface) // 只能用于 PREROUTING、INPUT、FORWARD
-	} else if len(rule.Outerface) > 0 {
+	} else if len(rule.Outerface) > 0 && rule.Outerface != `*` {
 		args = append(args, `-o`, rule.Outerface) // 只能用于 FORWARD、OUTPUT、POSTROUTING
 	}
-	if len(rule.RemoteIP) > 0 {
+	if len(rule.RemoteIP) > 0 && rule.RemoteIP != `0.0.0.0/0` {
 		if strings.Contains(rule.RemoteIP, `-`) {
 			args = append(args, `-m`, `iprange`)
 			args = append(args, `--src-range`, rule.RemoteIP)
 		} else {
 			args = append(args, `-s`, rule.RemoteIP)
 		}
-	} else if len(rule.LocalIP) > 0 {
+	} else if len(rule.LocalIP) > 0 && rule.LocalIP != `0.0.0.0/0` {
 		if strings.Contains(rule.LocalIP, `-`) {
 			args = append(args, `-m`, `iprange`)
 			args = append(args, `--dst-range`, rule.LocalIP)

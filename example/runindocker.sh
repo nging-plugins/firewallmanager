@@ -1,6 +1,6 @@
 image="test-ubuntu-firewall"
 if [ "$1" != "" ]; then
-    image="$1"
+    image="test-ubuntu-firewall-$1" # test-ubuntu-firewall-nftables
 fi
 docker run --rm -it\
  --workdir /root/go/src/github.com/nging-plugins/firewallmanager/example\

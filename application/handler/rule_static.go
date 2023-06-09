@@ -19,6 +19,8 @@
 package handler
 
 import (
+	"time"
+
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
 
@@ -55,6 +57,7 @@ func ruleStaticAdd(ctx echo.Context) error {
 		if err != nil {
 			goto END
 		}
+		setStaticRuleLastModifyTime(time.Now())
 		return ctx.Redirect(handler.URLFor(`/firewall/rule/static`))
 	} else {
 		id := ctx.Formx(`copyId`).Uint()
@@ -96,6 +99,7 @@ func ruleStaticEdit(ctx echo.Context) error {
 		if err != nil {
 			goto END
 		}
+		setStaticRuleLastModifyTime(time.Now())
 		rule := m.AsRule()
 		err = firewall.Insert(0, &rule)
 		if err != nil {
@@ -147,6 +151,7 @@ func ruleStaticDelete(ctx echo.Context) error {
 		}
 	}
 	if err == nil {
+		setStaticRuleLastModifyTime(time.Now())
 		handler.SendOk(ctx, ctx.T(`删除成功`))
 	} else {
 		handler.SendErr(ctx, err)
@@ -201,6 +206,8 @@ func ruleStaticApply(ctx echo.Context) error {
 			err = firewall.Insert(0, &rule)
 			if err != nil {
 				errs.Add(err)
+			} else {
+				setStaticRuleLastModifyTime(time.Now())
 			}
 		}
 	}

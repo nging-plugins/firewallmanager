@@ -15,6 +15,7 @@ require (
 	github.com/admpub/pp v0.0.7
 	github.com/google/nftables v0.1.0
 	github.com/nging-plugins/servermanager v1.3.5
+	github.com/stretchr/testify v1.8.3
 	github.com/webx-top/com v0.9.4
 	github.com/webx-top/db v1.23.17
 	github.com/webx-top/echo v2.35.3+incompatible
@@ -92,6 +93,7 @@ require (
 	github.com/coscms/forms v1.12.1 // indirect
 	github.com/coscms/go-imgparse v0.0.0-20150925144422-3e3a099f7856 // indirect
 	github.com/creack/pty v1.1.18 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/disintegration/imaging v1.6.2 // indirect
 	github.com/dsoprea/go-logging v0.0.0-20200710184922-b02d349568dd // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
@@ -149,6 +151,7 @@ require (
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 // indirect
 	github.com/nging-plugins/sshmanager v1.3.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/power-devops/perfstat v0.0.0-20221212215047-62379fc7944b // indirect
 	github.com/prometheus/client_golang v1.15.1 // indirect
 	github.com/prometheus/client_model v0.4.0 // indirect
@@ -193,6 +196,7 @@ require (
 	google.golang.org/protobuf v1.30.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 	honnef.co/go/tools v0.2.2 // indirect
 	rsc.io/qr v0.2.0 // indirect
 )

@@ -56,7 +56,7 @@
                                 {{- end -}}
 								<td class="label-group text-center">
 									{{- if call $.Func.canDelete $v.target -}}
-									<a class="label label-danger" href="{{BackendURL}}/firewall/iptables/delete?id={{$v.num}}&ipVer={{$.Stored.ipVer}}&table={{$.Stored.table}}&chain={{$.Stored.chain}}&idt={{call $.Func.genURLQuery $v}}" onclick="return confirm('{{`真的要删除吗？`|$.T}}');" title="{{`删除`|$.T}}" data-toggle="tooltip"><i class="fa fa-times"></i></a>
+									<a class="label label-danger" href="{{BackendURL}}/firewall/iptables/delete?id={{$v.num}}&ipVer={{$.Stored.ipVer}}&table={{$.Stored.table}}&chain={{$.Stored.chain}}&ts={{$.Stored.lastModidyTs}}" onclick="return confirm('{{`真的要删除吗？`|$.T}}');" title="{{`删除`|$.T}}" data-toggle="tooltip"><i class="fa fa-times"></i></a>
 									{{- else -}}
 									{{`不可操作`|$.T}}
 									{{- end -}}

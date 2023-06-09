@@ -19,6 +19,9 @@
 package handler
 
 import (
+	"sync/atomic"
+	"time"
+
 	"github.com/webx-top/echo"
 
 	"github.com/admpub/nging/v5/application/library/config/startup"
@@ -51,6 +54,15 @@ func registerRoute(g echo.RouteRegister) {
 	routeRegisters.Apply(g)
 }
 
+var staticRuleLastModifyTs uint64
+
+func setStaticRuleLastModifyTime(t time.Time) {
+	atomic.StoreUint64(&staticRuleLastModifyTs, uint64(t.Unix()))
+}
+
+func getStaticRuleLastModifyTs() uint64 {
+	return atomic.LoadUint64(&staticRuleLastModifyTs)
+}
 func init() {
 	startup.OnAfter(`web.installed`, func() {
 	})
