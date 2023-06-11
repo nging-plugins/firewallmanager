@@ -3,6 +3,7 @@ module github.com/nging-plugins/firewallmanager
 go 1.17
 
 replace github.com/admpub/nging/v5 => ../../admpub/nging
+replace github.com/admpub/nftablesutils => ../../admpub/nftablesutils
 
 require (
 	github.com/admpub/gerberos v0.0.6

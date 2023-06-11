@@ -21,6 +21,7 @@ package nftables
 import (
 	"strings"
 
+	"github.com/admpub/nftablesutils/biz"
 	"github.com/admpub/nging/v5/application/library/errorslice"
 	"github.com/google/nftables"
 	"github.com/google/nftables/expr"
@@ -31,6 +32,7 @@ import (
 var _ driver.Driver = (*NFTables)(nil)
 
 func New(proto nftables.TableFamily) (*NFTables, error) {
+	biz.Init
 	conn, err := nftables.New(nftables.AsLasting())
 	if err != nil {
 		return nil, err
