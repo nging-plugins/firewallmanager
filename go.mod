@@ -3,6 +3,7 @@ module github.com/nging-plugins/firewallmanager
 go 1.17
 
 replace github.com/admpub/nging/v5 => ../../admpub/nging
+
 replace github.com/admpub/nftablesutils => ../../admpub/nftablesutils
 
 require (
@@ -10,13 +11,14 @@ require (
 	github.com/admpub/go-iptables v0.6.5
 	github.com/admpub/iptables_parser v0.0.0-20221113113329-b2e71be4ff5e
 	github.com/admpub/log v1.3.3
+	github.com/admpub/nftablesutils v0.0.0-00010101000000-000000000000
 	github.com/admpub/nging/v5 v5.0.1
 	github.com/admpub/once v0.0.1
 	github.com/admpub/packer v0.0.2
 	github.com/admpub/pp v0.0.7
 	github.com/google/nftables v0.1.0
 	github.com/nging-plugins/servermanager v1.3.5
-	github.com/stretchr/testify v1.8.3
+	github.com/stretchr/testify v1.8.4
 	github.com/webx-top/com v0.9.4
 	github.com/webx-top/db v1.23.17
 	github.com/webx-top/echo v2.35.3+incompatible
@@ -125,7 +127,7 @@ require (
 	github.com/iamacarpet/go-winpty v1.0.4 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
-	github.com/josharian/native v0.0.0-20200817173448-b6b71def0850 // indirect
+	github.com/josharian/native v1.1.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.16.5 // indirect
 	github.com/klauspost/cpuid v1.3.1 // indirect
@@ -138,8 +140,8 @@ require (
 	github.com/mattn/go-runewidth v0.0.14 // indirect
 	github.com/mattn/go-sqlite3 v1.14.17 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
-	github.com/mdlayher/netlink v1.4.2 // indirect
-	github.com/mdlayher/socket v0.0.0-20211102153432-57e3fa563ecb // indirect
+	github.com/mdlayher/netlink v1.7.2 // indirect
+	github.com/mdlayher/socket v0.4.1 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.24 // indirect
 	github.com/miekg/dns v1.1.54 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
@@ -171,6 +173,8 @@ require (
 	github.com/tklauser/numcpus v0.6.1 // indirect
 	github.com/tuotoo/qrcode v0.0.0-20220425170535-52ccc2bebf5d // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
+	github.com/vishvananda/netlink v1.1.0 // indirect
+	github.com/vishvananda/netns v0.0.4 // indirect
 	github.com/volatiletech/inflect v0.0.1 // indirect
 	github.com/volatiletech/strmangle v0.0.4 // indirect
 	github.com/webx-top/captcha v0.1.0 // indirect
@@ -198,6 +202,5 @@ require (
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	honnef.co/go/tools v0.2.2 // indirect
 	rsc.io/qr v0.2.0 // indirect
 )

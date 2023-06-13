@@ -19,97 +19,109 @@
 package nftables
 
 import (
-	"strings"
-
+	"github.com/admpub/nftablesutils"
 	"github.com/admpub/nftablesutils/biz"
-	"github.com/admpub/nging/v5/application/library/errorslice"
+	ruleutils "github.com/admpub/nftablesutils/rule"
 	"github.com/google/nftables"
+	"github.com/google/nftables/binaryutil"
 	"github.com/google/nftables/expr"
 	"github.com/nging-plugins/firewallmanager/application/library/driver"
-	"github.com/webx-top/echo/param"
 )
 
 var _ driver.Driver = (*NFTables)(nil)
 
-func New(proto nftables.TableFamily) (*NFTables, error) {
-	biz.Init
-	conn, err := nftables.New(nftables.AsLasting())
-	if err != nil {
-		return nil, err
+func New(family nftables.TableFamily) (*NFTables, error) {
+	cfg := biz.Config{
+		Enabled:       true,
+		DefaultPolicy: `accept`,
+		TablePrefix:   `nging_`,
+		TrustPorts:    []uint16{},
 	}
 	t := &NFTables{
-		TableFamily: proto,
-		Conn:        conn,
+		TableFamily: family,
+		cfg:         &c,
+		NFTables:    biz.New(family, cfg, nil),
 	}
-	return t, nil
+	return t, t.Init()
 }
 
 type NFTables struct {
 	TableFamily nftables.TableFamily
-	*nftables.Conn
+	cfg         *biz.Config
+	*biz.NFTables
 }
 
-func (a *NFTables) RuleFrom(rule *driver.Rule) []string {
+func (a *NFTables) ruleFrom(rule *driver.Rule) []expr.Any {
 	if len(rule.Type) == 0 {
-		//rule.Type = TableFilter
+		//rule.Type = `filter`
 	}
 	if len(rule.Protocol) == 0 {
-		//rule.Protocol = ProtocolTCP
+		//rule.Protocol = `tcp`
 	}
 	if len(rule.Direction) == 0 {
-		//rule.Direction = ChainInput
+		//rule.Direction = `input`
 	}
-	args := []string{
-		`-p`, rule.Protocol,
-	}
+	args := nftablesutils.JoinExprs(nftablesutils.SetProtoTCP())
 	if len(rule.Interface) > 0 {
-		args = append(args, `-i`, rule.Interface) // 只能用于 PREROUTING、INPUT、FORWARD
+		args = args.Add(nftablesutils.SetIIF(rule.Interface)...) // 只能用于 PREROUTING、INPUT、FORWARD
 	} else if len(rule.Outerface) > 0 {
-		args = append(args, `-o`, rule.Outerface) // 只能用于 FORWARD、OUTPUT、POSTROUTING
+		args = args.Add(nftablesutils.SetOIF(rule.Outerface)...) // 只能用于 FORWARD、OUTPUT、POSTROUTING
 	}
-	if len(rule.RemoteIP) > 0 {
-		if strings.Contains(rule.RemoteIP, `-`) {
-			args = append(args, `-m`, `iprange`)
-			args = append(args, `--src-range`, rule.RemoteIP)
-		} else {
-			args = append(args, `-s`, rule.RemoteIP)
-		}
-	} else if len(rule.LocalIP) > 0 {
-		if strings.Contains(rule.LocalIP, `-`) {
-			args = append(args, `-m`, `iprange`)
-			args = append(args, `--dst-range`, rule.LocalIP)
-		} else {
-			args = append(args, `-d`, rule.LocalIP)
-		}
+	// if len(rule.RemoteIP) > 0 {
+	// 	if strings.Contains(rule.RemoteIP, `-`) {
+	// 		args = append(args, `-m`, `iprange`)
+	// 		args = append(args, `--src-range`, rule.RemoteIP)
+	// 	} else {
+	// 		args = append(args, `-s`, rule.RemoteIP)
+	// 	}
+	// } else if len(rule.LocalIP) > 0 {
+	// 	if strings.Contains(rule.LocalIP, `-`) {
+	// 		args = append(args, `-m`, `iprange`)
+	// 		args = append(args, `--dst-range`, rule.LocalIP)
+	// 	} else {
+	// 		args = append(args, `-d`, rule.LocalIP)
+	// 	}
+	// }
+	// if len(rule.RemotePort) > 0 {
+	// 	if strings.Contains(rule.RemotePort, `,`) {
+	// 		args = append(args, `-m`, `multiport`)
+	// 		args = append(args, `--sports`, rule.RemotePort)
+	// 	} else {
+	// 		rule.RemotePort = strings.ReplaceAll(rule.RemotePort, `-`, `:`)
+	// 		args = append(args, `--sport`, rule.RemotePort) // 支持用“:”指定端口范围，例如 “22:25” 指端口 22-25，或者 “:22” 指端口 0-22 或者 “22:” 指端口 22-65535
+	// 	}
+	// } else if len(rule.LocalPort) > 0 {
+	// 	if strings.Contains(rule.LocalPort, `,`) {
+	// 		args = append(args, `-m`, `multiport`)
+	// 		args = append(args, `--dports`, rule.LocalPort)
+	// 	} else {
+	// 		rule.LocalPort = strings.ReplaceAll(rule.LocalPort, `-`, `:`)
+	// 		args = args.Add(nftablesutils.DestinationPort(defaultRegister))
+	// 		args = args.Add(nftablesutils.SetPortRange(rule.Outerface)...)
+	// 		args = append(args, `--dport`, rule.LocalPort)
+	// 	}
+	// }
+	// if len(rule.State) > 0 {
+	// 	args = args.Add(nftablesutils.SetPortRange(rule.Outerface)...)
+	// 	args = append(args, `-m`, `state`)
+	// 	args = append(args, `--state`)
+	// 	states := strings.SplitN(rule.State, ` `, 2)
+	// 	if len(states) != 2 {
+	// 		//args = append(args, TCPFlagALL, rule.State)
+	// 	} else {
+	// 		args = append(args, states...)
+	// 	}
+	// }
+	switch rule.Action {
+	case `accept`:
+		args = args.Add(nftablesutils.Accept())
+	case `drop`:
+		args = args.Add(nftablesutils.Drop())
+	case `reject`:
+		args = args.Add(nftablesutils.Reject())
+	default:
+		args = args.Add(nftablesutils.Drop())
 	}
-	if len(rule.RemotePort) > 0 {
-		if strings.Contains(rule.RemotePort, `,`) {
-			args = append(args, `-m`, `multiport`)
-			args = append(args, `--sports`, rule.RemotePort)
-		} else {
-			rule.RemotePort = strings.ReplaceAll(rule.RemotePort, `-`, `:`)
-			args = append(args, `--sport`, rule.RemotePort) // 支持用“:”指定端口范围，例如 “22:25” 指端口 22-25，或者 “:22” 指端口 0-22 或者 “22:” 指端口 22-65535
-		}
-	} else if len(rule.LocalPort) > 0 {
-		if strings.Contains(rule.LocalPort, `,`) {
-			args = append(args, `-m`, `multiport`)
-			args = append(args, `--dports`, rule.LocalPort)
-		} else {
-			rule.LocalPort = strings.ReplaceAll(rule.LocalPort, `-`, `:`)
-			args = append(args, `--dport`, rule.LocalPort)
-		}
-	}
-	if len(rule.State) > 0 {
-		args = append(args, `-m`, `state`)
-		args = append(args, `--state`)
-		states := strings.SplitN(rule.State, ` `, 2)
-		if len(states) != 2 {
-			//args = append(args, TCPFlagALL, rule.State)
-		} else {
-			args = append(args, states...)
-		}
-	}
-	args = append(args, `-j`, rule.Action)
 	return args
 }
 
@@ -119,47 +131,6 @@ func (a *NFTables) Enabled(on bool) error {
 
 func (a *NFTables) Reset() error {
 	return driver.ErrUnsupported
-}
-
-func (a *NFTables) getTable(name string) (*nftables.Table, error) {
-	tables, err := a.Conn.ListTablesOfFamily(a.TableFamily)
-	if err != nil {
-		return nil, err
-	}
-	for _, table := range tables {
-		if table.Name == name {
-			return table, nil
-		}
-	}
-	table := a.Conn.AddTable(&nftables.Table{
-		Family: a.TableFamily,
-		Name:   name,
-	})
-	return table, err
-}
-
-func (a *NFTables) getChain(tableName, chainName string) (*nftables.Chain, error) {
-	table, err := a.getTable(tableName)
-	if err != nil {
-		return nil, err
-	}
-	chains, err := a.Conn.ListChainsOfTableFamily(a.TableFamily)
-	if err != nil {
-		return nil, err
-	}
-	for _, chain := range chains {
-		if chain.Table.Name == tableName && chain.Name == chainName {
-			return chain, nil
-		}
-	}
-	chain := a.Conn.AddChain(&nftables.Chain{
-		Name:     chainName,
-		Table:    table,
-		Type:     nftables.ChainTypeFilter,
-		Hooknum:  nftables.ChainHookInput,
-		Priority: nftables.ChainPriorityFilter,
-	})
-	return chain, err
 }
 
 func (a *NFTables) Import(wfwFile string) error {
@@ -173,85 +144,127 @@ func (a *NFTables) Export(wfwFile string) error {
 	return driver.RunCmd(saveBin, []string{`>`, wfwFile}, nil)
 }
 
-func (a *NFTables) Insert(pos int, rule *driver.Rule) error {
-	if pos <= 0 {
-		pos = 1
+func (a *NFTables) NewFilterRuleTarget(chain ...*nftables.Chain) ruleutils.RuleTarget {
+	var c *nftables.Chain
+	if len(chain) > 0 {
+		c = chain[0]
 	}
-	r := &nftables.Rule{}
-	a.Conn.InsertRule(r)
-	return a.Flush()
+	if c == nil {
+		c = a.NFTables.ChainInput()
+	}
+	return ruleutils.New(a.NFTables.TableFilter(), c)
+}
+
+func (a *NFTables) NewNATRuleTarget(chain ...*nftables.Chain) ruleutils.RuleTarget {
+	var c *nftables.Chain
+	if len(chain) > 0 {
+		c = chain[0]
+	}
+	if c == nil {
+		c = a.NFTables.ChainPostrouting()
+	}
+	return ruleutils.New(a.NFTables.TableNAT(), c)
+}
+
+func (a *NFTables) Insert(pos int, rule *driver.Rule) error {
+	ruleTarget := a.NewFilterRuleTarget()
+	id := binaryutil.BigEndian.PutUint64(uint64(rule.ID))
+	exprs := a.ruleFrom(rule)
+	ruleData := ruleutils.NewData(id, exprs)
+	return a.NFTables.Do(func(conn *nftables.Conn) error {
+		_, err := ruleTarget.Insert(conn, ruleData)
+		if err != nil {
+			return err
+		}
+		return conn.Flush()
+	})
 }
 
 func (a *NFTables) Append(rule *driver.Rule) error {
-	r := &nftables.Rule{}
-	a.Conn.AddRule(r)
-	return a.Flush()
+	ruleTarget := a.NewFilterRuleTarget()
+	id := binaryutil.BigEndian.PutUint64(uint64(rule.ID))
+	exprs := a.ruleFrom(rule)
+	ruleData := ruleutils.NewData(id, exprs)
+	return a.NFTables.Do(func(conn *nftables.Conn) error {
+		_, err := ruleTarget.Add(conn, ruleData)
+		if err != nil {
+			return err
+		}
+		return conn.Flush()
+	})
 }
 
 func (a *NFTables) AsWhitelist(tableName, chainName string) error {
-	chain, err := a.getChain(tableName, chainName)
-	if err != nil {
-		return err
-	}
-	r := &nftables.Rule{
-		Table: chain.Table,
-		Chain: chain,
-		Exprs: []expr.Any{
-			&expr.Verdict{
-				// [ immediate reg 0 drop ]
-				Kind: expr.VerdictDrop,
-			},
-		},
-	}
-	a.Conn.AddRule(r)
-	return a.Flush()
+	// a.cfg.DefaultPolicy = `drop`
+	// return a.NFTables.Do(func(conn *nftables.Conn) error {
+	// 	conn.FlushTable(a.NFTables.TableFilter())
+	// 	// reapply
+	// 	return conn.Flush()
+	// })
+	return driver.ErrUnsupported
 }
 
 // Update update rulespec in specified table/chain
 func (a *NFTables) Update(pos int, rule *driver.Rule) error {
-	r := &nftables.Rule{}
-	a.Conn.ReplaceRule(r)
-	return a.Flush()
+	ruleTarget := a.NewFilterRuleTarget()
+	id := binaryutil.BigEndian.PutUint64(uint64(rule.ID))
+	exprs := a.ruleFrom(rule)
+	ruleData := ruleutils.NewData(id, exprs)
+	return a.NFTables.Do(func(conn *nftables.Conn) error {
+		_, _, _, err := ruleTarget.Update(conn, []ruleutils.RuleData{ruleData})
+		if err != nil {
+			return err
+		}
+		return conn.Flush()
+	})
 }
 
 func (a *NFTables) Delete(rule *driver.Rule) error {
-	r := &nftables.Rule{}
-	a.Conn.DelRule(r)
-	return a.Flush()
+	ruleTarget := a.NewFilterRuleTarget()
+	id := binaryutil.BigEndian.PutUint64(uint64(rule.ID))
+	exprs := a.ruleFrom(rule)
+	ruleData := ruleutils.NewData(id, exprs)
+	return a.NFTables.Do(func(conn *nftables.Conn) error {
+		_, err := ruleTarget.Delete(conn, ruleData)
+		if err != nil {
+			return err
+		}
+		return conn.Flush()
+	})
 }
 
 func (a *NFTables) Exists(rule *driver.Rule) (bool, error) {
-	return false, driver.ErrUnsupported
+	ruleTarget := a.NewFilterRuleTarget()
+	id := binaryutil.BigEndian.PutUint64(uint64(rule.ID))
+	exprs := a.ruleFrom(rule)
+	ruleData := ruleutils.NewData(id, exprs)
+	var exists bool
+	err := a.NFTables.Do(func(conn *nftables.Conn) (err error) {
+		exists, err = ruleTarget.Exists(conn, ruleData)
+		return
+	})
+	return exists, err
 }
 
 func (a *NFTables) Stats(tableName, chainName string) ([]map[string]string, error) {
-	chain, err := a.getChain(tableName, chainName)
-	if err != nil {
-		return nil, err
-	}
-	rows, err := a.Conn.GetRules(chain.Table, chain)
-	if err != nil {
-		return nil, err
-	}
-	result := make([]map[string]string, len(rows))
-	for index, row := range rows {
-		result[index] = map[string]string{
-			`num`: param.AsString(row.Position),
-		}
-	}
-	return result, nil
+	var result []map[string]string
+	// ruleTarget := a.NewFilterRuleTarget()
+	// err := a.NFTables.Do(func(conn *nftables.Conn) error {
+	// 	rules, err := ruleTarget.List(conn)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// 	for _, rule := range rules {
+	// 		result = append(result, map[string]string{
+	// 			`id`: string(rule.UserData),
+	// 		})
+	// 	}
+	// 	return err
+	// })
+	return result, driver.ErrUnsupported
 }
 
 func (a *NFTables) List(tableName, chainName string) ([]*driver.Rule, error) {
-	chain, err := a.getChain(tableName, chainName)
-	if err != nil {
-		return nil, err
-	}
-	rows, err := a.Conn.GetRules(chain.Table, chain)
-	if err != nil {
-		return nil, err
-	}
-	errs := errorslice.New()
 	var rules []*driver.Rule
 	var ipVersion string
 	switch a.TableFamily {
@@ -260,14 +273,22 @@ func (a *NFTables) List(tableName, chainName string) ([]*driver.Rule, error) {
 	case nftables.TableFamilyIPv6:
 		ipVersion = `6`
 	}
-	for _, row := range rows {
-		rule := &driver.Rule{
-			Type:      tableName,
-			Direction: chainName,
-			IPVersion: ipVersion,
-			Number:    row.Position,
+	ruleTarget := a.NewFilterRuleTarget()
+	err := a.NFTables.Do(func(conn *nftables.Conn) error {
+		rows, err := ruleTarget.List(conn)
+		if err != nil {
+			return err
 		}
-		rules = append(rules, rule)
-	}
-	return rules, errs.ToError()
+		for _, row := range rows {
+			rule := &driver.Rule{
+				Type:      tableName,
+				Direction: chainName,
+				IPVersion: ipVersion,
+				Number:    row.Position,
+			}
+			rules = append(rules, rule)
+		}
+		return err
+	})
+	return rules, err
 }

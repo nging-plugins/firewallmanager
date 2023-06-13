@@ -55,7 +55,7 @@ type IPTables struct {
 	*iptables.IPTables
 }
 
-func (a *IPTables) RuleFrom(rule *driver.Rule) []string {
+func (a *IPTables) ruleFrom(rule *driver.Rule) []string {
 	if len(rule.Type) == 0 {
 		rule.Type = TableFilter
 	}
@@ -157,14 +157,14 @@ func (a *IPTables) Insert(pos int, rule *driver.Rule) error {
 	if pos <= 0 {
 		pos = 1
 	}
-	rulespec := a.RuleFrom(rule)
+	rulespec := a.ruleFrom(rule)
 	table := rule.Type
 	chain := rule.Direction
 	return a.IPTables.InsertUnique(table, chain, pos, rulespec...)
 }
 
 func (a *IPTables) Append(rule *driver.Rule) error {
-	rulespec := a.RuleFrom(rule)
+	rulespec := a.ruleFrom(rule)
 	table := rule.Type
 	chain := rule.Direction
 	return a.IPTables.AppendUnique(table, chain, rulespec...)
@@ -179,7 +179,7 @@ func (a *IPTables) Update(pos int, rule *driver.Rule) error {
 	if pos <= 0 {
 		return driver.ErrInvalidRuleNumber
 	}
-	rulespec := a.RuleFrom(rule)
+	rulespec := a.ruleFrom(rule)
 	table := rule.Type
 	chain := rule.Direction
 	args := []string{"-t", table, "-R", chain}
@@ -193,7 +193,7 @@ func (a *IPTables) Delete(rule *driver.Rule) error {
 	if rule.Number > 0 {
 		rulespec = append(rulespec, strconv.FormatUint(rule.Number, 10))
 	} else {
-		rulespec = a.RuleFrom(rule)
+		rulespec = a.ruleFrom(rule)
 	}
 	table := rule.Type
 	chain := rule.Direction
@@ -201,7 +201,7 @@ func (a *IPTables) Delete(rule *driver.Rule) error {
 }
 
 func (a *IPTables) Exists(rule *driver.Rule) (bool, error) {
-	rulespec := a.RuleFrom(rule)
+	rulespec := a.ruleFrom(rule)
 	table := rule.Type
 	chain := rule.Direction
 	return a.IPTables.Exists(table, chain, rulespec...)

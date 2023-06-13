@@ -19,7 +19,6 @@
 package driver
 
 type Driver interface {
-	RuleFrom(rule *Rule) []string
 	Enabled(on bool) error
 	Reset() error
 	Import(wfwFile string) error
