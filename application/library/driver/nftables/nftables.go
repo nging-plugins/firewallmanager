@@ -39,10 +39,14 @@ func New(family nftables.TableFamily) (*NFTables, error) {
 	}
 	t := &NFTables{
 		TableFamily: family,
-		cfg:         &c,
+		cfg:         &cfg,
 		NFTables:    biz.New(family, cfg, nil),
 	}
-	return t, t.Init()
+	err := t.Init()
+	if err == nil {
+		err = t.Do(t.ApplyBase)
+	}
+	return t, err
 }
 
 type NFTables struct {
