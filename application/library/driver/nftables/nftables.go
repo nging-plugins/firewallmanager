@@ -19,13 +19,17 @@
 package nftables
 
 import (
+	"regexp"
+	"strings"
+
 	"github.com/admpub/nftablesutils"
 	"github.com/admpub/nftablesutils/biz"
 	ruleutils "github.com/admpub/nftablesutils/rule"
+	setutils "github.com/admpub/nftablesutils/set"
 	"github.com/google/nftables"
 	"github.com/google/nftables/binaryutil"
-	"github.com/google/nftables/expr"
 	"github.com/nging-plugins/firewallmanager/application/library/driver"
+	"github.com/webx-top/echo/param"
 )
 
 var _ driver.Driver = (*NFTables)(nil)
@@ -55,7 +59,13 @@ type NFTables struct {
 	*biz.NFTables
 }
 
-func (a *NFTables) ruleFrom(rule *driver.Rule) []expr.Any {
+var notNumberRegexp = regexp.MustCompile(`[^\d]+`)
+
+func (a *NFTables) isIPv4() bool {
+	return a.TableFamily == nftables.TableFamilyIPv4
+}
+
+func (a *NFTables) ruleFrom(c *nftables.Conn, rule *driver.Rule) (args nftablesutils.Exprs, err error) {
 	if len(rule.Type) == 0 {
 		//rule.Type = `filter`
 	}
@@ -65,46 +75,140 @@ func (a *NFTables) ruleFrom(rule *driver.Rule) []expr.Any {
 	if len(rule.Direction) == 0 {
 		//rule.Direction = `input`
 	}
-	args := nftablesutils.JoinExprs(nftablesutils.SetProtoTCP())
+	args = nftablesutils.JoinExprs(nftablesutils.SetProtoTCP())
 	if len(rule.Interface) > 0 {
 		args = args.Add(nftablesutils.SetIIF(rule.Interface)...) // 只能用于 PREROUTING、INPUT、FORWARD
 	} else if len(rule.Outerface) > 0 {
 		args = args.Add(nftablesutils.SetOIF(rule.Outerface)...) // 只能用于 FORWARD、OUTPUT、POSTROUTING
 	}
-	// if len(rule.RemoteIP) > 0 {
-	// 	if strings.Contains(rule.RemoteIP, `-`) {
-	// 		args = append(args, `-m`, `iprange`)
-	// 		args = append(args, `--src-range`, rule.RemoteIP)
-	// 	} else {
-	// 		args = append(args, `-s`, rule.RemoteIP)
-	// 	}
-	// } else if len(rule.LocalIP) > 0 {
-	// 	if strings.Contains(rule.LocalIP, `-`) {
-	// 		args = append(args, `-m`, `iprange`)
-	// 		args = append(args, `--dst-range`, rule.LocalIP)
-	// 	} else {
-	// 		args = append(args, `-d`, rule.LocalIP)
-	// 	}
-	// }
-	// if len(rule.RemotePort) > 0 {
-	// 	if strings.Contains(rule.RemotePort, `,`) {
-	// 		args = append(args, `-m`, `multiport`)
-	// 		args = append(args, `--sports`, rule.RemotePort)
-	// 	} else {
-	// 		rule.RemotePort = strings.ReplaceAll(rule.RemotePort, `-`, `:`)
-	// 		args = append(args, `--sport`, rule.RemotePort) // 支持用“:”指定端口范围，例如 “22:25” 指端口 22-25，或者 “:22” 指端口 0-22 或者 “22:” 指端口 22-65535
-	// 	}
-	// } else if len(rule.LocalPort) > 0 {
-	// 	if strings.Contains(rule.LocalPort, `,`) {
-	// 		args = append(args, `-m`, `multiport`)
-	// 		args = append(args, `--dports`, rule.LocalPort)
-	// 	} else {
-	// 		rule.LocalPort = strings.ReplaceAll(rule.LocalPort, `-`, `:`)
-	// 		args = args.Add(nftablesutils.DestinationPort(defaultRegister))
-	// 		args = args.Add(nftablesutils.SetPortRange(rule.Outerface)...)
-	// 		args = append(args, `--dport`, rule.LocalPort)
-	// 	}
-	// }
+	if len(rule.RemoteIP) > 0 {
+		if strings.Contains(rule.RemoteIP, `-`) {
+			var ipSet *nftables.Set
+			var elems []nftables.SetElement
+			var eErr error
+			if a.isIPv4() {
+				ipSet = nftablesutils.GetIPv4AddrSet(a.NFTables.TableFilter())
+				elems, eErr = setutils.GenerateElementsFromIPv4Address([]string{rule.RemoteIP})
+			} else {
+				ipSet = nftablesutils.GetIPv6AddrSet(a.NFTables.TableFilter())
+				elems, eErr = setutils.GenerateElementsFromIPv6Address([]string{rule.RemoteIP})
+			}
+			if eErr != nil {
+				err = eErr
+				return
+			}
+			err = c.AddSet(ipSet, elems)
+			if err != nil {
+				return nil, err
+			}
+			args = args.Add(nftablesutils.SetSAddrSet(ipSet)...)
+		} else {
+			args = args.Add(nftablesutils.SetCIDRMatcher(nftablesutils.ExprDirectionSource, rule.RemoteIP, false)...)
+		}
+	} else if len(rule.LocalIP) > 0 {
+		if strings.Contains(rule.LocalIP, `-`) {
+			var ipSet *nftables.Set
+			var elems []nftables.SetElement
+			var eErr error
+			if a.isIPv4() {
+				ipSet = nftablesutils.GetIPv4AddrSet(a.NFTables.TableFilter())
+				elems, eErr = setutils.GenerateElementsFromIPv4Address([]string{rule.LocalIP})
+			} else {
+				ipSet = nftablesutils.GetIPv6AddrSet(a.NFTables.TableFilter())
+				elems, eErr = setutils.GenerateElementsFromIPv6Address([]string{rule.LocalIP})
+			}
+			if eErr != nil {
+				err = eErr
+				return
+			}
+			err = c.AddSet(ipSet, elems)
+			if err != nil {
+				return nil, err
+			}
+			args = args.Add(nftablesutils.SetSAddrSet(ipSet)...)
+		} else {
+			args = args.Add(nftablesutils.SetCIDRMatcher(nftablesutils.ExprDirectionDestination, rule.LocalIP, false)...)
+		}
+	}
+	if len(rule.RemotePort) > 0 {
+		if strings.Contains(rule.RemotePort, `,`) {
+			ports := param.Split(rule.RemotePort, `,`).Unique().Uint32(func(_ int, v uint32) bool {
+				return nftablesutils.ValidatePort(uint16(v)) == nil
+			})
+			if len(ports) > 0 {
+				portSet := nftablesutils.GetPortSet(a.NFTables.TableFilter())
+				portsUint16 := make([]uint16, len(ports))
+				for k, v := range ports {
+					portsUint16[k] = uint16(v)
+				}
+				elems := nftablesutils.GetPortElems(portsUint16)
+				err = c.AddSet(portSet, elems)
+				if err != nil {
+					return nil, err
+				}
+				args = args.Add(nftablesutils.SetSPortSet(portSet)...)
+			}
+		} else {
+			ports := param.StringSlice(notNumberRegexp.Split(rule.RemotePort, -1)).Unique().Uint32(func(_ int, v uint32) bool {
+				return nftablesutils.ValidatePort(uint16(v)) == nil
+			})
+
+			if len(ports) > 0 {
+				portsUint16 := make([]uint16, len(ports))
+				for k, v := range ports {
+					portsUint16[k] = uint16(v)
+				}
+				if len(portsUint16) >= 2 {
+					err = nftablesutils.ValidatePortRange(portsUint16[0], portsUint16[1])
+					if err != nil {
+						return
+					}
+					args = args.Add(nftablesutils.SetSPortRange(portsUint16[0], portsUint16[1])...)
+				} else {
+					args = args.Add(nftablesutils.SetSPort(portsUint16[0])...)
+				}
+			}
+		}
+	} else if len(rule.LocalPort) > 0 {
+		if strings.Contains(rule.LocalPort, `,`) {
+			ports := param.Split(rule.LocalPort, `,`).Unique().Uint32(func(_ int, v uint32) bool {
+				return nftablesutils.ValidatePort(uint16(v)) == nil
+			})
+			if len(ports) > 0 {
+				portSet := nftablesutils.GetPortSet(a.NFTables.TableFilter())
+				portsUint16 := make([]uint16, len(ports))
+				for k, v := range ports {
+					portsUint16[k] = uint16(v)
+				}
+				elems := nftablesutils.GetPortElems(portsUint16)
+				err = c.AddSet(portSet, elems)
+				if err != nil {
+					return nil, err
+				}
+				args = args.Add(nftablesutils.SetDPortSet(portSet)...)
+			}
+		} else {
+			ports := param.StringSlice(notNumberRegexp.Split(rule.LocalPort, -1)).Unique().Uint32(func(_ int, v uint32) bool {
+				return nftablesutils.ValidatePort(uint16(v)) == nil
+			})
+
+			if len(ports) > 0 {
+				portsUint16 := make([]uint16, len(ports))
+				for k, v := range ports {
+					portsUint16[k] = uint16(v)
+				}
+				if len(portsUint16) >= 2 {
+					err = nftablesutils.ValidatePortRange(portsUint16[0], portsUint16[1])
+					if err != nil {
+						return
+					}
+					args = args.Add(nftablesutils.SetDPortRange(portsUint16[0], portsUint16[1])...)
+				} else {
+					args = args.Add(nftablesutils.SetDPort(portsUint16[0])...)
+				}
+			}
+		}
+	}
 	// if len(rule.State) > 0 {
 	// 	args = args.Add(nftablesutils.SetPortRange(rule.Outerface)...)
 	// 	args = append(args, `-m`, `state`)
@@ -126,7 +230,7 @@ func (a *NFTables) ruleFrom(rule *driver.Rule) []expr.Any {
 	default:
 		args = args.Add(nftablesutils.Drop())
 	}
-	return args
+	return args, nil
 }
 
 func (a *NFTables) Enabled(on bool) error {
@@ -172,11 +276,14 @@ func (a *NFTables) NewNATRuleTarget(chain ...*nftables.Chain) ruleutils.RuleTarg
 
 func (a *NFTables) Insert(pos int, rule *driver.Rule) error {
 	ruleTarget := a.NewFilterRuleTarget()
-	id := binaryutil.BigEndian.PutUint64(uint64(rule.ID))
-	exprs := a.ruleFrom(rule)
-	ruleData := ruleutils.NewData(id, exprs)
 	return a.NFTables.Do(func(conn *nftables.Conn) error {
-		_, err := ruleTarget.Insert(conn, ruleData)
+		exprs, err := a.ruleFrom(conn, rule)
+		if err != nil {
+			return err
+		}
+		id := binaryutil.BigEndian.PutUint64(uint64(rule.ID))
+		ruleData := ruleutils.NewData(id, exprs)
+		_, err = ruleTarget.Insert(conn, ruleData)
 		if err != nil {
 			return err
 		}
@@ -186,11 +293,14 @@ func (a *NFTables) Insert(pos int, rule *driver.Rule) error {
 
 func (a *NFTables) Append(rule *driver.Rule) error {
 	ruleTarget := a.NewFilterRuleTarget()
-	id := binaryutil.BigEndian.PutUint64(uint64(rule.ID))
-	exprs := a.ruleFrom(rule)
-	ruleData := ruleutils.NewData(id, exprs)
 	return a.NFTables.Do(func(conn *nftables.Conn) error {
-		_, err := ruleTarget.Add(conn, ruleData)
+		exprs, err := a.ruleFrom(conn, rule)
+		if err != nil {
+			return err
+		}
+		id := binaryutil.BigEndian.PutUint64(uint64(rule.ID))
+		ruleData := ruleutils.NewData(id, exprs)
+		_, err = ruleTarget.Add(conn, ruleData)
 		if err != nil {
 			return err
 		}
@@ -211,11 +321,14 @@ func (a *NFTables) AsWhitelist(tableName, chainName string) error {
 // Update update rulespec in specified table/chain
 func (a *NFTables) Update(pos int, rule *driver.Rule) error {
 	ruleTarget := a.NewFilterRuleTarget()
-	id := binaryutil.BigEndian.PutUint64(uint64(rule.ID))
-	exprs := a.ruleFrom(rule)
-	ruleData := ruleutils.NewData(id, exprs)
 	return a.NFTables.Do(func(conn *nftables.Conn) error {
-		_, _, _, err := ruleTarget.Update(conn, []ruleutils.RuleData{ruleData})
+		exprs, err := a.ruleFrom(conn, rule)
+		if err != nil {
+			return err
+		}
+		id := binaryutil.BigEndian.PutUint64(uint64(rule.ID))
+		ruleData := ruleutils.NewData(id, exprs)
+		_, _, _, err = ruleTarget.Update(conn, []ruleutils.RuleData{ruleData})
 		if err != nil {
 			return err
 		}
@@ -225,11 +338,14 @@ func (a *NFTables) Update(pos int, rule *driver.Rule) error {
 
 func (a *NFTables) Delete(rule *driver.Rule) error {
 	ruleTarget := a.NewFilterRuleTarget()
-	id := binaryutil.BigEndian.PutUint64(uint64(rule.ID))
-	exprs := a.ruleFrom(rule)
-	ruleData := ruleutils.NewData(id, exprs)
 	return a.NFTables.Do(func(conn *nftables.Conn) error {
-		_, err := ruleTarget.Delete(conn, ruleData)
+		exprs, err := a.ruleFrom(conn, rule)
+		if err != nil {
+			return err
+		}
+		id := binaryutil.BigEndian.PutUint64(uint64(rule.ID))
+		ruleData := ruleutils.NewData(id, exprs)
+		_, err = ruleTarget.Delete(conn, ruleData)
 		if err != nil {
 			return err
 		}
@@ -239,11 +355,14 @@ func (a *NFTables) Delete(rule *driver.Rule) error {
 
 func (a *NFTables) Exists(rule *driver.Rule) (bool, error) {
 	ruleTarget := a.NewFilterRuleTarget()
-	id := binaryutil.BigEndian.PutUint64(uint64(rule.ID))
-	exprs := a.ruleFrom(rule)
-	ruleData := ruleutils.NewData(id, exprs)
 	var exists bool
 	err := a.NFTables.Do(func(conn *nftables.Conn) (err error) {
+		exprs, err := a.ruleFrom(conn, rule)
+		if err != nil {
+			return err
+		}
+		id := binaryutil.BigEndian.PutUint64(uint64(rule.ID))
+		ruleData := ruleutils.NewData(id, exprs)
 		exists, err = ruleTarget.Exists(conn, ruleData)
 		return
 	})
@@ -271,10 +390,9 @@ func (a *NFTables) Stats(tableName, chainName string) ([]map[string]string, erro
 func (a *NFTables) List(tableName, chainName string) ([]*driver.Rule, error) {
 	var rules []*driver.Rule
 	var ipVersion string
-	switch a.TableFamily {
-	case nftables.TableFamilyIPv4:
+	if a.isIPv4() {
 		ipVersion = `4`
-	case nftables.TableFamilyIPv6:
+	} else {
 		ipVersion = `6`
 	}
 	ruleTarget := a.NewFilterRuleTarget()
