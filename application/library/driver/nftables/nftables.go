@@ -67,13 +67,13 @@ func (a *NFTables) isIPv4() bool {
 
 func (a *NFTables) ruleFrom(c *nftables.Conn, rule *driver.Rule) (args nftablesutils.Exprs, err error) {
 	if len(rule.Type) == 0 {
-		//rule.Type = `filter`
+		rule.Type = `filter`
 	}
 	if len(rule.Protocol) == 0 {
-		//rule.Protocol = `tcp`
+		rule.Protocol = `tcp`
 	}
 	if len(rule.Direction) == 0 {
-		//rule.Direction = `input`
+		rule.Direction = `input`
 	}
 	args = nftablesutils.JoinExprs(nftablesutils.SetProtoTCP())
 	if len(rule.Interface) > 0 {
@@ -132,8 +132,8 @@ func (a *NFTables) ruleFrom(c *nftables.Conn, rule *driver.Rule) (args nftablesu
 	}
 	if len(rule.RemotePort) > 0 {
 		if strings.Contains(rule.RemotePort, `,`) {
-			ports := param.Split(rule.RemotePort, `,`).Unique().Uint32(func(_ int, v uint32) bool {
-				return nftablesutils.ValidatePort(uint16(v)) == nil
+			ports := param.Split(rule.RemotePort, `,`).Unique().Uint16(func(_ int, v uint16) bool {
+				return nftablesutils.ValidatePort(v) == nil
 			})
 			if len(ports) > 0 {
 				portSet := nftablesutils.GetPortSet(a.NFTables.TableFilter())
@@ -149,8 +149,8 @@ func (a *NFTables) ruleFrom(c *nftables.Conn, rule *driver.Rule) (args nftablesu
 				args = args.Add(nftablesutils.SetSPortSet(portSet)...)
 			}
 		} else {
-			ports := param.StringSlice(notNumberRegexp.Split(rule.RemotePort, -1)).Unique().Uint32(func(_ int, v uint32) bool {
-				return nftablesutils.ValidatePort(uint16(v)) == nil
+			ports := param.StringSlice(notNumberRegexp.Split(rule.RemotePort, -1)).Unique().Uint16(func(_ int, v uint16) bool {
+				return nftablesutils.ValidatePort(v) == nil
 			})
 
 			if len(ports) > 0 {
@@ -171,8 +171,8 @@ func (a *NFTables) ruleFrom(c *nftables.Conn, rule *driver.Rule) (args nftablesu
 		}
 	} else if len(rule.LocalPort) > 0 {
 		if strings.Contains(rule.LocalPort, `,`) {
-			ports := param.Split(rule.LocalPort, `,`).Unique().Uint32(func(_ int, v uint32) bool {
-				return nftablesutils.ValidatePort(uint16(v)) == nil
+			ports := param.Split(rule.LocalPort, `,`).Unique().Uint16(func(_ int, v uint16) bool {
+				return nftablesutils.ValidatePort(v) == nil
 			})
 			if len(ports) > 0 {
 				portSet := nftablesutils.GetPortSet(a.NFTables.TableFilter())
@@ -188,8 +188,8 @@ func (a *NFTables) ruleFrom(c *nftables.Conn, rule *driver.Rule) (args nftablesu
 				args = args.Add(nftablesutils.SetDPortSet(portSet)...)
 			}
 		} else {
-			ports := param.StringSlice(notNumberRegexp.Split(rule.LocalPort, -1)).Unique().Uint32(func(_ int, v uint32) bool {
-				return nftablesutils.ValidatePort(uint16(v)) == nil
+			ports := param.StringSlice(notNumberRegexp.Split(rule.LocalPort, -1)).Unique().Uint16(func(_ int, v uint16) bool {
+				return nftablesutils.ValidatePort(v) == nil
 			})
 
 			if len(ports) > 0 {
@@ -209,17 +209,21 @@ func (a *NFTables) ruleFrom(c *nftables.Conn, rule *driver.Rule) (args nftablesu
 			}
 		}
 	}
-	// if len(rule.State) > 0 {
-	// 	args = args.Add(nftablesutils.SetPortRange(rule.Outerface)...)
-	// 	args = append(args, `-m`, `state`)
-	// 	args = append(args, `--state`)
-	// 	states := strings.SplitN(rule.State, ` `, 2)
-	// 	if len(states) != 2 {
-	// 		//args = append(args, TCPFlagALL, rule.State)
-	// 	} else {
-	// 		args = append(args, states...)
-	// 	}
-	// }
+	if len(rule.State) > 0 {
+		stateSet := nftablesutils.GetConntrackStateSet(a.NFTables.TableFilter())
+		states := strings.SplitN(rule.State, ` `, 2)
+		if len(states) != 2 {
+			states = strings.Split(rule.State, `,`)
+		} else {
+			states = strings.Split(states[1], `,`)
+		}
+		elems := nftablesutils.GetConntrackStateSetElems(states)
+		err = c.AddSet(stateSet, elems)
+		if err != nil {
+			return nil, err
+		}
+		args = args.Add(nftablesutils.SetConntrackStateSet(stateSet)...)
+	}
 	switch rule.Action {
 	case `accept`:
 		args = args.Add(nftablesutils.Accept())

@@ -19,9 +19,9 @@ require (
 	github.com/google/nftables v0.1.0
 	github.com/nging-plugins/servermanager v1.3.5
 	github.com/stretchr/testify v1.8.4
-	github.com/webx-top/com v0.9.4
+	github.com/webx-top/com v0.9.5
 	github.com/webx-top/db v1.23.17
-	github.com/webx-top/echo v2.35.3+incompatible
+	github.com/webx-top/echo v2.36.0+incompatible
 )
 
 require (
