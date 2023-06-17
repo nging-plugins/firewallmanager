@@ -49,7 +49,7 @@ func New(proto driver.Protocol) (*NFTables, error) {
 		NetworkNamespace: ``,
 		Enabled:          true,
 		DefaultPolicy:    `accept`,
-		TablePrefix:      `NgingStatic`,
+		TablePrefix:      `nging_`,
 		TrustPorts:       []uint16{},
 	}
 	t := &NFTables{
