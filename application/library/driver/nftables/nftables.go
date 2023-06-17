@@ -59,7 +59,8 @@ func New(proto driver.Protocol) (*NFTables, error) {
 	}
 	err := t.Init()
 	if err == nil {
-		err = t.Do(t.ApplyBase)
+		//err = t.Do(t.initTableOnly)
+		err = t.ApplyDefault()
 	}
 	return t, err
 }
@@ -74,6 +75,13 @@ var notNumberRegexp = regexp.MustCompile(`[^\d]+`)
 
 func (a *NFTables) isIPv4() bool {
 	return a.TableFamily == nftables.TableFamilyIPv4
+}
+
+func (a *NFTables) initTableOnly(conn *nftables.Conn) error {
+	if err := a.ApplyBase(conn); err != nil {
+		return err
+	}
+	return conn.Flush()
 }
 
 func (a *NFTables) ruleFrom(c *nftables.Conn, rule *driver.Rule) (args nftablesutils.Exprs, err error) {

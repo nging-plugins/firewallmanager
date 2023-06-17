@@ -28,6 +28,7 @@ func AsRule(m *dbschema.NgingFirewallRuleStatic) driver.Rule {
 		m.IpVersion = `4`
 	}
 	return driver.Rule{
+		ID:        m.Id,
 		Type:      m.Type,
 		Name:      m.Name,
 		Direction: m.Direction,
