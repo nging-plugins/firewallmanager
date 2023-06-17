@@ -115,20 +115,25 @@ func (c *firewallCmd) boot() error {
 
 	gerberosCfg := &gerberos.Configuration{
 		Verbose:      cfg.Verbose,
-		Backend:      cfg.Backend,
 		SaveFilePath: cfg.SaveFilePath,
 		Rules:        map[string]*gerberos.Rule{},
 	}
-	//gerberosCfg.Verbose = true
-	if len(gerberosCfg.Backend) == 0 {
+	switch cfg.Backend {
+	case `nftables`:
+		gerberosCfg.Backend = `nft`
+	case `iptables`:
+		gerberosCfg.Backend = `ipset`
+	case `nft`, `ipset`:
+		gerberosCfg.Backend = cfg.Backend
+	case ``:
 		backends := firewall.DynamicRuleBackends.Slice()
 		if len(backends) > 0 {
 			gerberosCfg.Backend = backends[0].K
 		}
+	default:
+		return fmt.Errorf(`unsupported firewall backend: %q`, cfg.Backend)
 	}
-	if gerberosCfg.Backend == `nftables` {
-		gerberosCfg.Backend = `nft`
-	}
+	//gerberosCfg.Verbose = true
 	ctx := defaults.NewMockContext()
 	ruleM := model.NewRuleDynamic(ctx)
 	_, err = ruleM.ListByOffset(nil, nil, 0, -1, `disabled`, `N`)

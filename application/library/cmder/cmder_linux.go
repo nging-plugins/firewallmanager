@@ -20,6 +20,33 @@
 
 package cmder
 
+import (
+	"fmt"
+
+	"github.com/admpub/packer"
+
+	"github.com/nging-plugins/firewallmanager/application/library/driver/iptables"
+	"github.com/nging-plugins/firewallmanager/application/library/driver/nftables"
+	"github.com/nging-plugins/firewallmanager/application/library/ipset"
+)
+
 func (c *firewallCmd) Boot() error {
+	cfg := c.FirewallConfig()
+	if len(cfg.Backend) == 0 {
+		if nftables.IsSupported() {
+			cfg.Backend = `nftables`
+		} else if iptables.IsSupported() {
+			if !ipset.IsSupported() {
+				err = packer.Install(`ipset`)
+				if err != nil {
+					return err
+				}
+				ipset.Reset()
+			}
+			cfg.Backend = `iptables`
+		} else {
+			return fmt.Errorf(`nftables or iptables is not installed on your system`)
+		}
+	}
 	return c.boot()
 }

@@ -20,8 +20,12 @@
 
 package firewall
 
+import (
+	"github.com/admpub/once"
+)
+
 var engine driver.Driver
-var engonce sync.Once
+var engonce once.Once
 
 func initEngine() {
 	var err error
@@ -34,4 +38,8 @@ func initEngine() {
 func Engine(_ string) driver.Driver {
 	engonce.Do(initEngine)
 	return engine
+}
+
+func ResetEngine() {
+	engonce.Reset()
 }

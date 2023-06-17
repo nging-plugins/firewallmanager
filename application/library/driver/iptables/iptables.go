@@ -35,23 +35,29 @@ import (
 
 var _ driver.Driver = (*IPTables)(nil)
 
-func New(proto iptables.Protocol, autoInstall bool) (*IPTables, error) {
+func New(proto driver.Protocol, autoInstall bool) (*IPTables, error) {
 	t := &IPTables{
 		IPProtocol: proto,
 	}
+	var family iptables.Protocol
+	if t.IPProtocol == driver.ProtocolIPv4 {
+		family = iptables.ProtocolIPv4
+	} else {
+		family = iptables.ProtocolIPv4
+	}
 	var err error
-	t.IPTables, err = iptables.New(iptables.IPFamily(t.IPProtocol))
+	t.IPTables, err = iptables.New(iptables.IPFamily(family))
 	if err != nil && autoInstall && errors.Is(err, exec.ErrNotFound) {
 		err = packer.Install(`iptables`)
 		if err == nil {
-			t.IPTables, err = iptables.New(iptables.IPFamily(t.IPProtocol))
+			t.IPTables, err = iptables.New(iptables.IPFamily(family))
 		}
 	}
 	return t, err
 }
 
 type IPTables struct {
-	IPProtocol iptables.Protocol
+	IPProtocol driver.Protocol
 	*iptables.IPTables
 }
 
@@ -130,9 +136,9 @@ func (a *IPTables) Reset() error {
 func (a *IPTables) Import(wfwFile string) error {
 	var restoreBin string
 	switch a.IPProtocol {
-	case ProtocolIPv6:
+	case driver.ProtocolIPv6:
 		restoreBin = `ip6tables-restore`
-	case ProtocolIPv4:
+	case driver.ProtocolIPv4:
 		fallthrough
 	default:
 		restoreBin = `iptables-restore`
@@ -143,9 +149,9 @@ func (a *IPTables) Import(wfwFile string) error {
 func (a *IPTables) Export(wfwFile string) error {
 	var saveBin string
 	switch a.IPProtocol {
-	case ProtocolIPv6:
+	case driver.ProtocolIPv6:
 		saveBin = `ip6tables-save`
-	case ProtocolIPv4:
+	case driver.ProtocolIPv4:
 		fallthrough
 	default:
 		saveBin = `iptables-save`
@@ -220,9 +226,9 @@ func (a *IPTables) List(table, chain string) ([]*driver.Rule, error) {
 	var rules []*driver.Rule
 	var ipVersion string
 	switch a.IPProtocol {
-	case ProtocolIPv6:
+	case driver.ProtocolIPv6:
 		ipVersion = `6`
-	case ProtocolIPv4:
+	case driver.ProtocolIPv4:
 		fallthrough
 	default:
 		ipVersion = `4`

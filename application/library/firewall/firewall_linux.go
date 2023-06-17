@@ -23,18 +23,26 @@ package firewall
 import (
 	"sync"
 
+	"github.com/admpub/once"
+
 	"github.com/nging-plugins/firewallmanager/application/library/driver"
 	"github.com/nging-plugins/firewallmanager/application/library/driver/iptables"
+	"github.com/nging-plugins/firewallmanager/application/library/driver/nftables"
 )
 
 var engineIPv4 driver.Driver
-var engonceIPv4 sync.Once
+var engonceIPv4 once.Once
 var engineIPv6 driver.Driver
-var engonceIPv6 sync.Once
+var engonceIPv6 once.Once
 
 func initEngineIPv4() {
 	var err error
-	engineIPv4, err = iptables.New(iptables.ProtocolIPv4, false)
+	cfg := cmder.GetFirewallConfig()
+	if cfg.Backend == `nftables` {
+		engineIPv4, err = nftables.New(driver.ProtocolIPv4)
+	} else {
+		engineIPv4, err = iptables.New(driver.ProtocolIPv4, false)
+	}
 	if err != nil {
 		panic(err)
 	}
@@ -47,7 +55,12 @@ func EngineIPv4() driver.Driver {
 
 func initEngineIPv6() {
 	var err error
-	engineIPv6, err = iptables.New(iptables.ProtocolIPv6, false)
+	cfg := cmder.GetFirewallConfig()
+	if cfg.Backend == `nftables` {
+		engineIPv6, err = nftables.New(driver.ProtocolIPv6)
+	} else {
+		engineIPv6, err = iptables.New(driver.ProtocolIPv6, false)
+	}
 	if err != nil {
 		panic(err)
 	}
@@ -63,4 +76,9 @@ func Engine(ipVersionNumber string) driver.Driver {
 		return EngineIPv6()
 	}
 	return EngineIPv4()
+}
+
+func ResetEngine() {
+	engonceIPv4.Reset()
+	engonceIPv6.Reset()
 }

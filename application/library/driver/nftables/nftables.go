@@ -28,13 +28,20 @@ import (
 	setutils "github.com/admpub/nftablesutils/set"
 	"github.com/google/nftables"
 	"github.com/google/nftables/binaryutil"
+	"github.com/google/nftables/expr"
 	"github.com/nging-plugins/firewallmanager/application/library/driver"
 	"github.com/webx-top/echo/param"
 )
 
 var _ driver.Driver = (*NFTables)(nil)
 
-func New(family nftables.TableFamily) (*NFTables, error) {
+func New(proto driver.Protocol) (*NFTables, error) {
+	var family nftables.TableFamily
+	if proto == driver.ProtocolIPv4 {
+		family = nftables.TableFamilyIPv4
+	} else {
+		family = nftables.TableFamilyIPv6
+	}
 	cfg := biz.Config{
 		Enabled:       true,
 		DefaultPolicy: `accept`,
@@ -229,12 +236,17 @@ func (a *NFTables) ruleFrom(c *nftables.Conn, rule *driver.Rule) (args nftablesu
 		args = args.Add(nftablesutils.SetConntrackStateSet(stateSet)...)
 	}
 	switch rule.Action {
-	case `accept`:
+	case `accept`, `ACCEPT`:
 		args = args.Add(nftablesutils.Accept())
-	case `drop`:
+	case `drop`, `DROP`:
 		args = args.Add(nftablesutils.Drop())
-	case `reject`:
+	case `reject`, `REJECT`:
 		args = args.Add(nftablesutils.Reject())
+	case `log`, `LOG`:
+		args = args.Add(&expr.Log{
+			Level: expr.LogLevelAlert,
+			Flags: expr.LogFlagsNFLog,
+		})
 	default:
 		args = args.Add(nftablesutils.Drop())
 	}
@@ -246,7 +258,11 @@ func (a *NFTables) Enabled(on bool) error {
 }
 
 func (a *NFTables) Reset() error {
-	return driver.ErrUnsupported
+	return a.NFTables.Do(func(conn *nftables.Conn) error {
+		conn.FlushTable(a.NFTables.TableFilter())
+		conn.FlushTable(a.NFTables.TableNAT())
+		return conn.Flush()
+	})
 }
 
 func (a *NFTables) Import(wfwFile string) error {

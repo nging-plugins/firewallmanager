@@ -30,6 +30,9 @@ func Engine(ipVersionNumber string) driver.Driver {
 	return defaultUnsupportedDriver
 }
 
+func ResetEngine() {
+}
+
 var ErrUnsupportedOperatingSystem = errors.New(`This feature is not supported in the current operating system`) //此功能在当前操作系统里不支持
 
 var defaultUnsupportedDriver = &unsupportedDriver{}

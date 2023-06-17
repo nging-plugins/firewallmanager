@@ -18,15 +18,6 @@
 
 package iptables
 
-import (
-	"github.com/admpub/go-iptables/iptables"
-)
-
-const (
-	ProtocolIPv4 iptables.Protocol = iptables.ProtocolIPv4
-	ProtocolIPv6 iptables.Protocol = iptables.ProtocolIPv6
-)
-
 const (
 	// 传输协议
 	ProtocolTCP  = `tcp`
