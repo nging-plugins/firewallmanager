@@ -29,12 +29,9 @@ func RunCmd(path string, args []string, stdout io.Writer, stdin ...io.Reader) er
 	if args == nil {
 		args = []string{}
 	}
-	cmd := exec.Cmd{
-		Path:   path,
-		Args:   args,
-		Stdout: stdout,
-		Stderr: packer.Stderr,
-	}
+	cmd := exec.Command(path, args...)
+	cmd.Stdout = stdout
+	cmd.Stderr = packer.Stderr
 	if len(stdin) > 0 {
 		cmd.Stdin = stdin[0]
 	}

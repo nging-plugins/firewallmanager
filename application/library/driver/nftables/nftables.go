@@ -19,9 +19,12 @@
 package nftables
 
 import (
+	"bytes"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/admpub/nftablesutils"
@@ -62,12 +65,14 @@ func New(proto driver.Protocol) (*NFTables, error) {
 		//err = t.Do(t.initTableOnly)
 		err = t.ApplyDefault()
 	}
+	t.bin, err = exec.LookPath(`nft`)
 	return t, err
 }
 
 type NFTables struct {
 	TableFamily nftables.TableFamily
 	cfg         *biz.Config
+	bin         string
 	*biz.NFTables
 }
 
@@ -293,9 +298,7 @@ func (a *NFTables) Reset() error {
 }
 
 func (a *NFTables) Import(wfwFile string) error {
-	var restoreBin string
-	restoreBin = `nft`
-	return driver.RunCmd(restoreBin, []string{`-f`, wfwFile}, nil)
+	return driver.RunCmd(a.bin, []string{`-f`, wfwFile}, nil)
 }
 
 func (a *NFTables) Export(wfwFile string) error {
@@ -305,11 +308,41 @@ func (a *NFTables) Export(wfwFile string) error {
 		return err
 	}
 	defer f.Close()
-	err = driver.RunCmd(`nft`, []string{`list`, `ruleset`}, f)
+	err = driver.RunCmd(a.bin, []string{`list`, `ruleset`}, f)
 	if err != nil {
 		return err
 	}
 	return f.Sync()
+}
+
+func (a *NFTables) ListSets(table, set string, page, limit uint) (rows []RowInfo, hasMore bool, err error) {
+	buf := bytes.NewBuffer(nil)
+	//nft --handle list set test_filter trust_ipset
+	err = driver.RunCmd(a.bin, []string{`--handle`, `list`, `set`, a.getTableFamilyString(), table, set}, buf)
+	if err != nil {
+		return
+	}
+	return ListPage(buf, page, limit)
+}
+
+func (a *NFTables) getTableFamilyString() string {
+	var family string
+	if a.isIPv4() {
+		family = `ip`
+	} else {
+		family = `ip6`
+	}
+	return family
+}
+
+func (a *NFTables) ListChainRules(table, chain string, page, limit uint) (rows []RowInfo, hasMore bool, err error) {
+	buf := bytes.NewBuffer(nil)
+	//nft --handle list chain test_filter input
+	err = driver.RunCmd(a.bin, []string{`--handle`, `list`, `chain`, a.getTableFamilyString(), table, chain}, buf)
+	if err != nil {
+		return
+	}
+	return ListPage(buf, page, limit)
 }
 
 func (a *NFTables) NewFilterRuleTarget(chain ...*nftables.Chain) ruleutils.RuleTarget {
@@ -402,17 +435,60 @@ func (a *NFTables) Update(rule driver.Rule) error {
 	})
 }
 
+func (a *NFTables) DeleteElementInSet(table, set, element string) (err error) {
+	//nft delete element global ipv4_ad { 192.168.1.5 }
+	//element = com.AddCSlashes(element, ';')
+	err = driver.RunCmd(a.bin, []string{
+		`delete`, `element`, a.getTableFamilyString(), table, set, `{ ` + element + ` }`,
+	}, nil)
+	return
+}
+
+func (a *NFTables) DeleteElementInSetByHandleID(table, set string, handleID uint64) (err error) {
+	err = driver.RunCmd(a.bin, []string{
+		`delete`, `element`, a.getTableFamilyString(), table, set,
+		`handle`, strconv.FormatUint(handleID, 10),
+	}, nil)
+	return
+}
+
+func (a *NFTables) DeleteSet(table, set string) (err error) {
+	//nft delete set global myset
+	err = driver.RunCmd(a.bin, []string{
+		`delete`, `set`, a.getTableFamilyString(), table, set,
+	}, nil)
+	return
+}
+
+func (a *NFTables) DeleteRuleByHandleID(table, chain string, handleID uint64) (err error) {
+	//nft delete rule filter output handle 10
+	err = driver.RunCmd(a.bin, []string{
+		`delete`, `rule`, a.getTableFamilyString(), table, chain,
+		`handle`, strconv.FormatUint(handleID, 10),
+	}, nil)
+	return
+}
+
+func (a *NFTables) DeleteByHandleID(rules ...driver.Rule) (err error) {
+	//nft delete rule filter output handle 10
+	for _, rule := range rules {
+		err = driver.RunCmd(a.bin, []string{
+			`delete`, `rule`, a.getTableFamilyString(), rule.Type, rule.Direction,
+			`handle`, strconv.FormatUint(rule.Number, 10),
+		}, nil)
+		if err != nil {
+			return
+		}
+	}
+	return
+}
+
 func (a *NFTables) Delete(rules ...driver.Rule) (err error) {
 	ruleTarget := a.NewFilterRuleTarget()
 	return a.NFTables.Do(func(conn *nftables.Conn) error {
 		for _, rule := range rules {
-			copyRule := rule
-			exprs, err := a.ruleFrom(conn, &copyRule)
-			if err != nil {
-				return err
-			}
 			id := binaryutil.BigEndian.PutUint64(uint64(rule.ID))
-			ruleData := ruleutils.NewData(id, exprs)
+			ruleData := ruleutils.NewData(id, nil, rule.Number)
 			_, err = ruleTarget.Delete(conn, ruleData)
 			if err != nil {
 				return err
@@ -431,7 +507,7 @@ func (a *NFTables) Exists(rule driver.Rule) (bool, error) {
 			return err
 		}
 		id := binaryutil.BigEndian.PutUint64(uint64(rule.ID))
-		ruleData := ruleutils.NewData(id, exprs)
+		ruleData := ruleutils.NewData(id, exprs, rule.Number)
 		exists, err = ruleTarget.Exists(conn, ruleData)
 		return
 	})

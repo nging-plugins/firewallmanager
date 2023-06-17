@@ -21,12 +21,14 @@
                 {{- end -}}
                 </div>
                 <div class="btn-group">
+				<span class="btn btn-default disabled">table</span>
                 {{- range $k, $v := $.Stored.tableList -}}
                 {{- $table := $v -}}
                 <a href="{{BackendURL}}/firewall/iptables/index?ipVer={{$.Stored.ipVer}}&table={{$table}}" class="btn {{if eq $.Stored.table $table}}btn-primary{{else}}btn-default{{end}}">{{$v|UpperCaseFirst}}</a>
                 {{- end -}}
                 </div>
                 <div class="btn-group">
+				<span class="btn btn-default disabled">chain</span>
                 {{- range $k, $chain := $.Stored.chainList -}}
                 <a href="{{BackendURL}}/firewall/iptables/index?ipVer={{$.Stored.ipVer}}&table={{$.Stored.table}}&chain={{$chain}}" class="btn {{if eq $.Stored.chain $chain}}btn-primary{{else}}btn-default{{end}}">{{$chain}}</a>
                 {{- end -}}
@@ -35,9 +37,9 @@
 					<table class="table no-border hover">
 						<thead class="no-border">
 							<tr>
-								<th style="width:30px"><strong></strong></th>
+								<th class="text-center" style="width:30px"><strong></strong></th>
                                 {{- range $k, $v := $.Stored.fieldList -}}
-								<th><strong>{{$v}}</strong></th>
+								<th class="text-center"><strong>{{$v}}</strong></th>
                                 {{- end -}}
 								<th class="text-center"><strong>{{`操作`|$.T}}</strong></th>
 							</tr>
@@ -47,7 +49,7 @@
 							<tr>
 								<td>
 									<div class="checkbox checkbox-success no-margin-y">
-										<input id="checkbox-{{$k}}" class="styled switch-disabled" type="checkbox" data-id="{{$v.num}}"{{if eq $v.Disabled "N"}} checked="checked"{{end}} value="N" /><label for="checkbox-{{$k}}">&nbsp;</label>
+										<input id="checkbox-{{$k}}" class="styled switch-disabled" type="checkbox" value="{{$v.num}}" /><label for="checkbox-{{$k}}">&nbsp;</label>
 									</div>
 								</td>
 
