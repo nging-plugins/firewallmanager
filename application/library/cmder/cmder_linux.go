@@ -37,11 +37,11 @@ func (c *firewallCmd) Boot() error {
 			cfg.Backend = `nftables`
 		} else if iptables.IsSupported() {
 			if !ipset.IsSupported() {
-				err = packer.Install(`ipset`)
+				err := packer.Install(`ipset`)
 				if err != nil {
 					return err
 				}
-				ipset.Reset()
+				ipset.ResetCheck()
 			}
 			cfg.Backend = `iptables`
 		} else {

@@ -22,6 +22,20 @@
 					<span class="label label-default label-btn-size x-block" data-toggle="tooltip" title="{{`请确保有可用动态规则`|$.T}}">{{`动态规则服务已停止`|$.T}}</span>
 				{{- end -}}
 				</div>
+				{{- if $.Stored.firewallBackend -}}
+				<span class="text-success pull-right xs-margin-right" style="line-height:35px">
+					<i class="fa fa-shield"></i>
+					{{$.Stored.firewallBackend}}
+					{{- if eq `iptables` $.Stored.firewallBackend -}}
+					<em class="text-pink">(ipset)</em>
+					{{- end -}}
+				</span>
+				{{- else -}}
+				<span class="text-danger pull-right xs-margin-right" style="line-height:35px">
+					<i class="fa fa-shield"></i>
+					{{`Unknown`|$.T}}
+				</span>
+				{{- end -}}
 				<h3>{{"动态规则"|$.T}}</h3>
 			</div>
 			<div class="content">

@@ -24,6 +24,9 @@ import (
 	"github.com/admpub/once"
 )
 
+func initBackend() {
+}
+
 var engine driver.Driver
 var engonce once.Once
 

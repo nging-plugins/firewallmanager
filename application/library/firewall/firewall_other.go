@@ -26,6 +26,9 @@ import (
 	"github.com/nging-plugins/firewallmanager/application/library/driver"
 )
 
+func initBackend() {
+}
+
 func Engine(ipVersionNumber string) driver.Driver {
 	return defaultUnsupportedDriver
 }

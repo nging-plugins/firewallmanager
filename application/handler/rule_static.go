@@ -37,6 +37,7 @@ func ruleStaticIndex(ctx echo.Context) error {
 	sorts := common.Sorts(ctx, m.NgingFirewallRuleStatic)
 	list, err := m.ListPage(cond, sorts...)
 	ctx.Set(`listData`, list)
+	ctx.Set(`firewallBackend`, firewall.GetBackend())
 	return ctx.Render(`firewall/rule/static`, common.Err(ctx, err))
 }
 

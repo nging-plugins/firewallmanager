@@ -19,8 +19,22 @@
 package firewall
 
 import (
+	"github.com/admpub/once"
 	"github.com/nging-plugins/firewallmanager/application/library/driver"
 )
+
+var backend string
+var backendOnce once.Once
+
+func GetBackend() string {
+	backendOnce.Do(initBackend)
+	return backend
+}
+
+func ResetBackend() {
+	backendOnce.Reset()
+	ResetEngine()
+}
 
 func Insert(pos int, rule *driver.Rule) (err error) {
 	if rule.IPVersion == `all` {

@@ -21,14 +21,20 @@
 package firewall
 
 import (
-	"sync"
-
 	"github.com/admpub/once"
 
 	"github.com/nging-plugins/firewallmanager/application/library/driver"
 	"github.com/nging-plugins/firewallmanager/application/library/driver/iptables"
 	"github.com/nging-plugins/firewallmanager/application/library/driver/nftables"
 )
+
+func initBackend() {
+	if nftables.IsSupported() {
+		backend = `nftables`
+	} else if iptables.IsSupported() {
+		backend = `iptables`
+	}
+}
 
 var engineIPv4 driver.Driver
 var engonceIPv4 once.Once
@@ -37,8 +43,7 @@ var engonceIPv6 once.Once
 
 func initEngineIPv4() {
 	var err error
-	cfg := cmder.GetFirewallConfig()
-	if cfg.Backend == `nftables` {
+	if GetBackend() == `nftables` {
 		engineIPv4, err = nftables.New(driver.ProtocolIPv4)
 	} else {
 		engineIPv4, err = iptables.New(driver.ProtocolIPv4, false)
@@ -55,8 +60,7 @@ func EngineIPv4() driver.Driver {
 
 func initEngineIPv6() {
 	var err error
-	cfg := cmder.GetFirewallConfig()
-	if cfg.Backend == `nftables` {
+	if GetBackend() == `nftables` {
 		engineIPv6, err = nftables.New(driver.ProtocolIPv6)
 	} else {
 		engineIPv6, err = iptables.New(driver.ProtocolIPv6, false)

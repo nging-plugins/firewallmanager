@@ -31,6 +31,7 @@ import (
 	"github.com/google/nftables/expr"
 	"github.com/nging-plugins/firewallmanager/application/library/driver"
 	"github.com/webx-top/echo/param"
+	"golang.org/x/sys/unix"
 )
 
 var _ driver.Driver = (*NFTables)(nil)
@@ -245,7 +246,9 @@ func (a *NFTables) ruleFrom(c *nftables.Conn, rule *driver.Rule) (args nftablesu
 	case `log`, `LOG`:
 		args = args.Add(&expr.Log{
 			Level: expr.LogLevelAlert,
-			Flags: expr.LogFlagsNFLog,
+			Flags: expr.LogFlagsNFLog, //expr.LogFlagsIPOpt | expr.LogFlagsTCPOpt,
+			Key:   1 << unix.NFTA_LOG_PREFIX,
+			Data:  []byte(`nging_`),
 		})
 	default:
 		args = args.Add(nftablesutils.Drop())

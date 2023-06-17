@@ -16,6 +16,17 @@
 					<i class="fa fa-refresh"></i> {{"应用规则"|$.T}}
 				</button>
 				<span class="text-warning pull-right xs-margin-right" style="line-height:35px">{{`黑名单模式`|$.T}}</span>
+				{{- if $.Stored.firewallBackend -}}
+				<span class="text-success pull-right xs-margin-right" style="line-height:35px">
+					<i class="fa fa-shield"></i>
+					{{$.Stored.firewallBackend}}
+				</span>
+				{{- else -}}
+				<span class="text-danger pull-right xs-margin-right" style="line-height:35px">
+					<i class="fa fa-shield"></i>
+					{{`Unknown`|$.T}}
+				</span>
+				{{- end -}}
 				<h3>{{"静态规则"|$.T}}</h3>
 			</div>
 			<div class="content">
