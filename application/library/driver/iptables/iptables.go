@@ -21,7 +21,9 @@ package iptables
 import (
 	"errors"
 	"fmt"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -143,7 +145,12 @@ func (a *IPTables) Import(wfwFile string) error {
 	default:
 		restoreBin = `iptables-restore`
 	}
-	return driver.RunCmd(restoreBin, []string{`<`, wfwFile}, nil)
+	f, err := os.Open(wfwFile)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	return driver.RunCmd(restoreBin, nil, nil, f)
 }
 
 func (a *IPTables) Export(wfwFile string) error {
@@ -156,7 +163,17 @@ func (a *IPTables) Export(wfwFile string) error {
 	default:
 		saveBin = `iptables-save`
 	}
-	return driver.RunCmd(saveBin, []string{`>`, wfwFile}, nil)
+	os.MkdirAll(filepath.Dir(wfwFile), os.ModePerm)
+	f, err := os.Create(wfwFile)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	err = driver.RunCmd(saveBin, nil, f)
+	if err != nil {
+		return err
+	}
+	return f.Sync()
 }
 
 func (a *IPTables) Insert(pos int, rule *driver.Rule) error {

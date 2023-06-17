@@ -19,6 +19,8 @@
 package nftables
 
 import (
+	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -44,10 +46,11 @@ func New(proto driver.Protocol) (*NFTables, error) {
 		family = nftables.TableFamilyIPv6
 	}
 	cfg := biz.Config{
-		Enabled:       true,
-		DefaultPolicy: `accept`,
-		TablePrefix:   `nging_`,
-		TrustPorts:    []uint16{},
+		NetworkNamespace: ``,
+		Enabled:          true,
+		DefaultPolicy:    `accept`,
+		TablePrefix:      `NgingStatic`,
+		TrustPorts:       []uint16{},
 	}
 	t := &NFTables{
 		TableFamily: family,
@@ -270,13 +273,22 @@ func (a *NFTables) Reset() error {
 
 func (a *NFTables) Import(wfwFile string) error {
 	var restoreBin string
-	restoreBin = `iptables-restore`
-	return driver.RunCmd(restoreBin, []string{`<`, wfwFile}, nil)
+	restoreBin = `nft`
+	return driver.RunCmd(restoreBin, []string{`-f`, wfwFile}, nil)
 }
 
 func (a *NFTables) Export(wfwFile string) error {
-	var saveBin string
-	return driver.RunCmd(saveBin, []string{`>`, wfwFile}, nil)
+	os.MkdirAll(filepath.Dir(wfwFile), os.ModePerm)
+	f, err := os.Create(wfwFile)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	err = driver.RunCmd(`nft`, []string{`list`, `ruleset`}, f)
+	if err != nil {
+		return err
+	}
+	return f.Sync()
 }
 
 func (a *NFTables) NewFilterRuleTarget(chain ...*nftables.Chain) ruleutils.RuleTarget {

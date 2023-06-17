@@ -25,12 +25,18 @@ import (
 	"github.com/admpub/packer"
 )
 
-func RunCmd(path string, args []string, stdout io.Writer) error {
+func RunCmd(path string, args []string, stdout io.Writer, stdin ...io.Reader) error {
+	if args == nil {
+		args = []string{}
+	}
 	cmd := exec.Cmd{
 		Path:   path,
 		Args:   args,
 		Stdout: stdout,
 		Stderr: packer.Stderr,
+	}
+	if len(stdin) > 0 {
+		cmd.Stdin = stdin[0]
 	}
 
 	if err := cmd.Run(); err != nil {

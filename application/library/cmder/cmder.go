@@ -46,8 +46,8 @@ import (
 const Name = `firewall`
 const DefaultPidFile = `firewall.pid`
 const DefaultChainName = `NgingDynamic`
-const DefaultTable4Name = `NgingIPv4`
-const DefaultTable6Name = `NgingIPv6`
+const DefaultTable4Name = `NgingDynamicIPv4`
+const DefaultTable6Name = `NgingDynamicIPv6`
 
 func init() {
 	cmder.Register(Name, New())
