@@ -22,8 +22,8 @@
                 </div>
                 <div class="btn-group">
                 {{- range $k, $v := $.Stored.tableList -}}
-                {{- $table := $v.K -}}
-                <a href="{{BackendURL}}/firewall/iptables/index?ipVer={{$.Stored.ipVer}}&table={{$table}}" class="btn {{if eq $.Stored.table $table}}btn-primary{{else}}btn-default{{end}}">{{$v.V}}</a>
+                {{- $table := $v -}}
+                <a href="{{BackendURL}}/firewall/iptables/index?ipVer={{$.Stored.ipVer}}&table={{$table}}" class="btn {{if eq $.Stored.table $table}}btn-primary{{else}}btn-default{{end}}">{{$v|UpperCaseFirst}}</a>
                 {{- end -}}
                 </div>
                 <div class="btn-group">

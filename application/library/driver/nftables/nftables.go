@@ -94,7 +94,20 @@ func (a *NFTables) ruleFrom(c *nftables.Conn, rule *driver.Rule) (args nftablesu
 	if len(rule.Direction) == 0 {
 		rule.Direction = `input`
 	}
-	args = nftablesutils.JoinExprs(nftablesutils.SetProtoTCP())
+	switch rule.Protocol {
+	case `tcp`:
+		args = nftablesutils.JoinExprs(nftablesutils.SetProtoTCP())
+	case `udp`:
+		args = nftablesutils.JoinExprs(nftablesutils.SetProtoUDP())
+	case `icmp`:
+		if a.isIPv4() {
+			args = nftablesutils.JoinExprs(nftablesutils.SetProtoICMP())
+		} else {
+			args = nftablesutils.JoinExprs(nftablesutils.SetProtoICMPv6())
+		}
+	default:
+		// all
+	}
 	if len(rule.Interface) > 0 {
 		args = args.Add(nftablesutils.SetIIF(rule.Interface)...) // 只能用于 PREROUTING、INPUT、FORWARD
 	} else if len(rule.Outerface) > 0 {
