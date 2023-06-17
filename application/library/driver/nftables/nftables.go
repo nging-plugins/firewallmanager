@@ -211,7 +211,7 @@ func (a *NFTables) ruleFrom(c *nftables.Conn, rule *driver.Rule) (args nftablesu
 	}
 	if len(rule.State) > 0 {
 		stateSet := nftablesutils.GetConntrackStateSet(a.NFTables.TableFilter())
-		states := strings.SplitN(rule.State, ` `, 2)
+		states := strings.SplitN(rule.State, ` `, 2) // "target1,target2 allow1,allow2"
 		if len(states) != 2 {
 			states = strings.Split(rule.State, `,`)
 		} else {
