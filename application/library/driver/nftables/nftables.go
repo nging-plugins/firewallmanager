@@ -217,6 +217,10 @@ func (a *NFTables) ruleFrom(c *nftables.Conn, rule *driver.Rule) (args nftablesu
 		} else {
 			states = strings.Split(states[1], `,`)
 		}
+		states = param.StringSlice(states).Unique().Filter().String()
+		if len(states) == 0 {
+			states = []string{nftablesutils.StateNew, nftablesutils.StateEstablished}
+		}
 		elems := nftablesutils.GetConntrackStateSetElems(states)
 		err = c.AddSet(stateSet, elems)
 		if err != nil {
