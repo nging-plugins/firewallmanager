@@ -176,21 +176,32 @@ func (a *IPTables) Export(wfwFile string) error {
 	return f.Sync()
 }
 
-func (a *IPTables) Insert(pos int, rule *driver.Rule) error {
-	if pos <= 0 {
-		pos = 1
+func (a *IPTables) Insert(rules ...driver.Rule) (err error) {
+	for _, rule := range rules {
+		copyRule := rule
+		rulespec := a.ruleFrom(&copyRule)
+		table := copyRule.Type
+		chain := copyRule.Direction
+		err = a.IPTables.InsertUnique(table, chain, int(copyRule.Number), rulespec...)
+		if err != nil {
+			break
+		}
 	}
-	rulespec := a.ruleFrom(rule)
-	table := rule.Type
-	chain := rule.Direction
-	return a.IPTables.InsertUnique(table, chain, pos, rulespec...)
+	return err
 }
 
-func (a *IPTables) Append(rule *driver.Rule) error {
-	rulespec := a.ruleFrom(rule)
-	table := rule.Type
-	chain := rule.Direction
-	return a.IPTables.AppendUnique(table, chain, rulespec...)
+func (a *IPTables) Append(rules ...driver.Rule) (err error) {
+	for _, rule := range rules {
+		copyRule := rule
+		rulespec := a.ruleFrom(&copyRule)
+		table := copyRule.Type
+		chain := copyRule.Direction
+		err = a.IPTables.AppendUnique(table, chain, rulespec...)
+		if err != nil {
+			break
+		}
+	}
+	return err
 }
 
 func (a *IPTables) AsWhitelist(table, chain string) error {
@@ -198,33 +209,37 @@ func (a *IPTables) AsWhitelist(table, chain string) error {
 }
 
 // Update update rulespec in specified table/chain
-func (a *IPTables) Update(pos int, rule *driver.Rule) error {
-	if pos <= 0 {
-		return driver.ErrInvalidRuleNumber
-	}
-	rulespec := a.ruleFrom(rule)
+func (a *IPTables) Update(rule driver.Rule) error {
+	rulespec := a.ruleFrom(&rule)
 	table := rule.Type
 	chain := rule.Direction
 	args := []string{"-t", table, "-R", chain}
-	args = append(args, strconv.Itoa(pos))
+	args = append(args, strconv.FormatUint(rule.Number, 10))
 	cmd := append(args, rulespec...)
 	return a.IPTables.Run(cmd...)
 }
 
-func (a *IPTables) Delete(rule *driver.Rule) error {
-	var rulespec []string
-	if rule.Number > 0 {
-		rulespec = append(rulespec, strconv.FormatUint(rule.Number, 10))
-	} else {
-		rulespec = a.ruleFrom(rule)
+func (a *IPTables) Delete(rules ...driver.Rule) (err error) {
+	for _, rule := range rules {
+		copyRule := rule
+		var rulespec []string
+		if rule.Number > 0 {
+			rulespec = append(rulespec, strconv.FormatUint(rule.Number, 10))
+		} else {
+			rulespec = a.ruleFrom(&copyRule)
+		}
+		table := rule.Type
+		chain := rule.Direction
+		err = a.IPTables.Delete(table, chain, rulespec...)
+		if err != nil {
+			break
+		}
 	}
-	table := rule.Type
-	chain := rule.Direction
-	return a.IPTables.Delete(table, chain, rulespec...)
+	return err
 }
 
-func (a *IPTables) Exists(rule *driver.Rule) (bool, error) {
-	rulespec := a.ruleFrom(rule)
+func (a *IPTables) Exists(rule driver.Rule) (bool, error) {
+	rulespec := a.ruleFrom(&rule)
 	table := rule.Type
 	chain := rule.Direction
 	return a.IPTables.Exists(table, chain, rulespec...)

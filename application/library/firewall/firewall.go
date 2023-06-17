@@ -19,6 +19,7 @@
 package firewall
 
 import (
+	"github.com/admpub/nging/v5/application/library/errorslice"
 	"github.com/admpub/once"
 	"github.com/nging-plugins/firewallmanager/application/library/driver"
 )
@@ -36,42 +37,74 @@ func ResetBackend() {
 	ResetEngine()
 }
 
-func Insert(pos int, rule *driver.Rule) (err error) {
-	if rule.IPVersion == `all` {
-		err = Engine(`4`).Insert(pos, rule)
-		if err != nil {
-			return
+func RulesGroupByIPVersion(rules []driver.Rule) map[string][]driver.Rule {
+	g := map[string][]driver.Rule{}
+	for _, rule := range rules {
+		if rule.IPVersion == `all` {
+			if _, ok := g[`4`]; !ok {
+				g[`4`] = []driver.Rule{}
+			}
+			if _, ok := g[`6`]; !ok {
+				g[`6`] = []driver.Rule{}
+			}
+			g[`4`] = append(g[`4`], rule)
+			g[`6`] = append(g[`6`], rule)
+		} else {
+			if _, ok := g[rule.IPVersion]; !ok {
+				g[rule.IPVersion] = []driver.Rule{}
+			}
+			g[rule.IPVersion] = append(g[rule.IPVersion], rule)
 		}
-		err = Engine(`6`).Insert(pos, rule)
-		return
 	}
-	err = Engine(rule.IPVersion).Insert(pos, rule)
+	return g
+}
+
+func Insert(rules ...driver.Rule) (err error) {
+	errs := errorslice.New()
+	for _ipVer, _rules := range RulesGroupByIPVersion(rules) {
+		err := Engine(_ipVer).Insert(_rules...)
+		if err != nil {
+			errs.Add(err)
+		}
+	}
+	err = errs.ToError()
 	return
 }
 
-func Update(pos int, rule *driver.Rule) (err error) {
-	if rule.IPVersion == `all` {
-		err = Engine(`4`).Update(pos, rule)
+func Append(rules ...driver.Rule) (err error) {
+	errs := errorslice.New()
+	for _ipVer, _rules := range RulesGroupByIPVersion(rules) {
+		err := Engine(_ipVer).Append(_rules...)
 		if err != nil {
-			return
+			errs.Add(err)
 		}
-		err = Engine(`6`).Update(pos, rule)
-		return
 	}
-	err = Engine(rule.IPVersion).Update(pos, rule)
+	err = errs.ToError()
 	return
 }
 
-func Delete(rule *driver.Rule) (err error) {
+func Update(rule driver.Rule) (err error) {
 	if rule.IPVersion == `all` {
-		err = Engine(`4`).Delete(rule)
+		err = Engine(`4`).Update(rule)
 		if err != nil {
 			return
 		}
-		err = Engine(`6`).Delete(rule)
-	} else {
-		err = Engine(rule.IPVersion).Delete(rule)
+		err = Engine(`6`).Update(rule)
+		return
 	}
+	err = Engine(rule.IPVersion).Update(rule)
+	return
+}
+
+func Delete(rules ...driver.Rule) (err error) {
+	errs := errorslice.New()
+	for _ipVer, _rules := range RulesGroupByIPVersion(rules) {
+		err := Engine(_ipVer).Delete(_rules...)
+		if err != nil {
+			errs.Add(err)
+		}
+	}
+	err = errs.ToError()
 	return err
 }
 

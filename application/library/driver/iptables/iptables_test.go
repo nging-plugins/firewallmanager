@@ -21,7 +21,7 @@ func TestAppend(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = a.Append(&driver.Rule{
+	err = a.Append(driver.Rule{
 		Type:      TableFilter,
 		Name:      `testAppend`,
 		Direction: ChainInput,

@@ -23,12 +23,12 @@ type Driver interface {
 	Reset() error
 	Import(wfwFile string) error
 	Export(wfwFile string) error
-	Insert(pos int, rule *Rule) error
+	Insert(rules ...Rule) error
 	AsWhitelist(table, chain string) error
-	Append(rule *Rule) error
-	Update(pos int, rule *Rule) error
-	Delete(rule *Rule) error
-	Exists(rule *Rule) (bool, error)
+	Append(rules ...Rule) error
+	Update(rule Rule) error
+	Delete(rules ...Rule) error
+	Exists(rule Rule) (bool, error)
 	Stats(table, chain string) ([]map[string]string, error)
 	List(table, chain string) ([]*Rule, error)
 }

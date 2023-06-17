@@ -112,7 +112,7 @@ func ipTablesDelete(ctx echo.Context) error {
 		handler.SendErr(ctx, ctx.NewError(code.Failure, `操作失败，规则有更改，编号可能已经发生变化，请重新操作`))
 		return ctx.Redirect(handler.URLFor(`/firewall/iptables/index`) + `?ipVer=` + ipVer + `&table=` + table + `&chain=` + chain)
 	}
-	err := firewall.Engine(ipVer).Delete(&driver.Rule{
+	err := firewall.Engine(ipVer).Delete(driver.Rule{
 		Number:    id,
 		Type:      table,
 		Direction: chain,

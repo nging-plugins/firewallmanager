@@ -27,6 +27,7 @@ import (
 	"github.com/admpub/nging/v5/application/handler"
 	"github.com/admpub/nging/v5/application/library/common"
 	"github.com/admpub/nging/v5/application/library/errorslice"
+	"github.com/nging-plugins/firewallmanager/application/library/driver"
 	"github.com/nging-plugins/firewallmanager/application/library/firewall"
 	"github.com/nging-plugins/firewallmanager/application/model"
 )
@@ -54,7 +55,7 @@ func ruleStaticAdd(ctx echo.Context) error {
 			goto END
 		}
 		rule := m.AsRule()
-		err = firewall.Insert(0, &rule)
+		err = firewall.Insert(rule)
 		if err != nil {
 			goto END
 		}
@@ -96,13 +97,13 @@ func ruleStaticEdit(ctx echo.Context) error {
 			goto END
 		}
 		oldRule := model.AsRule(&old)
-		err = firewall.Delete(&oldRule)
+		err = firewall.Delete(oldRule)
 		if err != nil {
 			goto END
 		}
 		setStaticRuleLastModifyTime(time.Now())
 		rule := m.AsRule()
-		err = firewall.Insert(0, &rule)
+		err = firewall.Insert(rule)
 		if err != nil {
 			goto END
 		}
@@ -119,9 +120,9 @@ func ruleStaticEdit(ctx echo.Context) error {
 			}
 			rule := m.AsRule()
 			if m.Disabled == `Y` {
-				err = firewall.Delete(&rule)
+				err = firewall.Delete(rule)
 			} else {
-				err = firewall.Update(0, &rule)
+				err = firewall.Update(rule)
 			}
 			if err != nil {
 				data.SetError(err)
@@ -148,7 +149,7 @@ func ruleStaticDelete(ctx echo.Context) error {
 		err = m.Delete(nil, `id`, id)
 		if err == nil {
 			rule := m.AsRule()
-			err = firewall.Delete(&rule)
+			err = firewall.Delete(rule)
 		}
 	}
 	if err == nil {
@@ -165,11 +166,18 @@ func ruleStaticApply(ctx echo.Context) error {
 	m := model.NewRuleStatic(ctx)
 	_, err := m.ListByOffset(nil, nil, 0, -1, `disabled`, `Y`)
 	if err == nil {
-		for _, row := range m.Objects() {
+		rows := m.Objects()
+		deleteRules := make([]driver.Rule, len(rows))
+		for idx, row := range rows {
 			rule := m.AsRule(row)
-			err = firewall.Delete(&rule)
+			deleteRules[idx] = rule
+		}
+		if len(deleteRules) > 0 {
+			err = firewall.Delete(deleteRules...)
 			if err != nil {
 				errs.Add(err)
+			} else {
+				setStaticRuleLastModifyTime(time.Now())
 			}
 		}
 	}
@@ -202,9 +210,14 @@ func ruleStaticApply(ctx echo.Context) error {
 		return r.OrderBy(`-position`, `-id`)
 	}, 0, -1, `disabled`, `N`)
 	if err == nil {
-		for _, row := range m.Objects() {
+		rows := m.Objects()
+		createRules := make([]driver.Rule, len(rows))
+		for idx, row := range rows {
 			rule := m.AsRule(row)
-			err = firewall.Insert(0, &rule)
+			createRules[idx] = rule
+		}
+		if len(createRules) > 0 {
+			err = firewall.Insert(createRules...)
 			if err != nil {
 				errs.Add(err)
 			} else {

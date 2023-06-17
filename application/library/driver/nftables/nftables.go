@@ -321,35 +321,41 @@ func (a *NFTables) NewNATRuleTarget(chain ...*nftables.Chain) ruleutils.RuleTarg
 	return ruleutils.New(a.NFTables.TableNAT(), c)
 }
 
-func (a *NFTables) Insert(pos int, rule *driver.Rule) error {
+func (a *NFTables) Insert(rules ...driver.Rule) (err error) {
 	ruleTarget := a.NewFilterRuleTarget()
 	return a.NFTables.Do(func(conn *nftables.Conn) error {
-		exprs, err := a.ruleFrom(conn, rule)
-		if err != nil {
-			return err
-		}
-		id := binaryutil.BigEndian.PutUint64(uint64(rule.ID))
-		ruleData := ruleutils.NewData(id, exprs)
-		_, err = ruleTarget.Insert(conn, ruleData)
-		if err != nil {
-			return err
+		for _, rule := range rules {
+			copyRule := rule
+			exprs, err := a.ruleFrom(conn, &copyRule)
+			if err != nil {
+				return err
+			}
+			id := binaryutil.BigEndian.PutUint64(uint64(rule.ID))
+			ruleData := ruleutils.NewData(id, exprs)
+			_, err = ruleTarget.Insert(conn, ruleData)
+			if err != nil {
+				return err
+			}
 		}
 		return conn.Flush()
 	})
 }
 
-func (a *NFTables) Append(rule *driver.Rule) error {
+func (a *NFTables) Append(rules ...driver.Rule) (err error) {
 	ruleTarget := a.NewFilterRuleTarget()
 	return a.NFTables.Do(func(conn *nftables.Conn) error {
-		exprs, err := a.ruleFrom(conn, rule)
-		if err != nil {
-			return err
-		}
-		id := binaryutil.BigEndian.PutUint64(uint64(rule.ID))
-		ruleData := ruleutils.NewData(id, exprs)
-		_, err = ruleTarget.Add(conn, ruleData)
-		if err != nil {
-			return err
+		for _, rule := range rules {
+			copyRule := rule
+			exprs, err := a.ruleFrom(conn, &copyRule)
+			if err != nil {
+				return err
+			}
+			id := binaryutil.BigEndian.PutUint64(uint64(rule.ID))
+			ruleData := ruleutils.NewData(id, exprs)
+			_, err = ruleTarget.Add(conn, ruleData)
+			if err != nil {
+				return err
+			}
 		}
 		return conn.Flush()
 	})
@@ -366,10 +372,10 @@ func (a *NFTables) AsWhitelist(tableName, chainName string) error {
 }
 
 // Update update rulespec in specified table/chain
-func (a *NFTables) Update(pos int, rule *driver.Rule) error {
+func (a *NFTables) Update(rule driver.Rule) error {
 	ruleTarget := a.NewFilterRuleTarget()
 	return a.NFTables.Do(func(conn *nftables.Conn) error {
-		exprs, err := a.ruleFrom(conn, rule)
+		exprs, err := a.ruleFrom(conn, &rule)
 		if err != nil {
 			return err
 		}
@@ -383,28 +389,31 @@ func (a *NFTables) Update(pos int, rule *driver.Rule) error {
 	})
 }
 
-func (a *NFTables) Delete(rule *driver.Rule) error {
+func (a *NFTables) Delete(rules ...driver.Rule) (err error) {
 	ruleTarget := a.NewFilterRuleTarget()
 	return a.NFTables.Do(func(conn *nftables.Conn) error {
-		exprs, err := a.ruleFrom(conn, rule)
-		if err != nil {
-			return err
-		}
-		id := binaryutil.BigEndian.PutUint64(uint64(rule.ID))
-		ruleData := ruleutils.NewData(id, exprs)
-		_, err = ruleTarget.Delete(conn, ruleData)
-		if err != nil {
-			return err
+		for _, rule := range rules {
+			copyRule := rule
+			exprs, err := a.ruleFrom(conn, &copyRule)
+			if err != nil {
+				return err
+			}
+			id := binaryutil.BigEndian.PutUint64(uint64(rule.ID))
+			ruleData := ruleutils.NewData(id, exprs)
+			_, err = ruleTarget.Delete(conn, ruleData)
+			if err != nil {
+				return err
+			}
 		}
 		return conn.Flush()
 	})
 }
 
-func (a *NFTables) Exists(rule *driver.Rule) (bool, error) {
+func (a *NFTables) Exists(rule driver.Rule) (bool, error) {
 	ruleTarget := a.NewFilterRuleTarget()
 	var exists bool
 	err := a.NFTables.Do(func(conn *nftables.Conn) (err error) {
-		exprs, err := a.ruleFrom(conn, rule)
+		exprs, err := a.ruleFrom(conn, &rule)
 		if err != nil {
 			return err
 		}

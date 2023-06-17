@@ -63,7 +63,7 @@ func (unsupportedDriver) Export(wfwFile string) error {
 	return ErrUnsupportedOperatingSystem
 }
 
-func (unsupportedDriver) Insert(pos int, rule *driver.Rule) error {
+func (unsupportedDriver) Insert(rules ...driver.Rule) error {
 	return ErrUnsupportedOperatingSystem
 }
 
@@ -71,19 +71,19 @@ func (unsupportedDriver) AsWhitelist(table, chain string) error {
 	return nil
 }
 
-func (unsupportedDriver) Append(rule *driver.Rule) error {
+func (unsupportedDriver) Append(rules ...driver.Rule) error {
 	return ErrUnsupportedOperatingSystem
 }
 
-func (unsupportedDriver) Update(pos int, rule *driver.Rule) error {
+func (unsupportedDriver) Update(rule driver.Rule) error {
 	return ErrUnsupportedOperatingSystem
 }
 
-func (unsupportedDriver) Delete(rule *driver.Rule) error {
+func (unsupportedDriver) Delete(rules ...driver.Rule) error {
 	return ErrUnsupportedOperatingSystem
 }
 
-func (unsupportedDriver) Exists(rule *driver.Rule) (bool, error) {
+func (unsupportedDriver) Exists(rule driver.Rule) (bool, error) {
 	return false, ErrUnsupportedOperatingSystem
 }
 

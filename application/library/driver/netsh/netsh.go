@@ -41,7 +41,7 @@ type NetSH struct {
 	path string
 }
 
-func (a *NetSH) RuleFrom(rule *driver.Rule) []string {
+func (a *NetSH) ruleFrom(rule *driver.Rule) []string {
 	action := `block`
 	switch rule.Action {
 	case `ACCEPT`:
@@ -96,39 +96,60 @@ func (a *NetSH) Export(wfwFile string) error {
 	return a.run(rulespec, nil)
 }
 
-func (a *NetSH) Insert(pos int, rule *driver.Rule) error {
-	rulespec := []string{`firewall`, `add`, `rule`}
-	rulespec = append(rulespec, a.RuleFrom(rule)...)
-	return a.run(rulespec, nil)
+func (a *NetSH) Insert(rules ...driver.Rule) (err error) {
+	for _, rule := range rules {
+		copyRule := rule
+		rulespec := []string{`firewall`, `add`, `rule`}
+		rulespec = append(rulespec, a.ruleFrom(&copyRule)...)
+		err = a.run(rulespec, nil)
+		if err != nil {
+			break
+		}
+	}
+	return
 }
 
 func (a *NetSH) AsWhitelist(table, chain string) error {
 	return nil
 }
 
-func (a *NetSH) Append(rule *driver.Rule) error {
-	rulespec := []string{`firewall`, `add`, `rule`}
-	rulespec = append(rulespec, a.RuleFrom(rule)...)
-	return a.run(rulespec, nil)
+func (a *NetSH) Append(rules ...driver.Rule) (err error) {
+	for _, rule := range rules {
+		copyRule := rule
+		rulespec := []string{`firewall`, `add`, `rule`}
+		rulespec = append(rulespec, a.ruleFrom(&copyRule)...)
+		err = a.run(rulespec, nil)
+		if err != nil {
+			break
+		}
+	}
+	return
 }
 
-func (a *NetSH) Update(pos int, rule *driver.Rule) error {
+func (a *NetSH) Update(rule driver.Rule) error {
 	//netsh advfirewall firewall set rule name="文件和打印机共享(回显请求 - ICMPv4-In)" new enable=yes action=allow localip=any remoteip=any
 	rulespec := []string{`firewall`, `set`, `rule`}
-	rules := a.RuleFrom(rule)
+	rules := a.ruleFrom(&rule)
 	newRules := append([]string{rules[0]}, `new`)
 	newRules = append(newRules, rules[1:]...)
 	rulespec = append(rulespec, newRules...)
 	return a.run(rulespec, nil)
 }
 
-func (a *NetSH) Delete(rule *driver.Rule) error {
-	rulespec := []string{`firewall`, `delete`, `rule`}
-	rulespec = append(rulespec, a.RuleFrom(rule)...)
-	return a.run(rulespec, nil)
+func (a *NetSH) Delete(rules ...driver.Rule) (err error) {
+	for _, rule := range rules {
+		copyRule := rule
+		rulespec := []string{`firewall`, `delete`, `rule`}
+		rulespec = append(rulespec, a.ruleFrom(&copyRule)...)
+		err = a.run(rulespec, nil)
+		if err != nil {
+			break
+		}
+	}
+	return
 }
 
-func (a *NetSH) Exists(rule *driver.Rule) (bool, error) {
+func (a *NetSH) Exists(rule driver.Rule) (bool, error) {
 	rulespec := []string{`firewall`, `show`, `rule`}
 	rulespec = append(rulespec, fmt.Sprintf(`name=%q`, rule.Name))
 	var stdout bytes.Buffer
