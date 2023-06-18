@@ -22,6 +22,7 @@ require (
 	github.com/webx-top/com v0.9.5
 	github.com/webx-top/db v1.23.17
 	github.com/webx-top/echo v2.36.1+incompatible
+	github.com/webx-top/pagination v0.2.1
 	golang.org/x/sys v0.9.0
 )
 
@@ -184,7 +185,6 @@ require (
 	github.com/webx-top/client v0.8.9 // indirect
 	github.com/webx-top/codec v0.3.0 // indirect
 	github.com/webx-top/image v0.1.0 // indirect
-	github.com/webx-top/pagination v0.2.1 // indirect
 	github.com/webx-top/poolx v0.0.0-20210912044716-5cfa2d58e380 // indirect
 	github.com/webx-top/restyclient v0.0.4 // indirect
 	github.com/webx-top/tagfast v0.0.0-20161020041435-9a2065ce3dd2 // indirect

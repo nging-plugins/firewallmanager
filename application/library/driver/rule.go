@@ -18,6 +18,8 @@
 
 package driver
 
+import "strconv"
+
 type Rule struct {
 	ID        uint   `json:"id,omitempty" xml:"id,omitempty"`
 	Number    uint64 `json:"num,omitempty" xml:"num,omitempty"`
@@ -40,4 +42,12 @@ type Rule struct {
 	RemotePort string `json:"remotePort" xml:"remotePort"` // 支持指定范围
 	LocalPort  string `json:"localPort" xml:"localPort"`   // 支持指定范围
 	IPVersion  string `json:"ipVersion"  xml:"ipVersion"`  // 4 or 6
+}
+
+func (r *Rule) IDBytes() []byte {
+	if r.ID == 0 {
+		return nil
+	}
+	s := strconv.FormatUint(uint64(r.ID), 10)
+	return []byte(s)
 }

@@ -32,7 +32,6 @@ import (
 	ruleutils "github.com/admpub/nftablesutils/rule"
 	setutils "github.com/admpub/nftablesutils/set"
 	"github.com/google/nftables"
-	"github.com/google/nftables/binaryutil"
 	"github.com/google/nftables/expr"
 	"github.com/nging-plugins/firewallmanager/application/library/driver"
 	"github.com/webx-top/echo/param"
@@ -91,24 +90,21 @@ func (a *NFTables) initTableOnly(conn *nftables.Conn) error {
 
 func (a *NFTables) ruleFrom(c *nftables.Conn, rule *driver.Rule) (args nftablesutils.Exprs, err error) {
 	if len(rule.Type) == 0 {
-		rule.Type = `filter`
-	}
-	if len(rule.Protocol) == 0 {
-		rule.Protocol = `tcp`
+		rule.Type = `filter` // table
 	}
 	if len(rule.Direction) == 0 {
-		rule.Direction = `input`
+		rule.Direction = `input` // chain
 	}
 	switch rule.Protocol {
 	case `tcp`:
-		args = nftablesutils.JoinExprs(nftablesutils.SetProtoTCP())
+		args = nftablesutils.JoinExprs(args, nftablesutils.SetProtoTCP())
 	case `udp`:
-		args = nftablesutils.JoinExprs(nftablesutils.SetProtoUDP())
+		args = nftablesutils.JoinExprs(args, nftablesutils.SetProtoUDP())
 	case `icmp`:
 		if a.isIPv4() {
-			args = nftablesutils.JoinExprs(nftablesutils.SetProtoICMP())
+			args = nftablesutils.JoinExprs(args, nftablesutils.SetProtoICMP())
 		} else {
-			args = nftablesutils.JoinExprs(nftablesutils.SetProtoICMPv6())
+			args = nftablesutils.JoinExprs(args, nftablesutils.SetProtoICMPv6())
 		}
 	default:
 		// all
@@ -376,7 +372,7 @@ func (a *NFTables) Insert(rules ...driver.Rule) (err error) {
 			if err != nil {
 				return err
 			}
-			id := binaryutil.BigEndian.PutUint64(uint64(rule.ID))
+			id := rule.IDBytes()
 			ruleData := ruleutils.NewData(id, exprs)
 			_, err = ruleTarget.Insert(conn, ruleData)
 			if err != nil {
@@ -396,7 +392,7 @@ func (a *NFTables) Append(rules ...driver.Rule) (err error) {
 			if err != nil {
 				return err
 			}
-			id := binaryutil.BigEndian.PutUint64(uint64(rule.ID))
+			id := rule.IDBytes()
 			ruleData := ruleutils.NewData(id, exprs)
 			_, err = ruleTarget.Add(conn, ruleData)
 			if err != nil {
@@ -425,7 +421,7 @@ func (a *NFTables) Update(rule driver.Rule) error {
 		if err != nil {
 			return err
 		}
-		id := binaryutil.BigEndian.PutUint64(uint64(rule.ID))
+		id := rule.IDBytes()
 		ruleData := ruleutils.NewData(id, exprs)
 		_, _, _, err = ruleTarget.Update(conn, []ruleutils.RuleData{ruleData})
 		if err != nil {
@@ -487,7 +483,7 @@ func (a *NFTables) Delete(rules ...driver.Rule) (err error) {
 	ruleTarget := a.NewFilterRuleTarget()
 	return a.NFTables.Do(func(conn *nftables.Conn) error {
 		for _, rule := range rules {
-			id := binaryutil.BigEndian.PutUint64(uint64(rule.ID))
+			id := rule.IDBytes()
 			ruleData := ruleutils.NewData(id, nil, rule.Number)
 			_, err = ruleTarget.Delete(conn, ruleData)
 			if err != nil {
@@ -506,7 +502,7 @@ func (a *NFTables) Exists(rule driver.Rule) (bool, error) {
 		if err != nil {
 			return err
 		}
-		id := binaryutil.BigEndian.PutUint64(uint64(rule.ID))
+		id := rule.IDBytes()
 		ruleData := ruleutils.NewData(id, exprs, rule.Number)
 		exists, err = ruleTarget.Exists(conn, ruleData)
 		return
