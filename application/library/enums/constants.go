@@ -16,7 +16,9 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-package iptables
+package enums
+
+// 本文件常量来自 iptables
 
 const (
 	// 传输协议

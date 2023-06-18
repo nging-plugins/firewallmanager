@@ -28,9 +28,19 @@ import (
 	"github.com/admpub/nging/v5/application/library/common"
 	"github.com/admpub/nging/v5/application/library/errorslice"
 	"github.com/nging-plugins/firewallmanager/application/library/driver"
+	"github.com/nging-plugins/firewallmanager/application/library/enums"
 	"github.com/nging-plugins/firewallmanager/application/library/firewall"
 	"github.com/nging-plugins/firewallmanager/application/model"
 )
+
+func ruleStaticSetFormData(c echo.Context) {
+	c.Set(`types`, enums.Types.Slice())
+	c.Set(`directions`, enums.Directions.Slice())
+	c.Set(`ipProtocols`, enums.IPProtocols.Slice())
+	c.Set(`netProtocols`, enums.NetProtocols.Slice())
+	c.Set(`actions`, enums.Actions.Slice())
+	c.Set(`tablesChains`, enums.TablesChains)
+}
 
 func ruleStaticIndex(ctx echo.Context) error {
 	m := model.NewRuleStatic(ctx)
@@ -74,7 +84,7 @@ func ruleStaticAdd(ctx echo.Context) error {
 END:
 	ctx.Set(`activeURL`, `/firewall/rule/static`)
 	ctx.Set(`title`, ctx.T(`添加规则`))
-	firewall.SetFormData(ctx)
+	ruleStaticSetFormData(ctx)
 	return ctx.Render(`firewall/rule/static_edit`, common.Err(ctx, err))
 }
 
@@ -139,7 +149,7 @@ func ruleStaticEdit(ctx echo.Context) error {
 END:
 	ctx.Set(`activeURL`, `/firewall/rule/static`)
 	ctx.Set(`title`, ctx.T(`修改规则`))
-	firewall.SetFormData(ctx)
+	ruleStaticSetFormData(ctx)
 	return ctx.Render(`firewall/rule/static_edit`, common.Err(ctx, err))
 }
 

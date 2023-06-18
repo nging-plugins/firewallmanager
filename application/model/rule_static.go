@@ -19,11 +19,15 @@
 package model
 
 import (
+	"github.com/webx-top/com"
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
+	"github.com/webx-top/echo/code"
 
 	"github.com/nging-plugins/firewallmanager/application/dbschema"
 	"github.com/nging-plugins/firewallmanager/application/library/driver"
+	"github.com/nging-plugins/firewallmanager/application/library/enums"
+	"github.com/nging-plugins/firewallmanager/application/library/netutils"
 )
 
 func NewRuleStatic(ctx echo.Context) *RuleStatic {
@@ -37,6 +41,50 @@ type RuleStatic struct {
 }
 
 func (r *RuleStatic) check() error {
+	ctx := r.Context()
+	if !enums.Types.Has(r.Type) {
+		return ctx.NewError(code.InvalidParameter, `类型无效`).SetZone(`type`)
+	}
+	if r.Type == `nat` {
+		r.NatIp = ``
+		r.NatPort = ``
+	}
+	if !com.InSlice(r.Direction, enums.TablesChains[r.Type]) {
+		return ctx.NewError(code.InvalidParameter, `类型“%v”不支持设置“%s”规则`, r.Type, ctx.T(enums.Directions.Get(r.Direction))).SetZone(`direction`)
+	}
+	if (len(r.Protocol) == 0 || r.Protocol == `all`) && (len(r.LocalPort) > 0 || len(r.RemotePort) > 0 || len(r.NatPort) > 0) {
+		return ctx.NewError(code.InvalidParameter, `当指定了端口时，必须明确的指定网络协议`).SetZone(`protocol`)
+	}
+	if len(r.LocalPort) > 0 {
+		if err := netutils.ValidatePort(ctx, r.LocalPort); err != nil {
+			return ctx.NewError(code.InvalidParameter, `服务%v`, err.Error()).SetZone(`localPort`)
+		}
+	}
+	if len(r.RemotePort) > 0 {
+		if err := netutils.ValidatePort(ctx, r.RemotePort); err != nil {
+			return ctx.NewError(code.InvalidParameter, `访客%v`, err.Error()).SetZone(`remotePort`)
+		}
+	}
+	if len(r.NatPort) > 0 {
+		if err := netutils.ValidatePort(ctx, r.NatPort); err != nil {
+			return ctx.NewError(code.InvalidParameter, `NAT %v`, err.Error()).SetZone(`natPort`)
+		}
+	}
+	if len(r.LocalIp) > 0 {
+		if err := netutils.ValidateIP(ctx, r.LocalIp); err != nil {
+			return ctx.NewError(code.InvalidParameter, `服务%v`, err.Error()).SetZone(`localIp`)
+		}
+	}
+	if len(r.RemoteIp) > 0 {
+		if err := netutils.ValidateIP(ctx, r.RemoteIp); err != nil {
+			return ctx.NewError(code.InvalidParameter, `访客%v`, err.Error()).SetZone(`remoteIp`)
+		}
+	}
+	if len(r.NatIp) > 0 {
+		if err := netutils.ValidateIP(ctx, r.NatIp); err != nil {
+			return ctx.NewError(code.InvalidParameter, `NAT %v`, err.Error()).SetZone(`natIp`)
+		}
+	}
 	return nil
 }
 

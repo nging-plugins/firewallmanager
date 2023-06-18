@@ -41,7 +41,7 @@ type NetSH struct {
 	path string
 }
 
-func (a *NetSH) ruleFrom(rule *driver.Rule) []string {
+func (a *NetSH) ruleFrom(rule *driver.Rule) ([]string, error) {
 	action := `block`
 	switch rule.Action {
 	case `ACCEPT`:
@@ -68,7 +68,7 @@ func (a *NetSH) ruleFrom(rule *driver.Rule) []string {
 		fmt.Sprintf(`localport=%s`, rule.LocalPort),
 		fmt.Sprintf(`localip=%s`, localIP),
 		fmt.Sprintf(`remoteip=%s`, remoteIP),
-	}
+	}, nil
 }
 
 func (a *NetSH) Enabled(on bool) error {
@@ -99,8 +99,13 @@ func (a *NetSH) Export(wfwFile string) error {
 func (a *NetSH) Insert(rules ...driver.Rule) (err error) {
 	for _, rule := range rules {
 		copyRule := rule
+		var _rulespec []string
+		_rulespec, err = a.ruleFrom(&copyRule)
+		if err != nil {
+			return
+		}
 		rulespec := []string{`firewall`, `add`, `rule`}
-		rulespec = append(rulespec, a.ruleFrom(&copyRule)...)
+		rulespec = append(rulespec, _rulespec...)
 		err = a.run(rulespec, nil)
 		if err != nil {
 			break
@@ -116,8 +121,13 @@ func (a *NetSH) AsWhitelist(table, chain string) error {
 func (a *NetSH) Append(rules ...driver.Rule) (err error) {
 	for _, rule := range rules {
 		copyRule := rule
+		var _rulespec []string
+		_rulespec, err = a.ruleFrom(&copyRule)
+		if err != nil {
+			return
+		}
 		rulespec := []string{`firewall`, `add`, `rule`}
-		rulespec = append(rulespec, a.ruleFrom(&copyRule)...)
+		rulespec = append(rulespec, _rulespec...)
 		err = a.run(rulespec, nil)
 		if err != nil {
 			break
@@ -129,7 +139,10 @@ func (a *NetSH) Append(rules ...driver.Rule) (err error) {
 func (a *NetSH) Update(rule driver.Rule) error {
 	//netsh advfirewall firewall set rule name="文件和打印机共享(回显请求 - ICMPv4-In)" new enable=yes action=allow localip=any remoteip=any
 	rulespec := []string{`firewall`, `set`, `rule`}
-	rules := a.ruleFrom(&rule)
+	rules, err := a.ruleFrom(&rule)
+	if err != nil {
+		return err
+	}
 	newRules := append([]string{rules[0]}, `new`)
 	newRules = append(newRules, rules[1:]...)
 	rulespec = append(rulespec, newRules...)
@@ -139,8 +152,13 @@ func (a *NetSH) Update(rule driver.Rule) error {
 func (a *NetSH) Delete(rules ...driver.Rule) (err error) {
 	for _, rule := range rules {
 		copyRule := rule
+		var _rulespec []string
+		_rulespec, err = a.ruleFrom(&copyRule)
+		if err != nil {
+			return
+		}
 		rulespec := []string{`firewall`, `delete`, `rule`}
-		rulespec = append(rulespec, a.ruleFrom(&copyRule)...)
+		rulespec = append(rulespec, _rulespec...)
 		err = a.run(rulespec, nil)
 		if err != nil {
 			break
@@ -162,7 +180,7 @@ func (a *NetSH) Exists(rule driver.Rule) (bool, error) {
 
 func (a *NetSH) Stats(table, chain string) ([]map[string]string, error) {
 	//TODO
-	return nil, nil
+	return nil, driver.ErrUnsupported
 }
 
 func (a *NetSH) List(table, chain string) ([]*driver.Rule, error) {

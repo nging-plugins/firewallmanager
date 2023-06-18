@@ -6,6 +6,7 @@ import (
 	"github.com/admpub/log"
 	"github.com/admpub/pp"
 	"github.com/nging-plugins/firewallmanager/application/library/driver"
+	"github.com/nging-plugins/firewallmanager/application/library/enums"
 )
 
 func TestInstall(t *testing.T) {
@@ -22,11 +23,11 @@ func TestAppend(t *testing.T) {
 		t.Fatal(err)
 	}
 	err = a.Append(driver.Rule{
-		Type:      TableFilter,
+		Type:      enums.TableFilter,
 		Name:      `testAppend`,
-		Direction: ChainInput,
-		Protocol:  ProtocolTCP,
-		Action:    TargetDrop,
+		Direction: enums.ChainInput,
+		Protocol:  enums.ProtocolTCP,
+		Action:    enums.TargetDrop,
 		LocalPort: `14444`,
 	})
 	if err != nil {
@@ -40,7 +41,7 @@ func TestList(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	rows, err := a.List(TableFilter, ChainInput)
+	rows, err := a.List(enums.TableFilter, enums.ChainInput)
 	if err != nil {
 		t.Fatal(err)
 	}

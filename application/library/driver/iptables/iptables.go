@@ -33,6 +33,7 @@ import (
 	"github.com/admpub/nging/v5/application/library/errorslice"
 	"github.com/admpub/packer"
 	"github.com/nging-plugins/firewallmanager/application/library/driver"
+	"github.com/nging-plugins/firewallmanager/application/library/enums"
 )
 
 var _ driver.Driver = (*IPTables)(nil)
@@ -63,22 +64,23 @@ type IPTables struct {
 	*iptables.IPTables
 }
 
-func (a *IPTables) ruleFrom(rule *driver.Rule) []string {
+func (a *IPTables) ruleFrom(rule *driver.Rule) ([]string, error) {
 	if len(rule.Type) == 0 {
-		rule.Type = TableFilter
+		rule.Type = enums.TableFilter
 	}
 	if len(rule.Protocol) == 0 {
-		rule.Protocol = ProtocolTCP
+		rule.Protocol = enums.ProtocolTCP
 	}
 	if len(rule.Direction) == 0 {
-		rule.Direction = ChainInput
+		rule.Direction = enums.ChainInput
 	}
 	args := []string{
 		`-p`, rule.Protocol,
 	}
 	if len(rule.Interface) > 0 && rule.Interface != `*` {
 		args = append(args, `-i`, rule.Interface) // 只能用于 PREROUTING、INPUT、FORWARD
-	} else if len(rule.Outerface) > 0 && rule.Outerface != `*` {
+	}
+	if len(rule.Outerface) > 0 && rule.Outerface != `*` {
 		args = append(args, `-o`, rule.Outerface) // 只能用于 FORWARD、OUTPUT、POSTROUTING
 	}
 	if len(rule.RemoteIP) > 0 && rule.RemoteIP != `0.0.0.0/0` {
@@ -88,7 +90,8 @@ func (a *IPTables) ruleFrom(rule *driver.Rule) []string {
 		} else {
 			args = append(args, `-s`, rule.RemoteIP)
 		}
-	} else if len(rule.LocalIP) > 0 && rule.LocalIP != `0.0.0.0/0` {
+	}
+	if len(rule.LocalIP) > 0 && rule.LocalIP != `0.0.0.0/0` {
 		if strings.Contains(rule.LocalIP, `-`) {
 			args = append(args, `-m`, `iprange`)
 			args = append(args, `--dst-range`, rule.LocalIP)
@@ -104,7 +107,8 @@ func (a *IPTables) ruleFrom(rule *driver.Rule) []string {
 			rule.RemotePort = strings.ReplaceAll(rule.RemotePort, `-`, `:`)
 			args = append(args, `--sport`, rule.RemotePort) // 支持用“:”指定端口范围，例如 “22:25” 指端口 22-25，或者 “:22” 指端口 0-22 或者 “22:” 指端口 22-65535
 		}
-	} else if len(rule.LocalPort) > 0 {
+	}
+	if len(rule.LocalPort) > 0 {
 		if strings.Contains(rule.LocalPort, `,`) {
 			args = append(args, `-m`, `multiport`)
 			args = append(args, `--dports`, rule.LocalPort)
@@ -118,13 +122,48 @@ func (a *IPTables) ruleFrom(rule *driver.Rule) []string {
 		args = append(args, `--state`)
 		states := strings.SplitN(rule.State, ` `, 2)
 		if len(states) != 2 {
-			args = append(args, TCPFlagALL, rule.State)
+			args = append(args, enums.TCPFlagALL, rule.State)
 		} else {
 			args = append(args, states...)
 		}
 	}
-	args = append(args, `-j`, rule.Action)
-	return args
+	if rule.Type == enums.TableNAT {
+		switch rule.Direction {
+		case enums.ChainPreRouting:
+			if len(rule.NatIP) > 0 {
+				args = append(args, `-j`, `DNAT`)
+				toDest := rule.NatIP
+				if len(rule.NatPort) > 0 {
+					toDest += `:` + rule.NatPort
+				}
+				args = append(args, `--to-destination`, toDest)
+			} else if len(rule.NatPort) > 0 {
+				args = append(args, `-j`, `REDIRECT`)
+				args = append(args, `--to-ports `, rule.NatPort)
+			} else {
+				return args, errors.New(`NAT IP 和 NAT 端口 不能同时为空`)
+			}
+		case enums.ChainPostRouting:
+			if len(rule.NatIP) > 0 {
+				args = append(args, `-j`, `SNAT`)
+				toSrc := rule.NatIP
+				if len(rule.NatPort) > 0 {
+					toSrc += `:` + rule.NatPort
+				}
+				args = append(args, `--to-source`, toSrc)
+			} else {
+				args = append(args, `-j`, `MASQUERADE`)
+				if len(rule.NatPort) > 0 {
+					args = append(args, `--to-ports `, rule.NatPort)
+				}
+			}
+		default:
+			return args, fmt.Errorf(`%w: %s (table=%v)`, driver.ErrUnsupportedChain, rule.Direction, rule.Type)
+		}
+	} else {
+		args = append(args, `-j`, rule.Action)
+	}
+	return args, nil
 }
 
 func (a *IPTables) Enabled(on bool) error {
@@ -179,12 +218,16 @@ func (a *IPTables) Export(wfwFile string) error {
 func (a *IPTables) Insert(rules ...driver.Rule) (err error) {
 	for _, rule := range rules {
 		copyRule := rule
-		rulespec := a.ruleFrom(&copyRule)
+		var rulespec []string
+		rulespec, err = a.ruleFrom(&copyRule)
+		if err != nil {
+			return
+		}
 		table := copyRule.Type
 		chain := copyRule.Direction
 		err = a.IPTables.InsertUnique(table, chain, int(copyRule.Number), rulespec...)
 		if err != nil {
-			break
+			return
 		}
 	}
 	return err
@@ -193,24 +236,31 @@ func (a *IPTables) Insert(rules ...driver.Rule) (err error) {
 func (a *IPTables) Append(rules ...driver.Rule) (err error) {
 	for _, rule := range rules {
 		copyRule := rule
-		rulespec := a.ruleFrom(&copyRule)
+		var rulespec []string
+		rulespec, err = a.ruleFrom(&copyRule)
+		if err != nil {
+			return
+		}
 		table := copyRule.Type
 		chain := copyRule.Direction
 		err = a.IPTables.AppendUnique(table, chain, rulespec...)
 		if err != nil {
-			break
+			return
 		}
 	}
 	return err
 }
 
 func (a *IPTables) AsWhitelist(table, chain string) error {
-	return a.IPTables.AppendUnique(table, chain, `-j`, TargetReject)
+	return a.IPTables.AppendUnique(table, chain, `-j`, enums.TargetReject)
 }
 
 // Update update rulespec in specified table/chain
 func (a *IPTables) Update(rule driver.Rule) error {
-	rulespec := a.ruleFrom(&rule)
+	rulespec, err := a.ruleFrom(&rule)
+	if err != nil {
+		return err
+	}
 	table := rule.Type
 	chain := rule.Direction
 	args := []string{"-t", table, "-R", chain}
@@ -226,20 +276,26 @@ func (a *IPTables) Delete(rules ...driver.Rule) (err error) {
 		if rule.Number > 0 {
 			rulespec = append(rulespec, strconv.FormatUint(rule.Number, 10))
 		} else {
-			rulespec = a.ruleFrom(&copyRule)
+			rulespec, err = a.ruleFrom(&copyRule)
+			if err != nil {
+				return
+			}
 		}
 		table := rule.Type
 		chain := rule.Direction
 		err = a.IPTables.Delete(table, chain, rulespec...)
 		if err != nil {
-			break
+			return
 		}
 	}
 	return err
 }
 
 func (a *IPTables) Exists(rule driver.Rule) (bool, error) {
-	rulespec := a.ruleFrom(&rule)
+	rulespec, err := a.ruleFrom(&rule)
+	if err != nil {
+		return false, err
+	}
 	table := rule.Type
 	chain := rule.Direction
 	return a.IPTables.Exists(table, chain, rulespec...)

@@ -31,6 +31,7 @@ import (
 	"github.com/nging-plugins/firewallmanager/application/library/cmder"
 	"github.com/nging-plugins/firewallmanager/application/library/driver"
 	"github.com/nging-plugins/firewallmanager/application/library/driver/iptables"
+	"github.com/nging-plugins/firewallmanager/application/library/enums"
 	"github.com/nging-plugins/firewallmanager/application/library/firewall"
 )
 
@@ -58,12 +59,12 @@ var ipTablesFieldList = []string{
 
 func ipTablesGetTableAndChain(ctx echo.Context) (ipVer string, table string, chain string, chainList []string) {
 	ipVer = ctx.Form(`ipVer`, `4`)
-	table = ctx.Form(`table`, iptables.TableFilter)
-	chain = ctx.Form(`chain`, iptables.ChainInput)
-	if !com.InSlice(table, iptables.TableList) {
-		table = iptables.TableFilter
+	table = ctx.Form(`table`, enums.TableFilter)
+	chain = ctx.Form(`chain`, enums.ChainInput)
+	if !com.InSlice(table, enums.TableList) {
+		table = enums.TableFilter
 	}
-	chainList = iptables.TablesChains[table]
+	chainList = enums.TablesChains[table]
 	if !com.InSlice(chain, chainList) {
 		chain = chainList[0]
 	}
@@ -83,11 +84,11 @@ func ipTablesIndex(ctx echo.Context) error {
 		return err
 	}
 	ctx.Set(`listData`, rules)
-	ctx.Set(`tableList`, iptables.TableList)
+	ctx.Set(`tableList`, enums.TableList)
 	ctx.Set(`chainList`, chainList)
-	ctx.Set(`ipVerList`, firewall.IPProtocols.Slice())
-	// ctx.Set(`targetList`, iptables.TargetList)
-	// ctx.Set(`protocolList`, iptables.ProtocolList)
+	ctx.Set(`ipVerList`, enums.IPProtocols.Slice())
+	// ctx.Set(`targetList`, enums.TargetList)
+	// ctx.Set(`protocolList`, enums.ProtocolList)
 	ctx.Set(`fieldList`, ipTablesFieldList)
 	ctx.Set(`table`, table)
 	ctx.Set(`chain`, chain)

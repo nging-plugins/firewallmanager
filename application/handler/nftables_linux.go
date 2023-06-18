@@ -32,6 +32,7 @@ import (
 	"github.com/nging-plugins/firewallmanager/application/library/cmder"
 	"github.com/nging-plugins/firewallmanager/application/library/driver"
 	"github.com/nging-plugins/firewallmanager/application/library/driver/nftables"
+	"github.com/nging-plugins/firewallmanager/application/library/enums"
 	"github.com/nging-plugins/firewallmanager/application/library/firewall"
 )
 
@@ -154,7 +155,7 @@ func nfTablesIndex(ctx echo.Context) error {
 	ctx.Set(`tableList`, tableList)
 	ctx.Set(`chainList`, chainList)
 	ctx.Set(`setList`, setList)
-	ctx.Set(`ipVerList`, firewall.IPProtocols.Slice())
+	ctx.Set(`ipVerList`, enums.IPProtocols.Slice())
 	ctx.Set(`table`, table)
 	ctx.Set(`chain`, chain)
 	ctx.Set(`set`, set)

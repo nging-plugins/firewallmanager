@@ -96,7 +96,7 @@ func (a *NFTables) ruleNATFrom(c *nftables.Conn, rule *driver.Rule) (args nftabl
 				args = args.Add(nftablesutils.SNATv6(ip)...)
 			}
 		} else {
-			args = args.Add(nftablesutils.ExprMasquerade(0, 0))
+			args = args.Add(nftablesutils.ExprMasquerade(1, 0))
 		}
 	default:
 		err = fmt.Errorf(`%w: %s (table=%v)`, driver.ErrUnsupportedChain, rule.Direction, rule.Type)
