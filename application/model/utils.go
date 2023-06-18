@@ -38,7 +38,9 @@ func AsRule(m *dbschema.NgingFirewallRuleStatic) driver.Rule {
 		// IP or Port
 		RemoteIP:   m.RemoteIp,
 		LocalIP:    m.LocalIp,
+		NatIP:      m.NatIp,
 		RemotePort: m.RemotePort,
 		LocalPort:  m.LocalPort,
+		NatPort:    m.NatPort,
 	}
 }

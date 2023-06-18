@@ -18,7 +18,14 @@
 
 package driver
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 var ErrUnsupported = errors.New(`unsupported`)
+var ErrUnsupportedTable = fmt.Errorf(`%w table`, ErrUnsupported)
+var ErrUnsupportedChain = fmt.Errorf(`%w chain`, ErrUnsupported)
+var ErrInvalidIPv4 = errors.New(`invalid IPv4 address`)
+var ErrInvalidIPv6 = errors.New(`invalid IPv6 address`)
 var ErrInvalidRuleNumber = errors.New(`invalid rule number`)

@@ -112,6 +112,8 @@ type NgingFirewallRuleStatic struct {
 	RemotePort string `db:"remote_port" bson:"remote_port" comment:"远程端口" json:"remote_port" xml:"remote_port"`
 	LocalIp    string `db:"local_ip" bson:"local_ip" comment:"本地IP" json:"local_ip" xml:"local_ip"`
 	LocalPort  string `db:"local_port" bson:"local_port" comment:"本地端口" json:"local_port" xml:"local_port"`
+	NatIp      string `db:"nat_ip" bson:"nat_ip" comment:"NAT IP" json:"nat_ip" xml:"nat_ip"`
+	NatPort    string `db:"nat_port" bson:"nat_port" comment:"NAT 端口" json:"nat_port" xml:"nat_port"`
 	Interface  string `db:"interface" bson:"interface" comment:"入站网口" json:"interface" xml:"interface"`
 	Outerface  string `db:"outerface" bson:"outerface" comment:"出站往口" json:"outerface" xml:"outerface"`
 	State      string `db:"state" bson:"state" comment:"状态(多个用逗号\",\"分隔)" json:"state" xml:"state"`
@@ -760,6 +762,8 @@ func (a *NgingFirewallRuleStatic) Reset() *NgingFirewallRuleStatic {
 	a.RemotePort = ``
 	a.LocalIp = ``
 	a.LocalPort = ``
+	a.NatIp = ``
+	a.NatPort = ``
 	a.Interface = ``
 	a.Outerface = ``
 	a.State = ``
@@ -784,6 +788,8 @@ func (a *NgingFirewallRuleStatic) AsMap(onlyFields ...string) param.Store {
 		r["RemotePort"] = a.RemotePort
 		r["LocalIp"] = a.LocalIp
 		r["LocalPort"] = a.LocalPort
+		r["NatIp"] = a.NatIp
+		r["NatPort"] = a.NatPort
 		r["Interface"] = a.Interface
 		r["Outerface"] = a.Outerface
 		r["State"] = a.State
@@ -816,6 +822,10 @@ func (a *NgingFirewallRuleStatic) AsMap(onlyFields ...string) param.Store {
 			r["LocalIp"] = a.LocalIp
 		case "LocalPort":
 			r["LocalPort"] = a.LocalPort
+		case "NatIp":
+			r["NatIp"] = a.NatIp
+		case "NatPort":
+			r["NatPort"] = a.NatPort
 		case "Interface":
 			r["Interface"] = a.Interface
 		case "Outerface":
@@ -860,6 +870,10 @@ func (a *NgingFirewallRuleStatic) FromRow(row map[string]interface{}) {
 			a.LocalIp = param.AsString(value)
 		case "local_port":
 			a.LocalPort = param.AsString(value)
+		case "nat_ip":
+			a.NatIp = param.AsString(value)
+		case "nat_port":
+			a.NatPort = param.AsString(value)
 		case "interface":
 			a.Interface = param.AsString(value)
 		case "outerface":
@@ -920,6 +934,10 @@ func (a *NgingFirewallRuleStatic) Set(key interface{}, value ...interface{}) {
 			a.LocalIp = param.AsString(vv)
 		case "LocalPort":
 			a.LocalPort = param.AsString(vv)
+		case "NatIp":
+			a.NatIp = param.AsString(vv)
+		case "NatPort":
+			a.NatPort = param.AsString(vv)
 		case "Interface":
 			a.Interface = param.AsString(vv)
 		case "Outerface":
@@ -953,6 +971,8 @@ func (a *NgingFirewallRuleStatic) AsRow(onlyFields ...string) param.Store {
 		r["remote_port"] = a.RemotePort
 		r["local_ip"] = a.LocalIp
 		r["local_port"] = a.LocalPort
+		r["nat_ip"] = a.NatIp
+		r["nat_port"] = a.NatPort
 		r["interface"] = a.Interface
 		r["outerface"] = a.Outerface
 		r["state"] = a.State
@@ -985,6 +1005,10 @@ func (a *NgingFirewallRuleStatic) AsRow(onlyFields ...string) param.Store {
 			r["local_ip"] = a.LocalIp
 		case "local_port":
 			r["local_port"] = a.LocalPort
+		case "nat_ip":
+			r["nat_ip"] = a.NatIp
+		case "nat_port":
+			r["nat_port"] = a.NatPort
 		case "interface":
 			r["interface"] = a.Interface
 		case "outerface":

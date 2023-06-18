@@ -102,10 +102,12 @@ func ruleStaticEdit(ctx echo.Context) error {
 			goto END
 		}
 		setStaticRuleLastModifyTime(time.Now())
-		rule := m.AsRule()
-		err = firewall.Insert(rule)
-		if err != nil {
-			goto END
+		if m.Disabled != `Y` {
+			rule := m.AsRule()
+			err = firewall.Insert(rule)
+			if err != nil {
+				goto END
+			}
 		}
 		return ctx.Redirect(handler.URLFor(`/firewall/rule/static`))
 	} else if ctx.IsAjax() {
@@ -122,7 +124,7 @@ func ruleStaticEdit(ctx echo.Context) error {
 			if m.Disabled == `Y` {
 				err = firewall.Delete(rule)
 			} else {
-				err = firewall.Update(rule)
+				err = firewall.Insert(rule)
 			}
 			if err != nil {
 				data.SetError(err)

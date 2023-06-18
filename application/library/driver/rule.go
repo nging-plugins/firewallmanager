@@ -39,8 +39,10 @@ type Rule struct {
 	// IP or Port
 	RemoteIP   string `json:"remoteIP" xml:"remoteIP"`
 	LocalIP    string `json:"localIP" xml:"localIP"`
+	NatIP      string `json:"natIP" xml:"natIP"`
 	RemotePort string `json:"remotePort" xml:"remotePort"` // 支持指定范围
 	LocalPort  string `json:"localPort" xml:"localPort"`   // 支持指定范围
+	NatPort    string `json:"natPort" xml:"natPort"`       // 支持指定范围
 	IPVersion  string `json:"ipVersion"  xml:"ipVersion"`  // 4 or 6
 }
 

@@ -43,7 +43,7 @@ var TableList = []string{TableFilter, TableNAT, TableMangle, TableRaw}
 var TablesChains = map[string][]string{
 	TableRaw:    {ChainOutput, ChainPreRouting},
 	TableMangle: {ChainPreRouting, ChainInput, ChainOutput, ChainForward, ChainPostRouting},
-	TableNAT:    {ChainPreRouting, ChainOutput, ChainPostRouting},
+	TableNAT:    {ChainPreRouting /*ChainOutput,*/, ChainPostRouting},
 	TableFilter: {ChainInput, ChainOutput, ChainForward},
 }
 
