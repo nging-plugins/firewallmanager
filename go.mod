@@ -21,7 +21,7 @@ require (
 	github.com/stretchr/testify v1.8.4
 	github.com/webx-top/com v0.9.5
 	github.com/webx-top/db v1.23.17
-	github.com/webx-top/echo v2.36.1+incompatible
+	github.com/webx-top/echo v2.36.2+incompatible
 	github.com/webx-top/pagination v0.2.1
 	golang.org/x/sys v0.9.0
 )

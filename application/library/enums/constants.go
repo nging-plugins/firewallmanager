@@ -64,6 +64,9 @@ const (
 
 var ChainList = []string{ChainPreRouting, ChainInput, ChainOutput, ChainForward, ChainPostRouting}
 
+var InputIfaceChainList = []string{ChainPreRouting, ChainInput, ChainForward}    // PREROUTING、INPUT、FORWARD
+var OutputIfaceChainList = []string{ChainOutput, ChainForward, ChainPostRouting} // FORWARD、OUTPUT、POSTROUTING
+
 const (
 	StateNew         = `NEW`         // 新连接
 	StateEstablished = `ESTABLISHED` // 后续对话连接

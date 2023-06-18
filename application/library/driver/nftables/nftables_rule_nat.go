@@ -1,7 +1,6 @@
 package nftables
 
 import (
-	"errors"
 	"fmt"
 	"net"
 	"strings"
@@ -13,40 +12,12 @@ import (
 )
 
 func (a *NFTables) ruleNATFrom(c *nftables.Conn, rule *driver.Rule) (args nftablesutils.Exprs, err error) {
-	args = args.Add(a.buildProtoRule(rule)...)
-	if len(rule.RemoteIP) > 0 {
-		_args, _err := a.buildRemoteIPRule(c, rule)
-		if _err != nil {
-			return nil, _err
-		}
-		args = args.Add(_args...)
-	}
-	if len(rule.RemotePort) > 0 {
-		_args, _err := a.buildRemotePortRule(c, rule)
-		if _err != nil {
-			return nil, _err
-		}
-		args = args.Add(_args...)
-	}
-	if len(rule.LocalIP) > 0 {
-		_args, _err := a.buildLocalIPRule(c, rule)
-		if _err != nil {
-			return nil, _err
-		}
-		args = args.Add(_args...)
-	}
-	if len(rule.LocalPort) > 0 {
-		_args, _err := a.buildLocalPortRule(c, rule)
-		if _err != nil {
-			return nil, _err
-		}
-		args = args.Add(_args...)
+	args, err = a.buildCommonRule(c, rule)
+	if err != nil {
+		return
 	}
 	switch rule.Direction {
 	case `prerouting`:
-		if len(rule.Interface) > 0 {
-			args = args.Add(nftablesutils.SetIIF(rule.Interface)...)
-		}
 		if len(rule.NatPort) > 0 {
 			port := param.AsUint16(rule.NatPort)
 			err = nftablesutils.ValidatePort(port)
@@ -73,12 +44,9 @@ func (a *NFTables) ruleNATFrom(c *nftables.Conn, rule *driver.Rule) (args nftabl
 				args = args.Add(nftablesutils.DNATv6(ip)...)
 			}
 		} else {
-			err = errors.New(`请设置要转发到哪个服务IP`)
+			err = driver.ErrNatIPOrNatPortRequired
 		}
 	case `postrouting`:
-		if len(rule.Outerface) > 0 {
-			args = args.Add(nftablesutils.SetOIF(rule.Outerface)...)
-		}
 		if len(rule.NatIP) > 0 { // 发送给访客
 			remoteIP := strings.SplitN(rule.NatIP, `-`, 2)[0]
 			ip := net.ParseIP(remoteIP)
