@@ -10,7 +10,7 @@ ENV GOPATH "/root/go"
 
 RUN apt update 
 #RUN apt upgrade -y
-RUN apt install wget gcc -y
+RUN apt install wget gcc telnet -y
 RUN if [ "$FIREWALL" = "nftables" ]; then apt install nftables -y; else apt install iptables ipset -y; fi
 
 #RUN wget -c https://studygolang.com/dl/golang/${GO_INSTALL_FILE}

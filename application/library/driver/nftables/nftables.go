@@ -130,6 +130,7 @@ func (a *NFTables) ruleFrom(c *nftables.Conn, rule *driver.Rule) (args nftablesu
 				err = eErr
 				return
 			}
+			ipSet.Interval = true
 			err = c.AddSet(ipSet, elems)
 			if err != nil {
 				return nil, err
@@ -154,6 +155,7 @@ func (a *NFTables) ruleFrom(c *nftables.Conn, rule *driver.Rule) (args nftablesu
 				err = eErr
 				return
 			}
+			ipSet.Interval = true
 			err = c.AddSet(ipSet, elems)
 			if err != nil {
 				return nil, err
@@ -175,6 +177,7 @@ func (a *NFTables) ruleFrom(c *nftables.Conn, rule *driver.Rule) (args nftablesu
 					portsUint16[k] = uint16(v)
 				}
 				elems := nftablesutils.GetPortElems(portsUint16)
+				//portSet.Interval = true
 				err = c.AddSet(portSet, elems)
 				if err != nil {
 					return nil, err
@@ -214,6 +217,7 @@ func (a *NFTables) ruleFrom(c *nftables.Conn, rule *driver.Rule) (args nftablesu
 					portsUint16[k] = uint16(v)
 				}
 				elems := nftablesutils.GetPortElems(portsUint16)
+				//portSet.Interval = true
 				err = c.AddSet(portSet, elems)
 				if err != nil {
 					return nil, err
@@ -265,8 +269,10 @@ func (a *NFTables) ruleFrom(c *nftables.Conn, rule *driver.Rule) (args nftablesu
 	case `accept`, `ACCEPT`:
 		args = args.Add(nftablesutils.Accept())
 	case `drop`, `DROP`:
+		args = args.Add(nftablesutils.ExprCounter())
 		args = args.Add(nftablesutils.Drop())
 	case `reject`, `REJECT`:
+		args = args.Add(nftablesutils.ExprCounter())
 		args = args.Add(nftablesutils.Reject())
 	case `log`, `LOG`:
 		args = args.Add(&expr.Log{
@@ -276,6 +282,7 @@ func (a *NFTables) ruleFrom(c *nftables.Conn, rule *driver.Rule) (args nftablesu
 			Data:  []byte(`nging_`),
 		})
 	default:
+		args = args.Add(nftablesutils.ExprCounter())
 		args = args.Add(nftablesutils.Drop())
 	}
 	return args, nil
@@ -423,7 +430,7 @@ func (a *NFTables) Update(rule driver.Rule) error {
 		}
 		id := rule.IDBytes()
 		ruleData := ruleutils.NewData(id, exprs)
-		_, _, _, err = ruleTarget.Update(conn, []ruleutils.RuleData{ruleData})
+		_, err = ruleTarget.Update(conn, ruleData)
 		if err != nil {
 			return err
 		}
