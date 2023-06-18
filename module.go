@@ -7,6 +7,7 @@ import (
 
 	"github.com/nging-plugins/firewallmanager/application/handler"
 	pluginCmder "github.com/nging-plugins/firewallmanager/application/library/cmder"
+	"github.com/nging-plugins/firewallmanager/application/library/setup"
 )
 
 const ID = `firewall`
@@ -22,8 +23,9 @@ var Module = module.Module{
 	TemplatePath: map[string]string{
 		ID: `firewallmanager/template/backend`,
 	},
-	AssetsPath:  []string{},
-	Navigate:    RegisterNavigate,
-	Route:       handler.RegisterRoute,
-	DBSchemaVer: 0.0000,
+	AssetsPath:    []string{},
+	SQLCollection: setup.RegisterSQL,
+	Navigate:      RegisterNavigate,
+	Route:         handler.RegisterRoute,
+	DBSchemaVer:   0.0001,
 }
