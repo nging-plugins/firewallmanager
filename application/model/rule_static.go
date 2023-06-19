@@ -82,12 +82,12 @@ func (r *RuleStatic) check() error {
 	}
 	if len(r.LocalPort) > 0 {
 		if err := netutils.ValidatePort(ctx, r.LocalPort); err != nil {
-			return ctx.NewError(code.InvalidParameter, `服务%v`, err.Error()).SetZone(`localPort`)
+			return ctx.NewError(code.InvalidParameter, `本机%v`, err.Error()).SetZone(`localPort`)
 		}
 	}
 	if len(r.RemotePort) > 0 {
 		if err := netutils.ValidatePort(ctx, r.RemotePort); err != nil {
-			return ctx.NewError(code.InvalidParameter, `访客%v`, err.Error()).SetZone(`remotePort`)
+			return ctx.NewError(code.InvalidParameter, `远程%v`, err.Error()).SetZone(`remotePort`)
 		}
 	}
 	if len(r.NatPort) > 0 {
@@ -97,12 +97,12 @@ func (r *RuleStatic) check() error {
 	}
 	if len(r.LocalIp) > 0 {
 		if err := netutils.ValidateIP(ctx, r.LocalIp); err != nil {
-			return ctx.NewError(code.InvalidParameter, `服务%v`, err.Error()).SetZone(`localIp`)
+			return ctx.NewError(code.InvalidParameter, `本机%v`, err.Error()).SetZone(`localIp`)
 		}
 	}
 	if len(r.RemoteIp) > 0 {
 		if err := netutils.ValidateIP(ctx, r.RemoteIp); err != nil {
-			return ctx.NewError(code.InvalidParameter, `访客%v`, err.Error()).SetZone(`remoteIp`)
+			return ctx.NewError(code.InvalidParameter, `远程%v`, err.Error()).SetZone(`remoteIp`)
 		}
 	}
 	if len(r.NatIp) > 0 {
