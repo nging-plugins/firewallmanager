@@ -20,40 +20,50 @@ func (a *IPTables) buildCommonRule(rule *driver.Rule) (args []string, err error)
 	if err != nil {
 		return
 	}
-	if com.InSlice(rule.Direction, enums.InputIfaceChainList) {
-		if !enums.IsEmptyIface(rule.Interface) {
-			args = append(args, `-i`, rule.Interface)
-		}
+	if com.InSlice(rule.Direction, enums.InputIfaceChainList) && !enums.IsEmptyIface(rule.Interface) {
+		args = append(args, `-i`, rule.Interface)
+	}
+
+	if com.InSlice(`localIp`, enums.ChainParams[rule.Direction]) {
 		_args, _err := a.buildLocalIPRule(rule)
 		if _err != nil {
 			err = _err
 			return
 		}
 		appendArgs(&args, _args)
-		_args, _err = a.buildLocalPortRule(rule)
+	}
+
+	if com.InSlice(`localPort`, enums.ChainParams[rule.Direction]) {
+		_args, _err := a.buildLocalPortRule(rule)
 		if _err != nil {
 			err = _err
 			return
 		}
 		appendArgs(&args, _args)
 	}
-	if com.InSlice(rule.Direction, enums.OutputIfaceChainList) {
-		if !enums.IsEmptyIface(rule.Outerface) {
-			args = append(args, `-o`, rule.Outerface)
-		}
+
+	if com.InSlice(rule.Direction, enums.OutputIfaceChainList) && !enums.IsEmptyIface(rule.Outerface) {
+		args = append(args, `-o`, rule.Outerface)
+	}
+
+	if com.InSlice(`remoteIp`, enums.ChainParams[rule.Direction]) {
 		_args, _err := a.buildRemoteIPRule(rule)
 		if _err != nil {
 			err = _err
 			return
 		}
 		appendArgs(&args, _args)
-		_args, _err = a.buildRemotePortRule(rule)
+	}
+
+	if com.InSlice(`remotePort`, enums.ChainParams[rule.Direction]) {
+		_args, _err := a.buildRemotePortRule(rule)
 		if _err != nil {
 			err = _err
 			return
 		}
 		appendArgs(&args, _args)
 	}
+
 	return
 }
 

@@ -14,36 +14,46 @@ import (
 
 func (a *NFTables) buildCommonRule(c *nftables.Conn, rule *driver.Rule) (args nftablesutils.Exprs, err error) {
 	args = args.Add(a.buildProtoRule(rule)...)
-	if com.InSlice(rule.Direction, enums.InputIfaceChainList) {
-		if !enums.IsEmptyIface(rule.Interface) {
-			args = args.Add(nftablesutils.SetIIF(rule.Interface)...)
-		}
+	if com.InSlice(rule.Direction, enums.InputIfaceChainList) && !enums.IsEmptyIface(rule.Interface) {
+		args = args.Add(nftablesutils.SetIIF(rule.Interface)...)
+	}
+
+	if com.InSlice(`localIp`, enums.ChainParams[rule.Direction]) {
 		_args, _err := a.buildLocalIPRule(c, rule)
 		if _err != nil {
 			return nil, _err
 		}
 		args = args.Add(_args...)
-		_args, _err = a.buildLocalPortRule(c, rule)
+	}
+
+	if com.InSlice(`localPort`, enums.ChainParams[rule.Direction]) {
+		_args, _err := a.buildLocalPortRule(c, rule)
 		if _err != nil {
 			return nil, _err
 		}
 		args = args.Add(_args...)
 	}
-	if com.InSlice(rule.Direction, enums.OutputIfaceChainList) {
-		if !enums.IsEmptyIface(rule.Outerface) {
-			args = args.Add(nftablesutils.SetOIF(rule.Outerface)...)
-		}
+
+	if com.InSlice(rule.Direction, enums.OutputIfaceChainList) && !enums.IsEmptyIface(rule.Outerface) {
+		args = args.Add(nftablesutils.SetOIF(rule.Outerface)...)
+	}
+
+	if com.InSlice(`remoteIp`, enums.ChainParams[rule.Direction]) {
 		_args, _err := a.buildRemoteIPRule(c, rule)
 		if _err != nil {
 			return nil, _err
 		}
 		args = args.Add(_args...)
-		_args, _err = a.buildRemotePortRule(c, rule)
+	}
+
+	if com.InSlice(`remotePort`, enums.ChainParams[rule.Direction]) {
+		_args, _err := a.buildRemotePortRule(c, rule)
 		if _err != nil {
 			return nil, _err
 		}
 		args = args.Add(_args...)
 	}
+
 	return
 }
 

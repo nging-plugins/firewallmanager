@@ -4,9 +4,11 @@ import (
 	"github.com/admpub/nftablesutils"
 	"github.com/google/nftables"
 	"github.com/google/nftables/expr"
+	"github.com/webx-top/com"
 	"golang.org/x/sys/unix"
 
 	"github.com/nging-plugins/firewallmanager/application/library/driver"
+	"github.com/nging-plugins/firewallmanager/application/library/enums"
 )
 
 func (a *NFTables) ruleFilterFrom(c *nftables.Conn, rule *driver.Rule) (args nftablesutils.Exprs, err error) {
@@ -14,11 +16,13 @@ func (a *NFTables) ruleFilterFrom(c *nftables.Conn, rule *driver.Rule) (args nft
 	if err != nil {
 		return
 	}
-	_args, _err := a.buildStateRule(c, rule)
-	if _err != nil {
-		return nil, _err
+	if com.InSlice(`state`, enums.ChainParams[rule.Direction]) {
+		_args, _err := a.buildStateRule(c, rule)
+		if _err != nil {
+			return nil, _err
+		}
+		args = args.Add(_args...)
 	}
-	args = args.Add(_args...)
 	switch rule.Action {
 	case `accept`, `ACCEPT`:
 		args = args.Add(nftablesutils.Accept())
