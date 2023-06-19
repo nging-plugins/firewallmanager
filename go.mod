@@ -7,7 +7,7 @@ replace github.com/admpub/nging/v5 => ../../admpub/nging
 replace github.com/admpub/nftablesutils => ../../admpub/nftablesutils
 
 require (
-	github.com/admpub/gerberos v0.0.6
+	github.com/admpub/gerberos v0.0.7
 	github.com/admpub/go-iptables v0.6.5
 	github.com/admpub/iptables_parser v0.0.0-20221113113329-b2e71be4ff5e
 	github.com/admpub/log v1.3.3
