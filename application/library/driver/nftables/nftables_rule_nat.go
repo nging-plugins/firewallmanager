@@ -1,3 +1,21 @@
+/*
+   Nging is a toolbox for webmasters
+   Copyright (C) 2018-present  Wenhui Shen <swh@admpub.com>
+
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Affero General Public License as published
+   by the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU Affero General Public License for more details.
+
+   You should have received a copy of the GNU Affero General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 package nftables
 
 import (
@@ -8,6 +26,7 @@ import (
 	"github.com/admpub/nftablesutils"
 	"github.com/google/nftables"
 	"github.com/nging-plugins/firewallmanager/application/library/driver"
+	"github.com/nging-plugins/firewallmanager/application/library/enums"
 	"github.com/webx-top/echo/param"
 )
 
@@ -17,7 +36,7 @@ func (a *NFTables) ruleNATFrom(c *nftables.Conn, rule *driver.Rule) (args nftabl
 		return
 	}
 	switch rule.Direction {
-	case `prerouting`:
+	case enums.ChainPreRouting:
 		if len(rule.NatPort) > 0 {
 			port := param.AsUint16(rule.NatPort)
 			err = nftablesutils.ValidatePort(port)
@@ -46,7 +65,7 @@ func (a *NFTables) ruleNATFrom(c *nftables.Conn, rule *driver.Rule) (args nftabl
 		} else {
 			err = driver.ErrNatIPOrNatPortRequired
 		}
-	case `postrouting`:
+	case enums.ChainPostRouting:
 		if len(rule.NatIP) > 0 { // 发送给访客
 			remoteIP := strings.SplitN(rule.NatIP, `-`, 2)[0]
 			ip := net.ParseIP(remoteIP)

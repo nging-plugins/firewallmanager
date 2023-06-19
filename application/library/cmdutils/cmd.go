@@ -16,20 +16,24 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-package driver
+package cmdutils
 
 import (
+	"context"
+	"errors"
 	"io"
 	"os/exec"
 
 	"github.com/admpub/packer"
 )
 
-func RunCmd(path string, args []string, stdout io.Writer, stdin ...io.Reader) error {
+var ErrCmdForcedExit = errors.New(`cmd forced exit`)
+
+func RunCmd(ctx context.Context, path string, args []string, stdout io.Writer, stdin ...io.Reader) error {
 	if args == nil {
 		args = []string{}
 	}
-	cmd := exec.Command(path, args...)
+	cmd := exec.CommandContext(ctx, path, args...)
 	cmd.Stdout = stdout
 	cmd.Stderr = packer.Stderr
 	if len(stdin) > 0 {
@@ -42,6 +46,29 @@ func RunCmd(path string, args []string, stdout io.Writer, stdin ...io.Reader) er
 			return e
 		default:
 			return err
+		}
+	}
+	return nil
+}
+
+func RunCmdWithCallback(ctx context.Context, path string, args []string, cb func(*exec.Cmd) error) error {
+	if args == nil {
+		args = []string{}
+	}
+	cmd := exec.CommandContext(ctx, path, args...)
+	cmd.Stderr = packer.Stderr
+	if err := cb(cmd); err != nil {
+		return err
+	}
+
+	if err := cmd.Run(); err != nil {
+		switch e := err.(type) {
+		case *exec.ExitError:
+			return e
+		default:
+			if !errors.Is(err, ErrCmdForcedExit) {
+				return err
+			}
 		}
 	}
 	return nil

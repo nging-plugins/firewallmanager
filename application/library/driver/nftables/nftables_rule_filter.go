@@ -1,3 +1,21 @@
+/*
+   Nging is a toolbox for webmasters
+   Copyright (C) 2018-present  Wenhui Shen <swh@admpub.com>
+
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Affero General Public License as published
+   by the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU Affero General Public License for more details.
+
+   You should have received a copy of the GNU Affero General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 package nftables
 
 import (
@@ -24,15 +42,15 @@ func (a *NFTables) ruleFilterFrom(c *nftables.Conn, rule *driver.Rule) (args nft
 		args = args.Add(_args...)
 	}
 	switch rule.Action {
-	case `accept`, `ACCEPT`:
+	case enums.TargetAccept:
 		args = args.Add(nftablesutils.Accept())
-	case `drop`, `DROP`:
+	case enums.TargetDrop:
 		args = args.Add(nftablesutils.ExprCounter())
 		args = args.Add(nftablesutils.Drop())
-	case `reject`, `REJECT`:
+	case enums.TargetReject:
 		args = args.Add(nftablesutils.ExprCounter())
 		args = args.Add(nftablesutils.Reject())
-	case `log`, `LOG`:
+	case enums.TargetLog:
 		args = args.Add(&expr.Log{
 			Level: expr.LogLevelAlert,
 			Flags: expr.LogFlagsNFLog, //expr.LogFlagsIPOpt | expr.LogFlagsTCPOpt,

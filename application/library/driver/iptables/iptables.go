@@ -19,6 +19,7 @@
 package iptables
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -32,6 +33,7 @@ import (
 	"github.com/admpub/log"
 	"github.com/admpub/nging/v5/application/library/errorslice"
 	"github.com/admpub/packer"
+	"github.com/nging-plugins/firewallmanager/application/library/cmdutils"
 	"github.com/nging-plugins/firewallmanager/application/library/driver"
 	"github.com/nging-plugins/firewallmanager/application/library/enums"
 )
@@ -103,7 +105,7 @@ func (a *IPTables) Import(wfwFile string) error {
 		return err
 	}
 	defer f.Close()
-	return driver.RunCmd(restoreBin, nil, nil, f)
+	return cmdutils.RunCmd(context.Background(), restoreBin, nil, nil, f)
 }
 
 func (a *IPTables) Export(wfwFile string) error {
@@ -122,7 +124,7 @@ func (a *IPTables) Export(wfwFile string) error {
 		return err
 	}
 	defer f.Close()
-	err = driver.RunCmd(saveBin, nil, f)
+	err = cmdutils.RunCmd(context.Background(), saveBin, nil, f)
 	if err != nil {
 		return err
 	}

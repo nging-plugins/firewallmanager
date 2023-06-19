@@ -21,10 +21,12 @@ package netsh
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"strings"
 
+	"github.com/nging-plugins/firewallmanager/application/library/cmdutils"
 	"github.com/nging-plugins/firewallmanager/application/library/driver"
 )
 
@@ -196,5 +198,5 @@ func (a *NetSH) List(table, chain string) ([]*driver.Rule, error) {
 }
 
 func (a *NetSH) run(args []string, stdout io.Writer) error {
-	return driver.RunCmd(a.path, append([]string{`advfirewall`}, args...), stdout)
+	return cmdutils.RunCmd(context.Background(), a.path, append([]string{`advfirewall`}, args...), stdout)
 }
