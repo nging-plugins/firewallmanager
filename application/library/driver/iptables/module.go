@@ -24,6 +24,12 @@ import (
 	"github.com/webx-top/echo/param"
 )
 
+type Moduler interface {
+	Strings() []string
+	ModuleStrings() []string
+	String() string
+}
+
 var ModuleList = []string{`comment`, `string`, `time`, `connlimit`, `limit`}
 
 type ModuleComment struct {
@@ -146,17 +152,17 @@ func (m *ModuleConnLimit) String() string {
 }
 
 type ModuleLimit struct {
-	Limit      uint   // 指定令牌桶中生成新令牌的频率
-	Unit       string // 时间单位 second、minute、hour、day
-	LimitBurst uint   // 指定令牌桶中令牌的最大数量
+	Limit uint   // 指定令牌桶中生成新令牌的频率
+	Unit  string // 时间单位 second、minute、hour、day
+	Burst uint   // 指定令牌桶中令牌的最大数量
 }
 
 func (m *ModuleLimit) Strings() []string {
 	var rs []string
-	if m.LimitBurst > 0 {
-		rs = append(rs, `--limit-burst`, param.AsString(m.LimitBurst))
+	if m.Burst > 0 {
+		rs = append(rs, `--limit-burst`, param.AsString(m.Burst))
 	}
-	if m.LimitBurst > 0 && len(m.Unit) > 0 {
+	if m.Limit > 0 && len(m.Unit) > 0 {
 		rs = append(rs, `--limit`, param.AsString(m.Limit)+`/`+m.Unit)
 	}
 	return rs
