@@ -77,10 +77,10 @@
                         </div>
                         <label class="col-sm-1 control-label">{{"远程端口"|$.T}}</label>
                         <div class="col-sm-4">
-                            <input type="text" name="remotePort" id="remotePort" class="form-control firewall-rule" value="{{$.Form `remotePort`}}" pattern="^([0-9]+([:-][0-9]+)?|[0-9]+[:-]|[:-][0-9]+|[0-9]+(,[0-9]+)*)$">
+                            <input type="text" name="remotePort" id="remotePort" class="form-control firewall-rule" value="{{$.Form `remotePort`}}" pattern="^([0-9]+([-][0-9]+)?|[0-9]+[-]|[-][0-9]+|[0-9]+(,[0-9]+)*)$">
                             <div class="help-block">
                                 {{`如果是入站规则就是指访客端口。`|$.T}}<br />
-                                {{`支持指定单个端口或者端口范围，例如“10000-20000”或者“10000:20000”表示从端口10000到20000；或者指定端口列表，例如“10000,10001”。端口范围和端口列表不能同时存在。`|$.T}}
+                                {{`支持指定单个端口或者端口范围，例如“10000-20000”表示从端口10000到20000；或者指定端口列表，例如“10000,10001”。端口范围和端口列表不能同时存在。`|$.T}}
                             </div>
                         </div>
                     </div>
@@ -92,20 +92,20 @@
                         </div>
                         <label class="col-sm-1 control-label">{{"本机端口"|$.T}}</label>
                         <div class="col-sm-4">
-                            <input type="text" name="localPort" id="localPort" class="form-control firewall-rule" value="{{$.Form `localPort`}}" pattern="^([0-9]+([:-][0-9]+)?|[0-9]+[:-]|[:-][0-9]+|[0-9]+(,[0-9]+)*)$">
-                            <div class="help-block">{{`支持指定单个端口或者端口范围，例如“10000-20000”或者“10000:20000”表示从端口10000到20000；或者指定端口列表，例如“10000,10001”。端口范围和端口列表不能同时存在。`|$.T}}</div>
+                            <input type="text" name="localPort" id="localPort" class="form-control firewall-rule" value="{{$.Form `localPort`}}" pattern="^([0-9]+([-][0-9]+)?|[0-9]+[-]|[-][0-9]+|[0-9]+(,[0-9]+)*)$">
+                            <div class="help-block">{{`支持指定单个端口或者端口范围，例如“10000-20000”表示从端口10000到20000；或者指定端口列表，例如“10000,10001”。端口范围和端口列表不能同时存在。`|$.T}}</div>
                         </div>
                     </div>
                     <div class="form-group" id="tNATContainer"{{if ne $type `nat`}} style="display:none"{{end}}>
                         <label class="col-sm-2 control-label">{{"NAT IP"|$.T}}</label>
                         <div class="col-sm-4">
                             <input type="text" name="natIp" id="natIp" class="form-control" value="{{$.Form `natIp`}}">
-                            <div class="help-block">{{`指定要转发到哪个IP`|$.T}}</div>
+                            <div class="help-block">{{`指定要转发到哪个IP。支持指定范围，例如：192.168.0.1-192.168.0.5`|$.T}}</div>
                         </div>
                         <label class="col-sm-1 control-label">{{"NAT 端口"|$.T}}</label>
                         <div class="col-sm-4">
                             <input type="text" name="natPort" id="natPort" class="form-control" value="{{$.Form `natPort`}}" pattern="^[0-9]+([-][0-9]+)?$">
-                            <div class="help-block">{{`指定要转发到哪个端口`|$.T}}</div>
+                            <div class="help-block">{{`指定要转发到哪个端口。支持指定范围，例如：20000-20010`|$.T}}</div>
                         </div>
                     </div>
                     <div class="form-group">
