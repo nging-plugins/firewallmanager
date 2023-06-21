@@ -138,7 +138,7 @@
                                     <div class="col-sm-10">
                                         <input type="text" name="rateLimit" id="rateLimit" class="form-control firewall-rule" value="{{$.Form `rateLimit`}}" pattern="^[\d]+/[pb]/[smhd]$" placeholder="{{`限制数量/限制类型/时间单位`|$.T}}">
                                         <div class="help-block">
-                                            {{`每个IP的频率限制，格式由“限制数量”、“限制类型“、”时间单位“这三部分组成并用斜杠”/“分隔。`|$.T}}<br />
+                                            {{`频率限制，格式由“限制数量”、“限制类型“、”时间单位“这三部分组成并用斜杠”/“分隔。`|$.T}}<br />
                                             {{`其中“限制类型”支持“p”(表示包)和“b”(表示字节)；`|$.T}}<br />
                                             {{`“时间单位”支持“s”(秒)、“m”(分钟)、“h”(小时)、“d”(天)。`|$.T}}<br />
                                             {{`例如`|$.T}}<code>200/p/s</code>{{`表示每秒200个包；`|$.T}}<code>200+/b/s</code>{{`表示每秒200个字节以上(加号仅nftables支持)。`|$.T}}
@@ -154,7 +154,7 @@
                                     <label class="col-sm-2 control-label">{{"最大连接数"|$.T}}</label>
                                     <div class="col-sm-4">
                                         <input type="number" name="connLimit" id="connLimit" class="form-control firewall-rule" value="{{$.Form `connLimit`}}" min="0">
-                                        <div class="help-block">{{`每个IP的最大连接数(非必填)`|$.T}}</div>
+                                        <div class="help-block">{{`最大连接数(非必填)`|$.T}}</div>
                                     </div>
                                 </div>
                             </div>
