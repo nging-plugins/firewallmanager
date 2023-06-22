@@ -27,10 +27,10 @@ func testLineParser(i uint64, t string) (rowInfo *RowInfo, err error) {
 			return
 		}
 		rowInfo = &RowInfo{
-			RowNo:  i,
-			Row:    parts[0],
-			Handle: &handleID,
+			RowNo: i,
+			Row:   parts[0],
 		}
+		rowInfo.Handle.SetValid(handleID)
 	} else {
 		rowInfo = &RowInfo{
 			RowNo: i,

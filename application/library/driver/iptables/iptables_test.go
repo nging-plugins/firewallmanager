@@ -5,6 +5,8 @@ import (
 
 	"github.com/admpub/log"
 	"github.com/admpub/pp"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/nging-plugins/firewallmanager/application/library/driver"
 	"github.com/nging-plugins/firewallmanager/application/library/enums"
 )
@@ -22,17 +24,21 @@ func TestAppend(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = a.Append(driver.Rule{
+	rule := driver.Rule{
 		Type:      enums.TableFilter,
 		Name:      `testAppend`,
 		Direction: enums.ChainInput,
 		Protocol:  enums.ProtocolTCP,
 		Action:    enums.TargetDrop,
 		LocalPort: `14444`,
-	})
+	}
+	err = a.Append(rule)
 	if err != nil {
 		t.Fatal(err)
 	}
+	exists, err := a.Exists(rule)
+	assert.NoError(t, err)
+	assert.True(t, exists)
 }
 
 func TestList(t *testing.T) {
@@ -46,4 +52,17 @@ func TestList(t *testing.T) {
 		t.Fatal(err)
 	}
 	pp.Println(rows)
+}
+
+func TestFindByComment(t *testing.T) {
+	defer log.Close()
+	a, err := New(driver.ProtocolIPv4, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	nums, err := a.findByComment(enums.TableFilter, enums.ChainInput, CommentPrefix+`2`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	pp.Println(nums)
 }

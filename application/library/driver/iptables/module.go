@@ -41,6 +41,9 @@ type ModuleComment struct {
 
 func (m *ModuleComment) Args() []string {
 	var rs []string
+	if len(m.Comment) == 0 {
+		return rs
+	}
 	rs = append(rs, m.ModuleStrings()...)
 	rs = append(rs, m.Strings()...)
 	return rs
@@ -112,8 +115,12 @@ func joinUint(vals []uint, sep string) string {
 
 func (m *ModuleTime) Args() []string {
 	var rs []string
+	args := m.Strings()
+	if len(args) == 0 {
+		return rs
+	}
 	rs = append(rs, m.ModuleStrings()...)
-	rs = append(rs, m.Strings()...)
+	rs = append(rs, args...)
 	return rs
 }
 
@@ -159,8 +166,12 @@ type ModuleConnLimit struct {
 
 func (m *ModuleConnLimit) Args() []string {
 	var rs []string
+	args := m.Strings()
+	if len(args) == 0 {
+		return rs
+	}
 	rs = append(rs, m.ModuleStrings()...)
-	rs = append(rs, m.Strings()...)
+	rs = append(rs, args...)
 	return rs
 }
 
@@ -247,8 +258,12 @@ type ModuleLimit struct {
 
 func (m *ModuleLimit) Args() []string {
 	var rs []string
+	args := m.Strings()
+	if len(args) == 0 {
+		return rs
+	}
 	rs = append(rs, m.ModuleStrings()...)
-	rs = append(rs, m.Strings()...)
+	rs = append(rs, args...)
 	return rs
 }
 

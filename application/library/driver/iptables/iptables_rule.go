@@ -82,7 +82,7 @@ func (a *IPTables) buildCommonRule(rule *driver.Rule) (args []string, err error)
 		appendArgs(&args, _args)
 	}
 	cmt := &ModuleComment{
-		Comment: rule.IDString(),
+		Comment: CommentPrefix + rule.IDString(),
 	}
 	args = append(args, cmt.Args()...)
 	return
