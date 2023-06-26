@@ -280,7 +280,7 @@ func (a *IPTables) findByComment(table, chain string, findComments ...string) (m
 	if len(findComments) == 0 {
 		return result, nil
 	}
-	rows, _, err := cmdutils.RecvCmdOutputs(1, uint(len(findComments)+1),
+	rows, _, err := cmdutils.RecvCmdOutputs(1, uint(len(findComments)),
 		iptables.GetIptablesCommand(a.Proto()),
 		[]string{
 			`-t`, table,

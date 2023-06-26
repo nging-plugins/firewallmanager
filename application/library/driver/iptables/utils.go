@@ -23,7 +23,8 @@ func LineCommentParser(findComments []string) func(i uint64, t string) (rowInfo 
 		if !com.InSlice(comment, findComments) {
 			return
 		}
-		handleID, err := strconv.ParseUint(strings.SplitN(t, ` `, 2)[0], 10, 64)
+		var handleID uint64
+		handleID, err = strconv.ParseUint(strings.SplitN(t, ` `, 2)[0], 10, 64)
 		if err != nil {
 			return
 		}
