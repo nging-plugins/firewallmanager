@@ -88,6 +88,11 @@ func (a *NetSH) Reset() error {
 	return a.run(rulespec, nil)
 }
 
+func (a *NetSH) Clear() error {
+	rulespec := []string{`firewall`, `delete`, `rule`, `all`}
+	return a.run(rulespec, nil)
+}
+
 func (a *NetSH) Import(wfwFile string) error {
 	rulespec := []string{`import`, fmt.Sprintf(`%q`, wfwFile)}
 	return a.run(rulespec, nil)

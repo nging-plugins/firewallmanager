@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func testLineParser(i uint64, t string) (rowInfo *RowInfo, err error) {
+func testLineParser(i uint64, t string) (rowInfo RowInfo, err error) {
 	fmt.Println(`line:`, i, `text:`, t)
 	t = strings.TrimSpace(t)
 	if strings.HasSuffix(t, `{`) || t == `}` {
@@ -26,7 +26,7 @@ func testLineParser(i uint64, t string) (rowInfo *RowInfo, err error) {
 		if err != nil {
 			return
 		}
-		rowInfo = &RowInfo{
+		rowInfo = RowInfo{
 			RowNo: i,
 			Row:   parts[0],
 		}

@@ -57,7 +57,7 @@ func ruleStaticIndex(ctx echo.Context) error {
 }
 
 func ruleStaticGetFirewallPosition(m *model.RuleStatic, row *dbschema.NgingFirewallRuleStatic, excludeOther ...uint) (uint64, error) {
-	next, err := m.NextRow(row.IpVersion, row.Position, row.Id, excludeOther...)
+	next, err := m.NextRow(row.Type, row.Direction, row.IpVersion, row.Position, row.Id, excludeOther...)
 	if err != nil {
 		if errors.Is(err, db.ErrNoMoreRows) {
 			err = nil
@@ -227,6 +227,7 @@ func ruleStaticDelete(ctx echo.Context) error {
 
 func ruleStaticApply(ctx echo.Context) error {
 	firewall.ResetEngine()
+	firewall.Clear(`all`)
 	err := applyStaticRule(ctx)
 	if err == nil {
 		handler.SendOk(ctx, ctx.T(`规则应用成功`))

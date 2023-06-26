@@ -180,7 +180,7 @@ func (r *RuleStatic) AsRule(row ...*dbschema.NgingFirewallRuleStatic) driver.Rul
 	return AsRule(m)
 }
 
-func (r *RuleStatic) NextRow(ipVer string, position int, id uint, excludeOther ...uint) (*dbschema.NgingFirewallRuleStatic, error) {
+func (r *RuleStatic) NextRow(table string, chain string, ipVer string, position int, id uint, excludeOther ...uint) (*dbschema.NgingFirewallRuleStatic, error) {
 	row := dbschema.NewNgingFirewallRuleStatic(r.Context())
 	cond := db.NewCompounds()
 	cond.Add(cond.Or(

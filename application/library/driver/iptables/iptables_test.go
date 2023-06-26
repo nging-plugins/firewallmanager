@@ -47,7 +47,7 @@ func TestList(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	rows, err := a.List(enums.TableFilter, enums.ChainInput)
+	rows, err := a.base.List(enums.TableFilter, enums.ChainInput)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -60,7 +60,7 @@ func TestFindByComment(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	nums, err := a.findByComment(enums.TableFilter, enums.ChainInput, CommentPrefix+`2`)
+	nums, err := a.base.findByComment(enums.TableFilter, FilterChainInput, CommentPrefix+`1`)
 	if err != nil {
 		t.Fatal(err)
 	}

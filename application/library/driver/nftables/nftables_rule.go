@@ -84,7 +84,7 @@ func (a *NFTables) buildProtoRule(rule *driver.Rule) (args nftablesutils.Exprs) 
 	case enums.ProtocolUDP:
 		args = nftablesutils.JoinExprs(args, nftablesutils.SetProtoUDP())
 	case enums.ProtocolICMP:
-		if a.isIPv4() {
+		if a.base.isIPv4() {
 			args = nftablesutils.JoinExprs(args, nftablesutils.SetProtoICMP())
 		} else {
 			args = nftablesutils.JoinExprs(args, nftablesutils.SetProtoICMPv6())
@@ -103,11 +103,11 @@ func (a *NFTables) buildLocalIPRule(c *nftables.Conn, rule *driver.Rule) (args n
 		var ipSet *nftables.Set
 		var elems []nftables.SetElement
 		var eErr error
-		if a.isIPv4() {
-			ipSet = nftablesutils.GetIPv4AddrSet(a.NFTables.TableFilter())
+		if a.base.isIPv4() {
+			ipSet = nftablesutils.GetIPv4AddrSet(a.base.TableFilter())
 			elems, eErr = setutils.GenerateElementsFromIPv4Address([]string{rule.LocalIP})
 		} else {
-			ipSet = nftablesutils.GetIPv6AddrSet(a.NFTables.TableFilter())
+			ipSet = nftablesutils.GetIPv6AddrSet(a.base.TableFilter())
 			elems, eErr = setutils.GenerateElementsFromIPv6Address([]string{rule.LocalIP})
 		}
 		if eErr != nil {
@@ -134,11 +134,11 @@ func (a *NFTables) buildRemoteIPRule(c *nftables.Conn, rule *driver.Rule) (args 
 		var ipSet *nftables.Set
 		var elems []nftables.SetElement
 		var eErr error
-		if a.isIPv4() {
-			ipSet = nftablesutils.GetIPv4AddrSet(a.NFTables.TableFilter())
+		if a.base.isIPv4() {
+			ipSet = nftablesutils.GetIPv4AddrSet(a.base.TableFilter())
 			elems, eErr = setutils.GenerateElementsFromIPv4Address([]string{rule.RemoteIP})
 		} else {
-			ipSet = nftablesutils.GetIPv6AddrSet(a.NFTables.TableFilter())
+			ipSet = nftablesutils.GetIPv6AddrSet(a.base.TableFilter())
 			elems, eErr = setutils.GenerateElementsFromIPv6Address([]string{rule.RemoteIP})
 		}
 		if eErr != nil {
@@ -166,7 +166,7 @@ func (a *NFTables) buildLocalPortRule(c *nftables.Conn, rule *driver.Rule) (args
 			return nftablesutils.ValidatePort(v) == nil
 		})
 		if len(ports) > 0 {
-			portSet := nftablesutils.GetPortSet(a.NFTables.TableFilter())
+			portSet := nftablesutils.GetPortSet(a.base.TableFilter())
 			portsUint16 := make([]uint16, len(ports))
 			for k, v := range ports {
 				portsUint16[k] = uint16(v)
@@ -212,7 +212,7 @@ func (a *NFTables) buildRemotePortRule(c *nftables.Conn, rule *driver.Rule) (arg
 			return nftablesutils.ValidatePort(v) == nil
 		})
 		if len(ports) > 0 {
-			portSet := nftablesutils.GetPortSet(a.NFTables.TableFilter())
+			portSet := nftablesutils.GetPortSet(a.base.TableFilter())
 			portsUint16 := make([]uint16, len(ports))
 			for k, v := range ports {
 				portsUint16[k] = uint16(v)
@@ -253,7 +253,7 @@ func (a *NFTables) buildStateRule(c *nftables.Conn, rule *driver.Rule) (args nft
 	if len(rule.State) == 0 {
 		return
 	}
-	stateSet := nftablesutils.GetConntrackStateSet(a.NFTables.TableFilter())
+	stateSet := nftablesutils.GetConntrackStateSet(a.base.TableFilter())
 	states := strings.Split(rule.State, `,`)
 	states = param.StringSlice(states).Unique().Filter().String()
 	if len(states) == 0 {

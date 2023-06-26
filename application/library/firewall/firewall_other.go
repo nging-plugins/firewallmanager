@@ -55,6 +55,10 @@ func (unsupportedDriver) Reset() error {
 	return ErrUnsupportedOperatingSystem
 }
 
+func (unsupportedDriver) Clear() error {
+	return ErrUnsupportedOperatingSystem
+}
+
 func (unsupportedDriver) Import(wfwFile string) error {
 	return ErrUnsupportedOperatingSystem
 }
