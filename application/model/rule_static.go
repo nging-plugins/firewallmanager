@@ -179,3 +179,21 @@ func (r *RuleStatic) AsRule(row ...*dbschema.NgingFirewallRuleStatic) driver.Rul
 	}
 	return AsRule(m)
 }
+
+func (r *RuleStatic) NextRow(ipVer string, position int, id uint, excludeOther ...uint) (*dbschema.NgingFirewallRuleStatic, error) {
+	row := dbschema.NewNgingFirewallRuleStatic(r.Context())
+	cond := db.NewCompounds()
+	cond.Add(cond.Or(
+		db.Cond{`position`: db.Gte(position)},
+		db.Cond{`id`: db.Gt(id)},
+	))
+	cond.Add(db.Cond{`ip_version`: ipVer})
+	exclude := make([]uint, 0, len(excludeOther)+1)
+	exclude = append(exclude, id)
+	exclude = append(exclude, excludeOther...)
+	cond.Add(db.Cond{`id`: db.NotIn(exclude)})
+	err := row.Get(func(r db.Result) db.Result {
+		return r.OrderBy(`position`, `id`)
+	}, cond.And())
+	return row, err
+}

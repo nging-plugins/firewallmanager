@@ -29,6 +29,7 @@ func AsRule(m *dbschema.NgingFirewallRuleStatic) driver.Rule {
 	}
 	return driver.Rule{
 		ID:        m.Id,
+		Number:    0,
 		Type:      m.Type,
 		Name:      m.Name,
 		Direction: m.Direction,

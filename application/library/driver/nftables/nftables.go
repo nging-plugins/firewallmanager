@@ -207,7 +207,7 @@ func (a *NFTables) Insert(rules ...driver.Rule) (err error) {
 				return err
 			}
 			id := rule.IDBytes()
-			ruleData := ruleutils.NewData(id, exprs)
+			ruleData := ruleutils.NewData(id, exprs, 0, copyRule.Number)
 			_, err = ruleTarget.Insert(conn, ruleData)
 			if err != nil {
 				return err
@@ -379,4 +379,23 @@ func (a *NFTables) Stats(tableName, chainName string) ([]map[string]string, erro
 
 func (a *NFTables) List(tableName, chainName string) ([]*driver.Rule, error) {
 	return nil, driver.ErrUnsupported
+}
+
+func (a *NFTables) FindPositionByID(table, chain string, id uint) (uint64, error) {
+	var position uint64
+	err := a.NFTables.Do(func(conn *nftables.Conn) (err error) {
+		ruleTarget, err := a.NewRuleTarget(table, chain)
+		if err != nil {
+			return err
+		}
+		s := strconv.FormatUint(uint64(id), 10)
+		ruleData := ruleutils.NewData([]byte(s), nil, 0)
+		rule, err := ruleTarget.FindRuleByID(conn, ruleData)
+		if err != nil {
+			return err
+		}
+		position = rule.Position
+		return nil
+	})
+	return position, err
 }

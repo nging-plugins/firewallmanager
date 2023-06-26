@@ -94,3 +94,7 @@ func (unsupportedDriver) Stats(table, chain string) ([]map[string]string, error)
 func (unsupportedDriver) List(table, chain string) ([]*driver.Rule, error) {
 	return nil, ErrUnsupportedOperatingSystem
 }
+
+func (unsupportedDriver) FindPositionByID(table, chain string, id uint) (uint64, error) {
+	return 0, ErrUnsupportedOperatingSystem
+}

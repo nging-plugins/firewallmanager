@@ -30,5 +30,6 @@ type Driver interface {
 	Delete(rules ...Rule) error
 	Exists(rule Rule) (bool, error)
 	Stats(table, chain string) ([]map[string]string, error)
-	List(table, chain string) ([]*Rule, error)
+	//List(table, chain string) ([]*Rule, error)
+	FindPositionByID(table, chain string, id uint) (uint64, error)
 }

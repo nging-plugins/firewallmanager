@@ -150,7 +150,7 @@ func (a *IPTables) Insert(rules ...driver.Rule) (err error) {
 		}
 		table := copyRule.Type
 		chain := copyRule.Direction
-		err = a.IPTables.InsertUnique(table, chain, int(copyRule.Number), rulespec...)
+		err = a.IPTables.Insert(table, chain, int(copyRule.Number), rulespec...)
 		if err != nil {
 			return
 		}
@@ -161,6 +161,7 @@ func (a *IPTables) Insert(rules ...driver.Rule) (err error) {
 func (a *IPTables) getExistsIndexes(rules []driver.Rule) (map[int]uint64, error) {
 	comments := map[string]map[string][]string{}
 	commentk := map[string]int{}
+	exists := map[int]uint64{}
 	for index, rule := range rules {
 		if rule.ID > 0 {
 			comment := CommentPrefix + param.AsString(rule.ID)
@@ -174,7 +175,6 @@ func (a *IPTables) getExistsIndexes(rules []driver.Rule) (map[int]uint64, error)
 			comments[rule.Type][rule.Direction] = append(comments[rule.Type][rule.Direction], comment)
 		}
 	}
-	exists := map[int]uint64{}
 	if len(comments) > 0 {
 		for table, chains := range comments {
 			for chain, cmts := range chains {
@@ -209,7 +209,7 @@ func (a *IPTables) Append(rules ...driver.Rule) (err error) {
 		}
 		table := copyRule.Type
 		chain := copyRule.Direction
-		err = a.IPTables.AppendUnique(table, chain, rulespec...)
+		err = a.IPTables.Append(table, chain, rulespec...)
 		if err != nil {
 			return
 		}
@@ -375,4 +375,14 @@ func (a *IPTables) List(table, chain string) ([]*driver.Rule, error) {
 		rules = append(rules, rule)
 	}
 	return rules, errs.ToError()
+}
+
+func (a *IPTables) FindPositionByID(table, chain string, id uint) (uint64, error) {
+	var position uint64
+	comment := CommentPrefix + strconv.FormatUint(uint64(id), 10)
+	nums, err := a.findByComment(table, chain, comment)
+	if err == nil {
+		position = nums[comment]
+	}
+	return position, err
 }

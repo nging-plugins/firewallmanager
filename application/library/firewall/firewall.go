@@ -120,3 +120,7 @@ func AsWhitelist(ipVersion, table, chain string) (err error) {
 	}
 	return err
 }
+
+func FindPositionByID(ipVersion, table, chain string, id uint) (uint64, error) {
+	return Engine(ipVersion).FindPositionByID(table, chain, id)
+}

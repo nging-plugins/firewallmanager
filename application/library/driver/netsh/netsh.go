@@ -200,3 +200,8 @@ func (a *NetSH) List(table, chain string) ([]*driver.Rule, error) {
 func (a *NetSH) run(args []string, stdout io.Writer) error {
 	return cmdutils.RunCmd(context.Background(), a.path, append([]string{`advfirewall`}, args...), stdout)
 }
+
+func (a *NetSH) FindPositionByID(table, chain string, id uint) (uint64, error) {
+	var position uint64
+	return position, driver.ErrUnsupported
+}
