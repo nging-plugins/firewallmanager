@@ -183,15 +183,16 @@ func (r *RuleStatic) AsRule(row ...*dbschema.NgingFirewallRuleStatic) driver.Rul
 func (r *RuleStatic) NextRow(table string, chain string, ipVer string, position int, id uint, excludeOther ...uint) (*dbschema.NgingFirewallRuleStatic, error) {
 	row := dbschema.NewNgingFirewallRuleStatic(r.Context())
 	cond := db.NewCompounds()
-	cond.Add(cond.Or(
-		db.Cond{`position`: db.Gte(position)},
-		db.Cond{`id`: db.Gt(id)},
-	))
+	cond.Add(db.Cond{`disabled`: `N`})
 	cond.Add(db.Cond{`ip_version`: ipVer})
 	exclude := make([]uint, 0, len(excludeOther)+1)
 	exclude = append(exclude, id)
 	exclude = append(exclude, excludeOther...)
 	cond.Add(db.Cond{`id`: db.NotIn(exclude)})
+	cond.Add(cond.Or(
+		cond.And(db.Cond{`position`: position}, db.Cond{`id`: db.Gt(id)}),
+		cond.And(db.Cond{`position`: db.Gt(position)}),
+	))
 	err := row.Get(func(r db.Result) db.Result {
 		return r.OrderBy(`position`, `id`)
 	}, cond.And())
