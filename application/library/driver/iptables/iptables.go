@@ -115,13 +115,13 @@ func (a *IPTables) Enabled(on bool) error {
 func (a *IPTables) Clear() error {
 	for _, chain := range FilterChains {
 		err := a.base.ClearChain(enums.TableFilter, chain)
-		if err != nil && !IsExist(err) {
+		if err != nil {
 			return err
 		}
 	}
 	for _, chain := range NATChains {
 		err := a.base.ClearChain(enums.TableNAT, chain)
-		if err != nil && !IsExist(err) {
+		if err != nil {
 			return err
 		}
 	}
@@ -129,19 +129,26 @@ func (a *IPTables) Clear() error {
 }
 
 func (a *IPTables) Reset() error {
-	err := a.Clear()
-	if err != nil {
-		return err
-	}
+	var err error
 	for _, chain := range FilterChains {
-		err = a.base.DeleteChain(enums.TableFilter, chain)
-		if err != nil && !IsExist(err) {
+		refChain := RefFilterChains[chain]
+		err = a.base.DeleteIfExists(enums.TableFilter, refChain, `-j`, chain)
+		if err != nil {
+			return err
+		}
+		err = a.base.ClearAndDeleteChain(enums.TableFilter, chain)
+		if err != nil {
 			return err
 		}
 	}
 	for _, chain := range NATChains {
-		err = a.base.DeleteChain(enums.TableNAT, chain)
-		if err != nil && !IsExist(err) {
+		refChain := RefNATChains[chain]
+		err = a.base.DeleteIfExists(enums.TableNAT, refChain, `-j`, chain)
+		if err != nil {
+			return err
+		}
+		err = a.base.ClearAndDeleteChain(enums.TableNAT, chain)
+		if err != nil {
 			return err
 		}
 	}
