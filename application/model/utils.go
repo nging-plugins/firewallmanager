@@ -27,7 +27,7 @@ import (
 )
 
 func AsRule(m *dbschema.NgingFirewallRuleStatic) driver.Rule {
-	if len(m.IpVersion) > 0 {
+	if len(m.IpVersion) == 0 {
 		m.IpVersion = `4`
 	}
 	rule := driver.Rule{
@@ -68,8 +68,8 @@ func AsRule(m *dbschema.NgingFirewallRuleStatic) driver.Rule {
 			rule.Extra = recv
 		}
 	}
-	if len(m.RateLimit) > 0 && m.RateExpires == 0 {
-		m.RateExpires = 86400
+	if len(rule.RateLimit) > 0 && rule.RateExpires == 0 {
+		rule.RateExpires = 86400
 	}
 	return rule
 }

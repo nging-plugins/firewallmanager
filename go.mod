@@ -8,7 +8,7 @@ require (
 	github.com/admpub/gerberos v0.0.7
 	github.com/admpub/go-iptables v0.6.5
 	github.com/admpub/log v1.3.3
-	github.com/admpub/nftablesutils v0.0.7
+	github.com/admpub/nftablesutils v0.0.9
 	github.com/admpub/nging/v5 v5.0.1
 	github.com/admpub/null v8.0.4+incompatible
 	github.com/admpub/once v0.0.1

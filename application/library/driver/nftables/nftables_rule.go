@@ -273,7 +273,7 @@ func (a *NFTables) buildStateRule(c *nftables.Conn, rule *driver.Rule) (args nft
 	return
 }
 
-func (a *NFTables) buildConnLimitRule(rule *driver.Rule) (args nftablesutils.Exprs, err error) {
+func (a *NFTables) buildConnLimitRule(_ *nftables.Conn, rule *driver.Rule) (args nftablesutils.Exprs, err error) {
 	if rule.ConnLimit == 0 {
 		return
 	}
@@ -281,7 +281,7 @@ func (a *NFTables) buildConnLimitRule(rule *driver.Rule) (args nftablesutils.Exp
 	return
 }
 
-func (a *NFTables) buildLimitRule(rule *driver.Rule) (args nftablesutils.Exprs, err error) {
+func (a *NFTables) buildLimitRule(_ *nftables.Conn, rule *driver.Rule) (args nftablesutils.Exprs, err error) {
 	if len(rule.RateLimit) == 0 {
 		return
 	}
@@ -294,16 +294,14 @@ func (a *NFTables) buildLimitRule(rule *driver.Rule) (args nftablesutils.Exprs, 
 	return
 }
 
-func (a *NFTables) buildHashLimitRule(rule *driver.Rule) (args nftablesutils.Exprs, err error) {
+func (a *NFTables) buildHashLimitRule(c *nftables.Conn, rule *driver.Rule) (args nftablesutils.Exprs, err error) {
+	setName := HashLimitNamePrefix + param.AsString(rule.ID)
 	if len(rule.RateLimit) == 0 {
-		err = a.base.Do(func(conn *nftables.Conn) error {
-			existSet, err := conn.GetSetByName(a.base.TableFilter(), HashLimitNamePrefix+param.AsString(rule.ID))
-			if err != nil {
-				return nil
-			}
-			conn.DelSet(existSet)
-			return conn.Flush()
-		})
+		existSet, existErr := c.GetSetByName(a.base.TableFilter(), setName)
+		if existErr != nil {
+			return
+		}
+		c.DelSet(existSet)
 		return
 	}
 	var set *nftables.Set
@@ -317,26 +315,28 @@ func (a *NFTables) buildHashLimitRule(rule *driver.Rule) (args nftablesutils.Exp
 	set.Dynamic = true
 	set.HasTimeout = true
 	set.Timeout = time.Duration(rule.RateExpires) * time.Second
-	set.Name = HashLimitNamePrefix + param.AsString(rule.ID)
-	err = a.base.Do(func(conn *nftables.Conn) error {
-		existSet, err := conn.GetSetByName(a.base.TableFilter(), set.Name)
-		if err == nil {
-			if existSet.Timeout == set.Timeout {
-				return nil
-			}
-			conn.DelSet(existSet)
+	set.Name = setName
+
+	var existSet *nftables.Set
+	existSet, err = c.GetSetByName(a.base.TableFilter(), set.Name)
+	if err == nil {
+		if existSet.Timeout != set.Timeout {
+			c.DelSet(existSet)
+		} else {
+			goto END
 		}
-		err = conn.AddSet(set, []nftables.SetElement{})
-		if err != nil {
-			return err
-		}
-		return conn.Flush()
-	})
-	var dynset *expr.Dynset
-	dynset, err = nftablesutils.ExprDynamicLimitSet(set, uint32(rule.ConnLimit), rule.RateLimit, uint32(rule.RateBurst))
+	}
+	err = c.AddSet(set, []nftables.SetElement{})
 	if err != nil {
 		return
 	}
-	args = args.Add(dynset)
+
+END:
+	var exprs []expr.Any
+	exprs, err = nftablesutils.SetDynamicLimitSet(set, rule.RateLimit, uint32(rule.RateBurst))
+	if err != nil {
+		return
+	}
+	args = args.Add(exprs...)
 	return
 }
