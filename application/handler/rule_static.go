@@ -109,6 +109,7 @@ func ruleStaticAdd(ctx echo.Context) error {
 		if id > 0 {
 			err = m.Get(nil, db.Cond{`id`: id})
 			if err == nil {
+				echo.StructToForm(ctx, m.NgingFirewallRuleStatic, ``, echo.LowerCaseFirstLetter)
 				ctx.Request().Form().Set(`id`, `0`)
 			}
 		}

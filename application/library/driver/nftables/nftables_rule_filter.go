@@ -43,16 +43,20 @@ func (a *NFTables) ruleFilterFrom(c *nftables.Conn, rule *driver.Rule) (args nft
 	}
 
 	if com.InSlice(`connLimit`, enums.ChainParams[rule.Direction]) {
-		_args, _err := a.buildConnLimitRule(rule)
-		if _err != nil {
-			err = _err
-			return
+		if !com.InSlice(`rateLimit`, enums.ChainParams[rule.Direction]) { // 如果已经支持了rateLimit则不用再添加connlimit，因为rateLimit采用buildHashLimitRule，其中已经包含了connlimit的支持
+			_args, _err := a.buildConnLimitRule(rule)
+			if _err != nil {
+				err = _err
+				return
+			}
+			args = args.Add(_args...)
 		}
-		args = args.Add(_args...)
+	} else if rule.ConnLimit > 0 {
+		rule.ConnLimit = 0
 	}
 
 	if com.InSlice(`rateLimit`, enums.ChainParams[rule.Direction]) {
-		_args, _err := a.buildLimitRule(rule)
+		_args, _err := a.buildHashLimitRule(rule)
 		if _err != nil {
 			err = _err
 			return

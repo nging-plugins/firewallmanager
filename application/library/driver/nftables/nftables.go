@@ -256,16 +256,12 @@ func (a *NFTables) Delete(rules ...driver.Rule) (err error) {
 func (a *NFTables) Exists(rule driver.Rule) (bool, error) {
 	var exists bool
 	err := a.base.Do(func(conn *nftables.Conn) (err error) {
-		exprs, err := a.ruleFrom(conn, &rule)
-		if err != nil {
-			return err
-		}
 		ruleTarget, err := a.base.NewRuleTarget(rule.Type, rule.Direction)
 		if err != nil {
 			return err
 		}
 		id := rule.IDBytes()
-		ruleData := ruleutils.NewData(id, exprs, rule.Number)
+		ruleData := ruleutils.NewData(id, nil, rule.Number)
 		exists, err = ruleTarget.Exists(conn, ruleData)
 		return
 	})

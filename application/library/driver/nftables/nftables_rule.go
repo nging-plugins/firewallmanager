@@ -20,6 +20,7 @@ package nftables
 
 import (
 	"strings"
+	"time"
 
 	"github.com/admpub/nftablesutils"
 	setutils "github.com/admpub/nftablesutils/set"
@@ -290,5 +291,52 @@ func (a *NFTables) buildLimitRule(rule *driver.Rule) (args nftablesutils.Exprs, 
 		return
 	}
 	args = args.Add(exp)
+	return
+}
+
+func (a *NFTables) buildHashLimitRule(rule *driver.Rule) (args nftablesutils.Exprs, err error) {
+	if len(rule.RateLimit) == 0 {
+		err = a.base.Do(func(conn *nftables.Conn) error {
+			existSet, err := conn.GetSetByName(a.base.TableFilter(), HashLimitNamePrefix+param.AsString(rule.ID))
+			if err != nil {
+				return nil
+			}
+			conn.DelSet(existSet)
+			return conn.Flush()
+		})
+		return
+	}
+	var set *nftables.Set
+	if a.base.isIPv4() {
+		set = nftablesutils.GetIPv4AddrSet(a.base.TableFilter())
+	} else {
+		set = nftablesutils.GetIPv6AddrSet(a.base.TableFilter())
+	}
+	set.Anonymous = false
+	set.Constant = false
+	set.Dynamic = true
+	set.HasTimeout = true
+	set.Timeout = time.Duration(rule.RateExpires) * time.Second
+	set.Name = HashLimitNamePrefix + param.AsString(rule.ID)
+	err = a.base.Do(func(conn *nftables.Conn) error {
+		existSet, err := conn.GetSetByName(a.base.TableFilter(), set.Name)
+		if err == nil {
+			if existSet.Timeout == set.Timeout {
+				return nil
+			}
+			conn.DelSet(existSet)
+		}
+		err = conn.AddSet(set, []nftables.SetElement{})
+		if err != nil {
+			return err
+		}
+		return conn.Flush()
+	})
+	var dynset *expr.Dynset
+	dynset, err = nftablesutils.ExprDynamicLimitSet(set, uint32(rule.ConnLimit), rule.RateLimit, uint32(rule.RateBurst))
+	if err != nil {
+		return
+	}
+	args = args.Add(dynset)
 	return
 }

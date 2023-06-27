@@ -19,15 +19,18 @@
 package model
 
 import (
+	"encoding/json"
+
 	"github.com/nging-plugins/firewallmanager/application/dbschema"
 	"github.com/nging-plugins/firewallmanager/application/library/driver"
+	"github.com/webx-top/echo"
 )
 
 func AsRule(m *dbschema.NgingFirewallRuleStatic) driver.Rule {
 	if len(m.IpVersion) > 0 {
 		m.IpVersion = `4`
 	}
-	return driver.Rule{
+	rule := driver.Rule{
 		ID:        m.Id,
 		Number:    0,
 		Type:      m.Type,
@@ -53,8 +56,20 @@ func AsRule(m *dbschema.NgingFirewallRuleStatic) driver.Rule {
 		IPVersion:  m.IpVersion,
 
 		// Limit
-		ConnLimit: m.ConnLimit,
-		RateLimit: m.RateLimit,
-		RateBurst: m.RateBurst,
+		ConnLimit:   m.ConnLimit,
+		RateLimit:   m.RateLimit,
+		RateBurst:   m.RateBurst,
+		RateExpires: m.RateExpires,
 	}
+	if len(m.Extra) > 0 {
+		recv := echo.H{}
+		err := json.Unmarshal([]byte(m.Extra), &recv)
+		if err == nil {
+			rule.Extra = recv
+		}
+	}
+	if len(m.RateLimit) > 0 && m.RateExpires == 0 {
+		m.RateExpires = 86400
+	}
+	return rule
 }

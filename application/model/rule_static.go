@@ -45,7 +45,7 @@ type RuleStatic struct {
 	*dbschema.NgingFirewallRuleStatic
 }
 
-var rateLimitRegex = regexp.MustCompile(`^[\d]+/[pb]/[smhd]$`)
+var rateLimitRegex = regexp.MustCompile(`^[\d]+[+]?/[pb]/[smhd]$`)
 
 func MatchRageLimit(rateLimit string) bool {
 	return rateLimitRegex.MatchString(rateLimit)
@@ -78,7 +78,9 @@ func (r *RuleStatic) check() error {
 		if r.RateBurst == 0 {
 			return ctx.NewError(code.InvalidParameter, `您设置了“频率限制”规则，必须同时设置“频率峰值”`).SetZone(`rateBurst`)
 		}
-		limit, err := strconv.ParseUint(strings.SplitN(r.RateLimit, `/`, 2)[0], 10, 64)
+		rateLimit := strings.SplitN(r.RateLimit, `/`, 2)[0]
+		rateLimit = strings.TrimSuffix(rateLimit, `+`)
+		limit, err := strconv.ParseUint(rateLimit, 10, 64)
 		if err != nil {
 			return ctx.NewError(code.InvalidParameter, `“频率限制”规则中的“限制数量”(%v)不是有效的数字`, r.RateLimit).SetZone(`rateLimit`)
 		}
