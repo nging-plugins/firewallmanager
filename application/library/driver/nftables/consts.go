@@ -1,3 +1,3 @@
 package nftables
 
-const HashLimitNamePrefix = `nging_limit_`
+const LimitSetNamePrefix = `nging_limit_`
