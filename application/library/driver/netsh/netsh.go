@@ -206,7 +206,7 @@ func (a *NetSH) run(args []string, stdout io.Writer) error {
 	return cmdutils.RunCmd(context.Background(), a.path, append([]string{`advfirewall`}, args...), stdout)
 }
 
-func (a *NetSH) FindPositionByID(table, chain string, id uint) (uint64, error) {
-	var position uint64
+func (a *NetSH) FindPositionByID(table, chain string, id uint) (uint, error) {
+	var position uint
 	return position, driver.ErrUnsupported
 }
