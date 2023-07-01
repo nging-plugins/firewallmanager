@@ -78,6 +78,7 @@ func getStaticRuleLastModifyTs() uint64 {
 }
 func init() {
 	startup.OnAfter(`web.installed`, func() {
+		firewall.Clear(`all`)
 		ctx := defaults.NewMockContext()
 		err := applyNgingRule(ctx)
 		if err == nil {
