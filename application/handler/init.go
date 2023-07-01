@@ -101,8 +101,8 @@ func applyNgingRule(ctx echo.Context) error {
 		Type:      enums.TableFilter,
 		Direction: enums.ChainInput,
 		Action:    enums.TargetAccept,
-		LocalIP:   portStr,
-		IPVersion: `all`,
+		LocalPort: portStr,
+		IPVersion: `4`,
 	}
 	cfg := cmder.GetFirewallConfig()
 	if cfg.NgingRule != nil {
@@ -115,7 +115,7 @@ func applyNgingRule(ctx echo.Context) error {
 				portStrs := []string{portStr}
 				portStrs = append(portStrs, otherPortStrs...)
 				portStrs = param.StringSlice(portStrs).Filter().Unique().String()
-				rule.LocalIP = strings.Join(portStrs, `,`)
+				rule.LocalPort = strings.Join(portStrs, `,`)
 			}
 		}
 	}
