@@ -123,6 +123,7 @@ func applyNgingRule(ctx echo.Context) error {
 	if cfg.NgingRule != nil && cfg.NgingRule.RpsLimit > 0 {
 		// 限流 Nging 自己的端口
 		rateLimitRule := rule
+		rateLimitRule.Name = `NgingPresetLimit`
 		if cfg.NgingRule.RpsLimit > 0 {
 			rateLimitRule.RateLimit = param.AsString(cfg.NgingRule.RpsLimit) + `+/p/s`
 		}
