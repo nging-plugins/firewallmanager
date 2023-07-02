@@ -15,7 +15,7 @@ require (
 	github.com/admpub/packer v0.0.2
 	github.com/admpub/pp v0.0.7
 	github.com/google/nftables v0.1.0
-	github.com/nging-plugins/servermanager v1.3.5
+	github.com/nging-plugins/servermanager v1.3.7
 	github.com/stretchr/testify v1.8.4
 	github.com/webx-top/com v0.9.5
 	github.com/webx-top/db v1.23.17
