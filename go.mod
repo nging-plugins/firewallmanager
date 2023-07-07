@@ -12,10 +12,10 @@ require (
 	github.com/admpub/nging/v5 v5.0.1
 	github.com/admpub/null v8.0.4+incompatible
 	github.com/admpub/once v0.0.1
-	github.com/admpub/packer v0.0.2
+	github.com/admpub/packer v0.0.3
 	github.com/admpub/pp v0.0.7
 	github.com/google/nftables v0.1.0
-	github.com/nging-plugins/servermanager v1.3.7
+	github.com/nging-plugins/servermanager v1.4.0
 	github.com/stretchr/testify v1.8.4
 	github.com/webx-top/com v0.9.5
 	github.com/webx-top/db v1.24.3
@@ -27,7 +27,6 @@ require (
 require (
 	gitee.com/admpub/certmagic v0.8.8 // indirect
 	github.com/BurntSushi/toml v1.3.2 // indirect
-	github.com/JustinTimperio/osinfo v0.0.0-20210705143940-9e63396e3c2f // indirect
 	github.com/abh/errorutil v1.0.0 // indirect
 	github.com/admpub/9t v0.0.0-20190605154903-a68069ace5e1 // indirect
 	github.com/admpub/ccs-gm v0.0.5 // indirect
@@ -71,6 +70,7 @@ require (
 	github.com/admpub/mail v0.0.0-20170408110349-d63147b0317b // indirect
 	github.com/admpub/marmot v0.0.0-20200702042226-2170d9ff59f5 // indirect
 	github.com/admpub/mysql-schema-sync v0.2.5 // indirect
+	github.com/admpub/osinfo v0.0.2 // indirect
 	github.com/admpub/pester v0.0.0-20200411024648-005672a2bd48 // indirect
 	github.com/admpub/qrcode v0.0.3 // indirect
 	github.com/admpub/randomize v0.0.2 // indirect
@@ -152,7 +152,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/muesli/smartcrop v0.3.0 // indirect
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 // indirect
-	github.com/nging-plugins/sshmanager v1.3.1 // indirect
+	github.com/nging-plugins/sshmanager v1.4.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/power-devops/perfstat v0.0.0-20221212215047-62379fc7944b // indirect
