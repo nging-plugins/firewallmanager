@@ -175,7 +175,7 @@ function onActionTypeChange(event){
         var first=formElements[0];
         label=first.V;
         input=template('formInputTmpl',{
-            row:first,
+            row:first,index:0,
             name:'actionArg',
             values:['{{$.Stored.rule.ActionArg}}'],
             inputTypes:inputTypes,defaultValue:''
