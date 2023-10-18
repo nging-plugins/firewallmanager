@@ -14,6 +14,7 @@ import (
 )
 
 type Base struct {
+	blackListSetName string
 	*iptables.IPTables
 }
 
@@ -61,15 +62,14 @@ func (a *Base) FindPositionByID(table, chain string, id uint) (uint, error) {
 	return position, err
 }
 
-func (a *Base) AttachSet(chain string, set string, action string) error {
-	if err := a.NewChain(enums.TableFilter, chain); err != nil && !IsExist(err) {
-		return fmt.Errorf(`failed to create %s chain "%s": %w`, a.GetExeclutor(), chain, err)
+func (a *Base) AttachSet(set string, action string) error {
+	rulespec := []string{"-j", action, "-m", "set", "--match-set", set, "src"}
+	cmt := &ModuleComment{
+		Comment: `Nging` + set,
 	}
-	if err := a.InsertUnique(enums.TableFilter, chain, 1, "-j", action, "-m", "set", "--match-set", set, "src"); err != nil {
+	rulespec = append(rulespec, cmt.Args()...)
+	if err := a.AppendUnique(enums.TableFilter, FilterChainInput, rulespec...); err != nil {
 		return fmt.Errorf(`failed to create %s entry for set "%s": %w`, a.GetExeclutor(), set, err)
-	}
-	if err := a.InsertUnique(enums.TableFilter, enums.ChainInput, 1, "-j", chain); err != nil {
-		return fmt.Errorf(`failed to create %s entry for chain "%s": %w`, a.GetExeclutor(), chain, err)
 	}
 	return nil
 }
@@ -87,34 +87,34 @@ func (a *Base) CreateSet(ctx context.Context, set string) error {
 	return cmdutils.RunCmd(ctx, "ipset", args, os.Stdout)
 }
 
-func (a *Base) CreateBlackListSet(chain string, set string) error {
-	err := a.CreateSet(context.Background(), set)
+func (a *Base) CreateBlackListSet() error {
+	err := a.CreateSet(context.Background(), a.blackListSetName)
 	if err != nil {
 		return err
 	}
-	return a.AttachSet(chain, set, enums.TargetDrop)
+	return a.AttachBlackListSet()
 }
 
-func (a *Base) RemoveBlackListSet(chain string, set string) error {
-	return a.RemoveSet(chain, set, enums.TargetDrop)
+func (a *Base) AttachBlackListSet() error {
+	return a.AttachSet(a.blackListSetName, enums.TargetDrop)
 }
 
-func (a *Base) RemoveSet(chain string, set string, action string) error {
-	err := a.DeleteIfExists(enums.TableFilter, chain, `-j`, action, "-m", "set", "--match-set", set, "src")
-	if err != nil {
-		return err
-	}
-	err = a.DeleteIfExists(enums.TableFilter, enums.ChainInput, `-j`, chain)
-	if err != nil {
-		return err
-	}
-	err = a.ClearAndDeleteChain(enums.TableFilter, chain)
+func (a *Base) RemoveBlackListSet() error {
+	return a.RemoveSet(a.blackListSetName, enums.TargetDrop)
+}
+
+func (a *Base) RemoveSet(set string, action string) error {
+	err := a.DeleteIfExists(enums.TableFilter, FilterChainInput, `-j`, action, "-m", "set", "--match-set", set, "src")
 	if err != nil {
 		return err
 	}
 	ctx := context.Background()
 	args := []string{"destroy", set}
 	return cmdutils.RunCmd(ctx, "ipset", args, os.Stdout)
+}
+
+func (a *Base) AddToBlacklistSet(ips []net.IP, d time.Duration) error {
+	return a.AddToSet(a.blackListSetName, ips, d)
 }
 
 func (a *Base) AddToSet(set string, ips []net.IP, d time.Duration) error {

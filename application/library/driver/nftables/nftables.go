@@ -27,6 +27,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/admpub/nftablesutils"
@@ -137,6 +138,8 @@ func (a *NFTables) Enabled(on bool) error {
 	return driver.ErrUnsupported
 }
 
+var oldCleaned = atomic.Bool{}
+
 func (a *NFTables) Clear() error {
 	return a.base.Do(func(conn *nftables.Conn) error {
 		conn.FlushTable(a.base.TableFilter())
@@ -144,7 +147,8 @@ func (a *NFTables) Clear() error {
 		conn.FlushTable(a.base.tBlacklistFilter)
 
 		// 清除旧版数据
-		if !a.base.isIPv4() {
+		if !a.base.isIPv4() && !oldCleaned.Load() {
+			oldCleaned.Store(true)
 			conn.FlushTable(&nftables.Table{
 				Family: nftables.TableFamilyIPv6,
 				Name:   a.base.cfg.TablePrefix + `ip6_` + biz.TableFilter,

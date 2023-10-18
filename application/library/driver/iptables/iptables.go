@@ -40,17 +40,16 @@ var _ driver.Driver = (*IPTables)(nil)
 
 func New(proto driver.Protocol, autoInstall bool) (*IPTables, error) {
 	t := &IPTables{
-		IPProtocol:         proto,
-		blackListChainName: `NgingBlacklist`,
-		base:               &Base{},
+		IPProtocol: proto,
+		base:       &Base{},
 	}
 	var family iptables.Protocol
 	if t.IPProtocol == driver.ProtocolIPv4 {
 		family = iptables.ProtocolIPv4
-		t.blackListSetName = `blacklist_ip4`
+		t.base.blackListSetName = `Blacklist4`
 	} else {
 		family = iptables.ProtocolIPv6
-		t.blackListSetName = `blacklist_ip6`
+		t.base.blackListSetName = `Blacklist6`
 	}
 	var err error
 	t.base.IPTables, err = iptables.New(iptables.IPFamily(family))
@@ -67,10 +66,8 @@ func New(proto driver.Protocol, autoInstall bool) (*IPTables, error) {
 }
 
 type IPTables struct {
-	IPProtocol         driver.Protocol
-	blackListChainName string
-	blackListSetName   string
-	base               *Base
+	IPProtocol driver.Protocol
+	base       *Base
 }
 
 func (a *IPTables) init() error {
@@ -103,13 +100,13 @@ func (a *IPTables) init() error {
 		}
 	}
 	if ipset.IsSupported() {
-		return a.base.CreateBlackListSet(a.blackListChainName, a.blackListSetName)
+		return a.base.CreateBlackListSet()
 	}
 	return nil
 }
 
 func (a *IPTables) Ban(ips []net.IP, expires time.Duration) error {
-	return a.base.AddToSet(a.blackListSetName, ips, expires)
+	return a.base.AddToBlacklistSet(ips, expires)
 }
 
 func (a *IPTables) ruleFrom(rule *driver.Rule) ([]string, error) {
@@ -171,9 +168,6 @@ func (a *IPTables) Reset() error {
 		if err != nil {
 			return err
 		}
-	}
-	if ipset.IsSupported() {
-		return a.base.RemoveBlackListSet(a.blackListChainName, a.blackListSetName)
 	}
 	return nil
 }
@@ -376,5 +370,8 @@ func (a *IPTables) Base() *Base {
 }
 
 func (a *IPTables) AddDefault() error {
+	if ipset.IsSupported() {
+		return a.base.AttachBlackListSet()
+	}
 	return nil
 }
