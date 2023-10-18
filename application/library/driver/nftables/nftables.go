@@ -26,6 +26,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/admpub/nftablesutils"
 	"github.com/admpub/nftablesutils/biz"
@@ -52,7 +53,7 @@ func New(proto driver.Protocol) (*NFTables, error) {
 		family = nftables.TableFamilyIPv4
 	} else {
 		family = nftables.TableFamilyIPv6
-		cfg.TablePrefix += `ip6_`
+		cfg.TableSuffix = `_ip6`
 	}
 	t := &NFTables{
 		base: &Base{
@@ -81,6 +82,14 @@ func (a *NFTables) initTableOnly(conn *nftables.Conn) error {
 	if err := a.base.ApplyBase(conn); err != nil {
 		return err
 	}
+	filterSetBlacklist := &nftables.Set{ // forward IP whitelist
+		Name:    "my_forward_ipset",
+		Table:   a.base.TableFilter(),
+		KeyType: nftables.TypeIPAddr,
+	}
+	if a.base.TableFilter().Family == nftables.TableFamilyIPv6 {
+		filterSetBlacklist.KeyType = nftables.TypeIP6Addr
+	}
 	return conn.Flush()
 }
 
@@ -89,6 +98,10 @@ func (a *NFTables) fullTableName(table string) string {
 		return table
 	}
 	return a.base.cfg.TablePrefix + table
+}
+
+func (a *NFTables) Ban(ip string, expires time.Duration) error {
+	return nil
 }
 
 func (a *NFTables) ruleFrom(c *nftables.Conn, rule *driver.Rule) (args nftablesutils.Exprs, err error) {

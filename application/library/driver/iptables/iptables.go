@@ -25,6 +25,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strconv"
+	"time"
 
 	"github.com/admpub/go-iptables/iptables"
 	"github.com/admpub/packer"
@@ -37,14 +38,17 @@ var _ driver.Driver = (*IPTables)(nil)
 
 func New(proto driver.Protocol, autoInstall bool) (*IPTables, error) {
 	t := &IPTables{
-		IPProtocol: proto,
-		base:       &Base{},
+		IPProtocol:         proto,
+		blackListChainName: `NgingBlacklist`,
+		base:               &Base{},
 	}
 	var family iptables.Protocol
 	if t.IPProtocol == driver.ProtocolIPv4 {
 		family = iptables.ProtocolIPv4
+		t.blackListSetName = `blacklist_ip4`
 	} else {
 		family = iptables.ProtocolIPv6
+		t.blackListSetName = `blacklist_ip6`
 	}
 	var err error
 	t.base.IPTables, err = iptables.New(iptables.IPFamily(family))
@@ -61,8 +65,10 @@ func New(proto driver.Protocol, autoInstall bool) (*IPTables, error) {
 }
 
 type IPTables struct {
-	IPProtocol driver.Protocol
-	base       *Base
+	IPProtocol         driver.Protocol
+	blackListChainName string
+	blackListSetName   string
+	base               *Base
 }
 
 func (a *IPTables) init() error {
@@ -88,7 +94,11 @@ func (a *IPTables) init() error {
 			return err
 		}
 	}
-	return nil
+	return a.base.CreateBlackListSet(a.blackListChainName, a.blackListSetName)
+}
+
+func (a *IPTables) Ban(ip string, expires time.Duration) error {
+	return a.base.AddToSet(a.blackListSetName, ip, expires)
 }
 
 func (a *IPTables) ruleFrom(rule *driver.Rule) ([]string, error) {

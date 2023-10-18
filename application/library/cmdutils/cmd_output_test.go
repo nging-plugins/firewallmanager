@@ -42,3 +42,9 @@ func TestRecvCmdOutputs(t *testing.T) {
 	assert.Equal(t, 10, len(rows))
 	assert.Equal(t, uint64(12), offset)
 }
+
+func TestBits(t *testing.T) {
+	for i := 0; i < 10; i++ {
+		fmt.Println(i, `->`, 1<<i)
+	}
+}
