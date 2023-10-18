@@ -3,6 +3,7 @@ package iptables
 import (
 	"context"
 	"fmt"
+	"net"
 	"os"
 	"strconv"
 	"time"
@@ -60,26 +61,78 @@ func (a *Base) FindPositionByID(table, chain string, id uint) (uint, error) {
 	return position, err
 }
 
-func (a *Base) CreateSet(chain string, set string, action string) error {
+func (a *Base) AttachSet(chain string, set string, action string) error {
 	if err := a.NewChain(enums.TableFilter, chain); err != nil && !IsExist(err) {
 		return fmt.Errorf(`failed to create %s chain "%s": %w`, a.GetExeclutor(), chain, err)
 	}
-	if err := a.InsertUnique(enums.TableFilter, chain, 0, "-j", action, "-m", "set", "--match-set", set, "src"); err != nil {
+	if err := a.InsertUnique(enums.TableFilter, chain, 1, "-j", action, "-m", "set", "--match-set", set, "src"); err != nil {
 		return fmt.Errorf(`failed to create %s entry for set "%s": %w`, a.GetExeclutor(), set, err)
 	}
-	if err := a.InsertUnique(enums.TableFilter, enums.ChainInput, 0, "-j", chain); err != nil {
+	if err := a.InsertUnique(enums.TableFilter, enums.ChainInput, 1, "-j", chain); err != nil {
 		return fmt.Errorf(`failed to create %s entry for chain "%s": %w`, a.GetExeclutor(), chain, err)
 	}
 	return nil
 }
 
-func (a *Base) CreateBlackListSet(chain string, set string) error {
-	return a.CreateSet(chain, set, enums.TargetDrop)
+func (a *Base) CreateSet(ctx context.Context, set string) error {
+	err := cmdutils.RunCmd(ctx, "ipset", []string{`list`, set}, os.Stdout)
+	if err == nil {
+		return nil
+	}
+	args := []string{"create", set, "hash:ip"}
+	if a.Proto() == iptables.ProtocolIPv6 {
+		args = append(args, "family", "inet6")
+	}
+	args = append(args, "timeout", "0")
+	return cmdutils.RunCmd(ctx, "ipset", args, os.Stdout)
 }
 
-func (a *Base) AddToSet(set string, ip string, d time.Duration) error {
-	args := []string{"add", set, ip, "timeout", fmt.Sprint(d.Seconds())}
-	return cmdutils.RunCmd(context.Background(), "ipset", args, os.Stdout)
+func (a *Base) CreateBlackListSet(chain string, set string) error {
+	err := a.CreateSet(context.Background(), set)
+	if err != nil {
+		return err
+	}
+	return a.AttachSet(chain, set, enums.TargetDrop)
+}
+
+func (a *Base) RemoveBlackListSet(chain string, set string) error {
+	return a.RemoveSet(chain, set, enums.TargetDrop)
+}
+
+func (a *Base) RemoveSet(chain string, set string, action string) error {
+	err := a.DeleteIfExists(enums.TableFilter, chain, `-j`, action, "-m", "set", "--match-set", set, "src")
+	if err != nil {
+		return err
+	}
+	err = a.DeleteIfExists(enums.TableFilter, enums.ChainInput, `-j`, chain)
+	if err != nil {
+		return err
+	}
+	err = a.ClearAndDeleteChain(enums.TableFilter, chain)
+	if err != nil {
+		return err
+	}
+	ctx := context.Background()
+	args := []string{"destroy", set}
+	return cmdutils.RunCmd(ctx, "ipset", args, os.Stdout)
+}
+
+func (a *Base) AddToSet(set string, ips []net.IP, d time.Duration) error {
+	var err error
+	ctx := context.Background()
+	dur := fmt.Sprint(d.Seconds())
+	for _, ip := range ips {
+		ipStr := ip.String()
+		args := []string{"test", set, ipStr}
+		if err = cmdutils.RunCmd(ctx, "ipset", args, os.Stdout); err != nil {
+			args = []string{"add", set, ipStr, "timeout", dur}
+			err = cmdutils.RunCmd(ctx, "ipset", args, os.Stdout)
+		}
+		if err != nil {
+			return err
+		}
+	}
+	return err
 }
 
 func (a *Base) GetExeclutor() string {

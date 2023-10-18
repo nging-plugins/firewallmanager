@@ -24,7 +24,9 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"net"
 	"strings"
+	"time"
 
 	"github.com/nging-plugins/firewallmanager/application/library/cmdutils"
 	"github.com/nging-plugins/firewallmanager/application/library/driver"
@@ -185,6 +187,10 @@ func (a *NetSH) Exists(rule driver.Rule) (bool, error) {
 	return strings.Contains(stdout.String(), rule.Name), nil
 }
 
+func (*NetSH) Ban(ips []net.IP, expires time.Duration) error {
+	return driver.ErrUnsupported
+}
+
 func (a *NetSH) Stats(table, chain string) ([]map[string]string, error) {
 	//TODO
 	return nil, driver.ErrUnsupported
@@ -209,4 +215,8 @@ func (a *NetSH) run(args []string, stdout io.Writer) error {
 func (a *NetSH) FindPositionByID(table, chain string, id uint) (uint, error) {
 	var position uint
 	return position, driver.ErrUnsupported
+}
+
+func (a *NetSH) AddDefault() error {
+	return nil
 }

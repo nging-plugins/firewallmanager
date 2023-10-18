@@ -21,6 +21,7 @@ package iptables
 import (
 	"context"
 	"errors"
+	"net"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -32,6 +33,7 @@ import (
 	"github.com/nging-plugins/firewallmanager/application/library/cmdutils"
 	"github.com/nging-plugins/firewallmanager/application/library/driver"
 	"github.com/nging-plugins/firewallmanager/application/library/enums"
+	"github.com/nging-plugins/firewallmanager/application/library/ipset"
 )
 
 var _ driver.Driver = (*IPTables)(nil)
@@ -94,11 +96,20 @@ func (a *IPTables) init() error {
 			return err
 		}
 	}
-	return a.base.CreateBlackListSet(a.blackListChainName, a.blackListSetName)
+	if !ipset.IsSupported() {
+		err := packer.Install(`ipset`)
+		if err == nil {
+			ipset.ResetCheck()
+		}
+	}
+	if ipset.IsSupported() {
+		return a.base.CreateBlackListSet(a.blackListChainName, a.blackListSetName)
+	}
+	return nil
 }
 
-func (a *IPTables) Ban(ip string, expires time.Duration) error {
-	return a.base.AddToSet(a.blackListSetName, ip, expires)
+func (a *IPTables) Ban(ips []net.IP, expires time.Duration) error {
+	return a.base.AddToSet(a.blackListSetName, ips, expires)
 }
 
 func (a *IPTables) ruleFrom(rule *driver.Rule) ([]string, error) {
@@ -160,6 +171,9 @@ func (a *IPTables) Reset() error {
 		if err != nil {
 			return err
 		}
+	}
+	if ipset.IsSupported() {
+		return a.base.RemoveBlackListSet(a.blackListChainName, a.blackListSetName)
 	}
 	return nil
 }
@@ -359,4 +373,8 @@ func (a *IPTables) FindPositionByID(table, chain string, id uint) (uint, error) 
 
 func (a *IPTables) Base() *Base {
 	return a.base
+}
+
+func (a *IPTables) AddDefault() error {
+	return nil
 }

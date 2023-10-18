@@ -20,6 +20,7 @@ package nftables
 
 import (
 	"context"
+	"net"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -63,6 +64,7 @@ func New(proto driver.Protocol) (*NFTables, error) {
 		},
 	}
 	_ = t.base.Init()
+	t.base.initBlacklist()
 	err := t.base.Do(t.initTableOnly)
 	//err := t.ApplyDefault()
 	if err != nil {
@@ -82,13 +84,11 @@ func (a *NFTables) initTableOnly(conn *nftables.Conn) error {
 	if err := a.base.ApplyBase(conn); err != nil {
 		return err
 	}
-	filterSetBlacklist := &nftables.Set{ // forward IP whitelist
-		Name:    "my_forward_ipset",
-		Table:   a.base.TableFilter(),
-		KeyType: nftables.TypeIPAddr,
+	if err := a.base.InitSet(conn, biz.SET_BLACKLIST); err != nil {
+		return err
 	}
-	if a.base.TableFilter().Family == nftables.TableFamilyIPv6 {
-		filterSetBlacklist.KeyType = nftables.TypeIP6Addr
+	if err := a.addDefaultRule(conn); err != nil {
+		return err
 	}
 	return conn.Flush()
 }
@@ -100,8 +100,22 @@ func (a *NFTables) fullTableName(table string) string {
 	return a.base.cfg.TablePrefix + table
 }
 
-func (a *NFTables) Ban(ip string, expires time.Duration) error {
-	return nil
+func (a *NFTables) AddDefault() error {
+	return a.base.Do(func(conn *nftables.Conn) error {
+		err := a.addDefaultRule(conn)
+		if err != nil {
+			return err
+		}
+		return conn.Flush()
+	})
+}
+
+func (a *NFTables) addDefaultRule(conn *nftables.Conn) error {
+	return a.base.blacklistRules(conn)
+}
+
+func (a *NFTables) Ban(ips []net.IP, expires time.Duration) error {
+	return a.base.Ban(ips, expires)
 }
 
 func (a *NFTables) ruleFrom(c *nftables.Conn, rule *driver.Rule) (args nftablesutils.Exprs, err error) {
@@ -127,6 +141,19 @@ func (a *NFTables) Clear() error {
 	return a.base.Do(func(conn *nftables.Conn) error {
 		conn.FlushTable(a.base.TableFilter())
 		conn.FlushTable(a.base.TableNAT())
+		conn.FlushTable(a.base.tBlacklistFilter)
+
+		// 清除旧版数据
+		if !a.base.isIPv4() {
+			conn.FlushTable(&nftables.Table{
+				Family: nftables.TableFamilyIPv6,
+				Name:   a.base.cfg.TablePrefix + `ip6_` + biz.TableFilter,
+			})
+			conn.FlushTable(&nftables.Table{
+				Family: nftables.TableFamilyIPv6,
+				Name:   a.base.cfg.TablePrefix + `ip6_` + biz.TableNAT,
+			})
+		}
 		return conn.Flush()
 	})
 }
