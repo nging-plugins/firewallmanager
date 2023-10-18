@@ -7,7 +7,7 @@ toolchain go1.21.1
 replace github.com/admpub/nging/v5 => ../../admpub/nging
 
 require (
-	github.com/admpub/gerberos v0.0.8
+	github.com/admpub/gerberos v0.0.9
 	github.com/admpub/go-iptables v0.6.5
 	github.com/admpub/log v1.3.6
 	github.com/admpub/nftablesutils v0.2.1
@@ -17,11 +17,11 @@ require (
 	github.com/admpub/packer v0.0.3
 	github.com/admpub/pp v0.0.7
 	github.com/google/nftables v0.1.0
-	github.com/nging-plugins/servermanager v1.4.13
+	github.com/nging-plugins/servermanager v1.4.14
 	github.com/stretchr/testify v1.8.4
-	github.com/webx-top/com v1.0.2
+	github.com/webx-top/com v1.0.3
 	github.com/webx-top/db v1.27.0
-	github.com/webx-top/echo v2.39.4+incompatible
+	github.com/webx-top/echo v2.39.5+incompatible
 	github.com/webx-top/pagination v0.2.7
 	golang.org/x/sys v0.13.0
 )
@@ -80,7 +80,7 @@ require (
 	github.com/admpub/redistore v1.2.1 // indirect
 	github.com/admpub/regexp2 v1.1.7 // indirect
 	github.com/admpub/resty/v2 v2.7.1 // indirect
-	github.com/admpub/securecookie v1.1.5 // indirect
+	github.com/admpub/securecookie v1.2.0 // indirect
 	github.com/admpub/service v0.0.5 // indirect
 	github.com/admpub/sessions v0.1.3 // indirect
 	github.com/admpub/sockjs-go/v3 v3.0.1 // indirect
@@ -88,8 +88,8 @@ require (
 	github.com/admpub/tail v1.1.0 // indirect
 	github.com/admpub/timeago v1.2.1 // indirect
 	github.com/admpub/websocket v1.0.4 // indirect
-	github.com/andybalholm/brotli v1.0.5 // indirect
-	github.com/aws/aws-sdk-go v1.45.24 // indirect
+	github.com/andybalholm/brotli v1.0.6 // indirect
+	github.com/aws/aws-sdk-go v1.45.25 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/boombuler/barcode v1.0.1 // indirect
@@ -105,7 +105,7 @@ require (
 	github.com/fcjr/aia-transport-go v1.2.2 // indirect
 	github.com/francoispqt/gojay v1.2.13 // indirect
 	github.com/friendsofgo/errors v0.9.2 // indirect
-	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/gaissmai/extnetip v0.3.3 // indirect
 	github.com/garyburd/redigo v1.6.4 // indirect
 	github.com/go-acme/lego/v4 v4.14.2 // indirect
@@ -120,7 +120,7 @@ require (
 	github.com/gofrs/uuid v4.4.0+incompatible // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
-	github.com/google/go-cmp v0.5.9 // indirect
+	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/google/uuid v1.3.1 // indirect
 	github.com/gorilla/css v1.0.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
@@ -132,7 +132,7 @@ require (
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/josharian/native v1.1.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
-	github.com/klauspost/compress v1.17.0 // indirect
+	github.com/klauspost/compress v1.17.1 // indirect
 	github.com/klauspost/cpuid v1.3.1 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.5 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect
@@ -145,7 +145,7 @@ require (
 	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
 	github.com/mdlayher/netlink v1.7.2 // indirect
 	github.com/mdlayher/socket v0.5.0 // indirect
-	github.com/microcosm-cc/bluemonday v1.0.25 // indirect
+	github.com/microcosm-cc/bluemonday v1.0.26 // indirect
 	github.com/miekg/dns v1.1.56 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
 	github.com/minio/minio-go/v7 v7.0.63 // indirect
@@ -195,11 +195,11 @@ require (
 	golang.org/x/crypto v0.14.0 // indirect
 	golang.org/x/image v0.13.0 // indirect
 	golang.org/x/mod v0.13.0 // indirect
-	golang.org/x/net v0.16.0 // indirect
+	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/sync v0.4.0 // indirect
 	golang.org/x/text v0.13.0 // indirect
 	golang.org/x/tools v0.14.0 // indirect
-	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
+	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
