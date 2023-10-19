@@ -7,7 +7,7 @@ toolchain go1.21.1
 replace github.com/admpub/nging/v5 => ../../admpub/nging
 
 require (
-	github.com/admpub/gerberos v0.0.9
+	github.com/admpub/gerberos v0.0.10
 	github.com/admpub/go-iptables v0.6.5
 	github.com/admpub/log v1.3.6
 	github.com/admpub/nftablesutils v0.3.2
