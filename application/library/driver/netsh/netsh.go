@@ -24,7 +24,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"net"
 	"strings"
 	"time"
 
@@ -187,7 +186,7 @@ func (a *NetSH) Exists(rule driver.Rule) (bool, error) {
 	return strings.Contains(stdout.String(), rule.Name), nil
 }
 
-func (*NetSH) Ban(ips []net.IP, expires time.Duration) error {
+func (*NetSH) Ban(ips []string, expires time.Duration) error {
 	return driver.ErrUnsupported
 }
 

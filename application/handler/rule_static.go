@@ -20,7 +20,6 @@ package handler
 
 import (
 	"errors"
-	"net"
 	"strings"
 	"time"
 
@@ -33,9 +32,11 @@ import (
 
 	"github.com/admpub/nging/v5/application/handler"
 	"github.com/admpub/nging/v5/application/library/common"
+	"github.com/admpub/nging/v5/application/library/errorslice"
 	"github.com/nging-plugins/firewallmanager/application/dbschema"
 	"github.com/nging-plugins/firewallmanager/application/library/enums"
 	"github.com/nging-plugins/firewallmanager/application/library/firewall"
+	"github.com/nging-plugins/firewallmanager/application/library/netutils"
 	"github.com/nging-plugins/firewallmanager/application/model"
 )
 
@@ -289,18 +290,23 @@ func ruleStaticBan(ctx echo.Context) error {
 		if expire <= 0 {
 			expire = time.Hour * 24
 		}
-		var ipv4 []net.IP
-		var ipv6 []net.IP
+		var ipv4 []string
+		var ipv6 []string
+		errs := errorslice.New()
 		for _, ip := range strings.Split(ips, com.StrLF) {
 			ip = strings.TrimSpace(ip)
 			if len(ip) == 0 {
 				continue
 			}
-			ipd := net.ParseIP(ip)
-			if ip4 := ipd.To4(); ip4 != nil {
-				ipv4 = append(ipv4, ip4)
-			} else if ip6 := ipd.To16(); ip6 != nil {
-				ipv6 = append(ipv6, ip6)
+			ipVer, err := netutils.ValidateIP(ctx, ip)
+			if err != nil {
+				errs.Add(err)
+				continue
+			}
+			if ipVer == 4 {
+				ipv4 = append(ipv4, ip)
+			} else if ipVer == 6 {
+				ipv6 = append(ipv6, ip)
 			} else {
 				log.Errorf(`invalid IP: %s`, ip)
 			}
@@ -315,7 +321,12 @@ func ruleStaticBan(ctx echo.Context) error {
 				return err
 			}
 		}
-		handler.SendOk(ctx, ctx.T(`操作成功`))
+		err = errs.ToError()
+		if err != nil {
+			handler.SendOk(ctx, ctx.T(`操作成功。但有部分错误：%s`, com.Nl2br(err.Error())))
+		} else {
+			handler.SendOk(ctx, ctx.T(`操作成功`))
+		}
 	}
 	ctx.Set(`activeURL`, `/firewall/rule/static`)
 	ctx.Set(`title`, ctx.T(`临时封IP`))

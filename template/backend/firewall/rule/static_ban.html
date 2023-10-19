@@ -19,7 +19,7 @@
                         <label class="col-sm-2 control-label">{{"IP地址"|$.T}}</label>
                         <div class="col-sm-3">{{$ips := $.Form `ips`}}
                             <textarea name="ips" class="form-control" cols="30" rows="10">{{$ips}}</textarea>
-                            <div class="help-block">{{`输入 IP 地址，一行一个。支持 IPv4 和 IPv6`|$.T}}</div>
+                            <div class="help-block">{{`输入 IP 地址，每行一个。可以在每行指定 IP 范围(例如: 10.1.1.0-10.1.1.10)或指定子网掩码(例如: 10.1.1.0/24)。支持 IPv4 和 IPv6`|$.T}}</div>
                         </div>
                     </div>
                     <div class="form-group">
