@@ -5,6 +5,6 @@ fi
 docker run --rm -it\
  --privileged\
  --entrypoint go\
- -p "18080:8080" -v "$GOPATH/src:/root/go/src" $image\
+ -p "18080:8080" -v "$GOPATH/src:/root/go/src" -v "$GOPATH/pkg:/root/go/pkg" $image\
  run -tags="sqlite"\
  . -c /myconfig/config.yaml -p 8080
