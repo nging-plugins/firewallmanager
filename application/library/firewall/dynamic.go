@@ -184,9 +184,9 @@ func DynamicRuleFromDB(c echo.Context, row *dbschema.NgingFirewallRuleDynamic) (
 		}
 		rule.Aggregate = append(rule.Aggregate, args...)
 	}
-	if row.OccurrenceNum > 0 && len(row.OccurrenceDuration) > 0 {
+	if row.OccurrenceNum > 1 && len(row.OccurrenceDuration) > 0 {
 		rule.Occurrences = []string{}
-		rule.Occurrences = append(rule.Occurrences, param.AsString(row.OccurrenceNum))
+		rule.Occurrences = append(rule.Occurrences, param.AsString(row.OccurrenceNum)) // OccurrenceNum must be > 1
 		rule.Occurrences = append(rule.Occurrences, row.OccurrenceDuration)
 	}
 
