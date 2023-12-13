@@ -72,16 +72,16 @@
                             <input type="text" name="remoteIp" id="remoteIp" class="form-control firewall-rule" value="{{$.Form `remoteIp`}}">
                             <div class="help-block">
                                 {{`如果是入站规则就是指访客IP。`|$.T}}<br />
-                                {{`支持指定单个IP或者IP范围，例如“192.168.0.100-192.168.0.255”，支持通过加前缀“<code>!</code>”来取反。`|$.T|ToHTML}}<br />
+                                {{`支持指定一个或多个IP(用半角逗号“,”隔开)或者IP范围，例如“192.168.0.100-192.168.0.255”，支持通过加前缀“<code>!</code>”来取反。`|$.T|ToHTML}}<br />
                                 {{`例如“<code>!192.168.0.100-192.168.0.255</code>”表示不在“192.168.0.100-192.168.0.255”这个范围内的其它IP。`|$.T|ToHTML}}
                             </div>
                         </div>
                         <label class="col-sm-1 control-label">{{"远程端口"|$.T}}</label>
                         <div class="col-sm-4">
-                            <input type="text" name="remotePort" id="remotePort" class="form-control firewall-rule" value="{{$.Form `remotePort`}}" pattern="^[!]?([0-9]+([-][0-9]+)?|[0-9]+[-]|[-][0-9]+|[0-9]+(,[0-9]+)*)$">
+                            <input type="text" name="remotePort" id="remotePort" class="form-control firewall-rule" value="{{$.Form `remotePort`}}" pattern="^[!]?[0-9]+([-,][0-9]+)*$">
                             <div class="help-block">
                                 {{`如果是入站规则就是指访客端口。`|$.T}}<br />
-                                {{`支持指定单个端口或者端口范围，例如“10000-20000”表示从10000到20000；或者指定端口列表，例如“10000,10001”。端口范围和端口列表不能同时存在。支持通过加前缀“<code>!</code>”来取反。`|$.T|ToHTML}}
+                                {{`支持指定一个或多个端口(用半角逗号“,”隔开)或者端口范围，例如“10000-20000”表示从10000到20000；或者指定端口列表，例如“10000,10001”。支持通过加前缀“<code>!</code>”来取反。`|$.T|ToHTML}}
                             </div>
                         </div>
                     </div>
@@ -93,7 +93,7 @@
                         </div>
                         <label class="col-sm-1 control-label">{{"本机端口"|$.T}}</label>
                         <div class="col-sm-4">
-                            <input type="text" name="localPort" id="localPort" class="form-control firewall-rule" value="{{$.Form `localPort`}}" pattern="^[!]?([0-9]+([-][0-9]+)?|[0-9]+[-]|[-][0-9]+|[0-9]+(,[0-9]+)*)$">
+                            <input type="text" name="localPort" id="localPort" class="form-control firewall-rule" value="{{$.Form `localPort`}}" pattern="^[!]?[0-9]+([-,][0-9]+)*$">
                             <div class="help-block">{{`支持的格式与“远程端口”相同`|$.T}}</div>
                         </div>
                     </div>

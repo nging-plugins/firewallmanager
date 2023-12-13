@@ -28,6 +28,7 @@ import (
 	"github.com/webx-top/db"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/code"
+	"github.com/webx-top/echo/param"
 
 	"github.com/nging-plugins/firewallmanager/application/dbschema"
 	"github.com/nging-plugins/firewallmanager/application/library/driver"
@@ -131,13 +132,21 @@ func (r *RuleStatic) check() error {
 		return ctx.NewError(code.InvalidParameter, `当指定了端口时，必须明确的指定网络协议`).SetZone(`protocol`)
 	}
 	if len(r.LocalPort) > 0 {
-		if err := netutils.ValidatePort(ctx, RemovePrefixNeq(r.LocalPort)); err != nil {
-			return ctx.NewError(code.InvalidParameter, `本机%v`, err.Error()).SetZone(`localPort`)
+		localPort := RemovePrefixNeq(r.LocalPort)
+		ports := param.Split(localPort, `,`).Unique().Filter().String()
+		for _, port := range ports {
+			if err := netutils.ValidatePort(ctx, port); err != nil {
+				return ctx.NewError(code.InvalidParameter, `本机%v`, err.Error()).SetZone(`localPort`)
+			}
 		}
 	}
 	if len(r.RemotePort) > 0 {
-		if err := netutils.ValidatePort(ctx, RemovePrefixNeq(r.RemotePort)); err != nil {
-			return ctx.NewError(code.InvalidParameter, `远程%v`, err.Error()).SetZone(`remotePort`)
+		remotePort := RemovePrefixNeq(r.RemotePort)
+		ports := param.Split(remotePort, `,`).Unique().Filter().String()
+		for _, port := range ports {
+			if err := netutils.ValidatePort(ctx, port); err != nil {
+				return ctx.NewError(code.InvalidParameter, `远程%v`, err.Error()).SetZone(`remotePort`)
+			}
 		}
 	}
 	if len(r.NatPort) > 0 {
@@ -146,13 +155,21 @@ func (r *RuleStatic) check() error {
 		}
 	}
 	if len(r.LocalIp) > 0 {
-		if _, err := netutils.ValidateIP(ctx, RemovePrefixNeq(r.LocalIp)); err != nil {
-			return ctx.NewError(code.InvalidParameter, `本机%v`, err.Error()).SetZone(`localIp`)
+		localIP := RemovePrefixNeq(r.LocalIp)
+		ips := param.Split(localIP, `,`).Unique().Filter().String()
+		for _, ip := range ips {
+			if _, err := netutils.ValidateIP(ctx, ip); err != nil {
+				return ctx.NewError(code.InvalidParameter, `本机%v`, err.Error()).SetZone(`localIp`)
+			}
 		}
 	}
 	if len(r.RemoteIp) > 0 {
-		if _, err := netutils.ValidateIP(ctx, RemovePrefixNeq(r.RemoteIp)); err != nil {
-			return ctx.NewError(code.InvalidParameter, `远程%v`, err.Error()).SetZone(`remoteIp`)
+		remoteIP := RemovePrefixNeq(r.RemoteIp)
+		ips := param.Split(remoteIP, `,`).Unique().Filter().String()
+		for _, ip := range ips {
+			if _, err := netutils.ValidateIP(ctx, ip); err != nil {
+				return ctx.NewError(code.InvalidParameter, `远程%v`, err.Error()).SetZone(`remoteIp`)
+			}
 		}
 	}
 	if len(r.NatIp) > 0 {

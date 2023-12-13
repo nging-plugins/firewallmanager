@@ -26,6 +26,7 @@ import (
 	"github.com/nging-plugins/firewallmanager/application/library/driver"
 	"github.com/nging-plugins/firewallmanager/application/library/enums"
 	"github.com/webx-top/com"
+	"github.com/webx-top/echo/param"
 )
 
 func appendArgs(to *[]string, from []string) {
@@ -106,12 +107,22 @@ func (a *IPTables) buildLocalIPRule(rule *driver.Rule) (args []string, err error
 		neq = true
 		rule.LocalIP = strings.TrimPrefix(rule.LocalIP, `!`)
 	}
-	if strings.Contains(rule.LocalIP, `-`) {
-		args = append(args, `-m`, `iprange`)
-		if neq {
-			args = append(args, `!`)
+	if strings.ContainsAny(rule.LocalIP, `-,`) {
+		ips := param.Split(rule.LocalIP, `,`).Unique().Filter().String()
+		for _, ip := range ips {
+			if strings.Contains(ip, `-`) {
+				args = append(args, `-m`, `iprange`)
+				if neq {
+					args = append(args, `!`)
+				}
+				args = append(args, `--dst-range`, ip)
+			} else {
+				if neq {
+					args = append(args, `!`)
+				}
+				args = append(args, `-d`, ip)
+			}
 		}
-		args = append(args, `--dst-range`, rule.LocalIP)
 	} else {
 		if neq {
 			args = append(args, `!`)
@@ -130,17 +141,65 @@ func (a *IPTables) buildRemoteIPRule(rule *driver.Rule) (args []string, err erro
 		neq = true
 		rule.RemoteIP = strings.TrimPrefix(rule.RemoteIP, `!`)
 	}
-	if strings.Contains(rule.RemoteIP, `-`) {
-		args = append(args, `-m`, `iprange`)
-		if neq {
-			args = append(args, `!`)
+	if strings.ContainsAny(rule.RemoteIP, `-,`) {
+		ips := param.Split(rule.RemoteIP, `,`).Unique().Filter().String()
+		for _, ip := range ips {
+			if strings.Contains(ip, `-`) {
+				args = append(args, `-m`, `iprange`)
+				if neq {
+					args = append(args, `!`)
+				}
+				args = append(args, `--src-range`, ip)
+			} else {
+				if neq {
+					args = append(args, `!`)
+				}
+				args = append(args, `-s`, ip)
+			}
 		}
-		args = append(args, `--src-range`, rule.RemoteIP)
 	} else {
 		if neq {
 			args = append(args, `!`)
 		}
 		args = append(args, `-s`, rule.RemoteIP)
+	}
+	return
+}
+
+func (a *IPTables) parsePorts(portCfg string, source bool, neq bool) (args []string, err error) {
+	var portKey string
+	var portsKey string
+	if source {
+		portKey = `sport`
+		portsKey = `sports`
+	} else {
+		portKey = `dport`
+		portsKey = `dports`
+	}
+	if strings.ContainsAny(portCfg, `-,`) {
+		ports := param.Split(portCfg, `,`).Unique().Filter().String()
+		for index, port := range ports {
+			port = strings.ReplaceAll(port, `-`, `:`)
+			ports[index] = port
+		}
+		switch {
+		case len(ports) > 1:
+			args = append(args, `-m`, `multiport`)
+			if neq {
+				args = append(args, `!`)
+			}
+			args = append(args, `--`+portsKey, strings.Join(ports, `,`))
+		case len(ports) == 1:
+			if neq {
+				args = append(args, `!`)
+			}
+			args = append(args, `--`+portKey, ports[0])
+		}
+	} else {
+		if neq {
+			args = append(args, `!`)
+		}
+		args = append(args, `--`+portKey, portCfg) // 支持用“:”指定端口范围，例如 “22:25” 指端口 22-25，或者 “:22” 指端口 0-22 或者 “22:” 指端口 22-65535
 	}
 	return
 }
@@ -154,20 +213,7 @@ func (a *IPTables) buildLocalPortRule(rule *driver.Rule) (args []string, err err
 		neq = true
 		rule.LocalPort = strings.TrimPrefix(rule.LocalPort, `!`)
 	}
-	if strings.Contains(rule.LocalPort, `,`) {
-		args = append(args, `-m`, `multiport`)
-		if neq {
-			args = append(args, `!`)
-		}
-		args = append(args, `--dports`, rule.LocalPort)
-	} else {
-		rule.LocalPort = strings.ReplaceAll(rule.LocalPort, `-`, `:`)
-		if neq {
-			args = append(args, `!`)
-		}
-		args = append(args, `--dport`, rule.LocalPort)
-	}
-	return
+	return a.parsePorts(rule.LocalPort, false, neq)
 }
 
 func (a *IPTables) buildRemotePortRule(rule *driver.Rule) (args []string, err error) {
@@ -179,20 +225,7 @@ func (a *IPTables) buildRemotePortRule(rule *driver.Rule) (args []string, err er
 		neq = true
 		rule.RemotePort = strings.TrimPrefix(rule.RemotePort, `!`)
 	}
-	if strings.Contains(rule.RemotePort, `,`) {
-		args = append(args, `-m`, `multiport`)
-		if neq {
-			args = append(args, `!`)
-		}
-		args = append(args, `--sports`, rule.RemotePort)
-	} else {
-		rule.RemotePort = strings.ReplaceAll(rule.RemotePort, `-`, `:`)
-		if neq {
-			args = append(args, `!`)
-		}
-		args = append(args, `--sport`, rule.RemotePort) // 支持用“:”指定端口范围，例如 “22:25” 指端口 22-25，或者 “:22” 指端口 0-22 或者 “22:” 指端口 22-65535
-	}
-	return
+	return a.parsePorts(rule.RemotePort, true, neq)
 }
 
 func (a *IPTables) buildStateRule(rule *driver.Rule) (args []string, err error) {

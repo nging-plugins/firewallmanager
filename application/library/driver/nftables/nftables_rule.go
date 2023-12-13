@@ -19,6 +19,7 @@
 package nftables
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -105,16 +106,17 @@ func (a *NFTables) buildLocalIPRule(c *nftables.Conn, rule *driver.Rule) (args n
 		neq = true
 		rule.LocalIP = strings.TrimPrefix(rule.LocalIP, `!`)
 	}
-	if strings.Contains(rule.LocalIP, `-`) {
+	if strings.ContainsAny(rule.LocalIP, `-,`) {
 		var ipSet *nftables.Set
 		var elems []nftables.SetElement
 		var eErr error
+		ips := param.Split(rule.LocalIP, `,`).Unique().Filter().String()
 		if a.base.isIPv4() {
 			ipSet = nftablesutils.GetIPv4AddrSet(a.base.TableFilter())
-			elems, eErr = setutils.GenerateElementsFromIPv4Address([]string{rule.LocalIP})
+			elems, eErr = setutils.GenerateElementsFromIPv4Address(ips)
 		} else {
 			ipSet = nftablesutils.GetIPv6AddrSet(a.base.TableFilter())
-			elems, eErr = setutils.GenerateElementsFromIPv6Address([]string{rule.LocalIP})
+			elems, eErr = setutils.GenerateElementsFromIPv6Address(ips)
 		}
 		if eErr != nil {
 			err = eErr
@@ -145,16 +147,17 @@ func (a *NFTables) buildRemoteIPRule(c *nftables.Conn, rule *driver.Rule) (args 
 		neq = true
 		rule.RemoteIP = strings.TrimPrefix(rule.RemoteIP, `!`)
 	}
-	if strings.Contains(rule.RemoteIP, `-`) {
+	if strings.ContainsAny(rule.RemoteIP, `-,`) {
 		var ipSet *nftables.Set
 		var elems []nftables.SetElement
 		var eErr error
+		ips := param.Split(rule.RemoteIP, `,`).Unique().Filter().String()
 		if a.base.isIPv4() {
 			ipSet = nftablesutils.GetIPv4AddrSet(a.base.TableFilter())
-			elems, eErr = setutils.GenerateElementsFromIPv4Address([]string{rule.RemoteIP})
+			elems, eErr = setutils.GenerateElementsFromIPv4Address(ips)
 		} else {
 			ipSet = nftablesutils.GetIPv6AddrSet(a.base.TableFilter())
-			elems, eErr = setutils.GenerateElementsFromIPv6Address([]string{rule.RemoteIP})
+			elems, eErr = setutils.GenerateElementsFromIPv6Address(ips)
 		}
 		if eErr != nil {
 			err = eErr
@@ -176,6 +179,70 @@ func (a *NFTables) buildRemoteIPRule(c *nftables.Conn, rule *driver.Rule) (args 
 	return
 }
 
+func (a *NFTables) parsePorts(c *nftables.Conn, portCfg string, source bool, neq bool) (nftablesutils.Exprs, error) {
+	ports := param.Split(portCfg, `,`).Unique().Filter().String()
+	var exprs nftablesutils.Exprs
+	var hasInterval bool
+	var portList []uint16
+	var portRange [][2]uint16
+	for _, port := range ports {
+		if !strings.Contains(port, `-`) {
+			portN := param.AsUint16(port)
+			err := nftablesutils.ValidatePort(portN)
+			if err != nil {
+				return nil, fmt.Errorf(`%w: %s`, err, portCfg)
+			}
+			portList = append(portList, portN)
+			continue
+		}
+		parts := strings.SplitN(port, `-`, 2)
+		hasInterval = true
+		portsUint16 := [2]uint16{}
+		for k, v := range parts {
+			portsUint16[k] = param.AsUint16(v)
+		}
+		err := nftablesutils.ValidatePortRange(portsUint16[0], portsUint16[1])
+		if err != nil {
+			return nil, fmt.Errorf(`%w: %s`, err, portCfg)
+		}
+		portRange = append(portRange, portsUint16)
+	}
+	if len(portRange) == 0 && len(portList) == 1 {
+		if source {
+			exprs = exprs.Add(nftablesutils.SetSPort(portList[0], !neq)...)
+		} else {
+			exprs = exprs.Add(nftablesutils.SetDPort(portList[0], !neq)...)
+		}
+		return exprs, nil
+	}
+	if !neq {
+		if len(portRange) == 1 && len(portList) == 0 {
+			if source {
+				exprs = exprs.Add(nftablesutils.SetSPortRange(portRange[0][0], portRange[0][1])...)
+			} else {
+				exprs = exprs.Add(nftablesutils.SetDPortRange(portRange[0][0], portRange[0][1])...)
+			}
+			return exprs, nil
+		}
+	}
+	portSet := nftablesutils.GetPortSet(a.base.TableFilter())
+	portSet.Interval = hasInterval
+	elems, err := setutils.GenerateElementsFromPort(ports)
+	if err != nil {
+		return nil, fmt.Errorf(`%w: %s`, err, portCfg)
+	}
+	err = c.AddSet(portSet, elems)
+	if err != nil {
+		return nil, fmt.Errorf(`%w: %s`, err, portCfg)
+	}
+	if source {
+		exprs = exprs.Add(nftablesutils.SetSPortSet(portSet, !neq)...)
+	} else {
+		exprs = exprs.Add(nftablesutils.SetDPortSet(portSet, !neq)...)
+	}
+	return exprs, nil
+}
+
 func (a *NFTables) buildLocalPortRule(c *nftables.Conn, rule *driver.Rule) (args nftablesutils.Exprs, err error) {
 	if enums.IsEmptyPort(rule.LocalPort) {
 		return
@@ -185,63 +252,7 @@ func (a *NFTables) buildLocalPortRule(c *nftables.Conn, rule *driver.Rule) (args
 		neq = true
 		rule.LocalPort = strings.TrimPrefix(rule.LocalPort, `!`)
 	}
-	if strings.Contains(rule.LocalPort, `,`) {
-		ports := param.Split(rule.LocalPort, `,`).Unique().Uint16(func(_ int, v uint16) bool {
-			return nftablesutils.ValidatePort(v) == nil
-		})
-		if len(ports) > 0 {
-			portSet := nftablesutils.GetPortSet(a.base.TableFilter())
-			portsUint16 := make([]uint16, len(ports))
-			for k, v := range ports {
-				portsUint16[k] = uint16(v)
-			}
-			elems := nftablesutils.GetPortElems(portsUint16)
-			//portSet.Interval = true
-			err = c.AddSet(portSet, elems)
-			if err != nil {
-				return nil, err
-			}
-			args = args.Add(nftablesutils.SetDPortSet(portSet, !neq)...)
-		}
-	} else {
-		ss := param.StringSlice(notNumberRegexp.Split(rule.LocalPort, -1)).Unique()
-		ports := ss.Uint16(func(_ int, v uint16) bool {
-			return nftablesutils.ValidatePort(v) == nil
-		})
-
-		if len(ports) > 0 {
-			portsUint16 := make([]uint16, len(ports))
-			portsString := make([]string, len(ports))
-			for k, v := range ports {
-				portsUint16[k] = uint16(v)
-				portsString[k] = param.AsString(v)
-			}
-			if len(portsUint16) >= 2 {
-				err = nftablesutils.ValidatePortRange(portsUint16[0], portsUint16[1])
-				if err != nil {
-					return
-				}
-				if neq {
-					portSet := nftablesutils.GetPortSet(a.base.TableFilter())
-					portSet.Interval = true
-					elems, err := setutils.GenerateElementsFromPort([]string{portsString[0] + `-` + portsString[1]})
-					if err != nil {
-						return nil, err
-					}
-					err = c.AddSet(portSet, elems)
-					if err != nil {
-						return nil, err
-					}
-					args = args.Add(nftablesutils.SetDPortSet(portSet, !neq)...)
-				} else {
-					args = args.Add(nftablesutils.SetDPortRange(portsUint16[0], portsUint16[1])...)
-				}
-			} else {
-				args = args.Add(nftablesutils.SetDPort(portsUint16[0], !neq)...)
-			}
-		}
-	}
-	return
+	return a.parsePorts(c, rule.LocalPort, false, neq)
 }
 
 func (a *NFTables) buildRemotePortRule(c *nftables.Conn, rule *driver.Rule) (args nftablesutils.Exprs, err error) {
@@ -253,62 +264,7 @@ func (a *NFTables) buildRemotePortRule(c *nftables.Conn, rule *driver.Rule) (arg
 		neq = true
 		rule.RemotePort = strings.TrimPrefix(rule.RemotePort, `!`)
 	}
-	if strings.Contains(rule.RemotePort, `,`) {
-		ports := param.Split(rule.RemotePort, `,`).Unique().Uint16(func(_ int, v uint16) bool {
-			return nftablesutils.ValidatePort(v) == nil
-		})
-		if len(ports) > 0 {
-			portSet := nftablesutils.GetPortSet(a.base.TableFilter())
-			portsUint16 := make([]uint16, len(ports))
-			for k, v := range ports {
-				portsUint16[k] = uint16(v)
-			}
-			elems := nftablesutils.GetPortElems(portsUint16)
-			//portSet.Interval = true
-			err = c.AddSet(portSet, elems)
-			if err != nil {
-				return nil, err
-			}
-			args = args.Add(nftablesutils.SetSPortSet(portSet, !neq)...)
-		}
-	} else {
-		ports := param.StringSlice(notNumberRegexp.Split(rule.RemotePort, -1)).Unique().Uint16(func(_ int, v uint16) bool {
-			return nftablesutils.ValidatePort(v) == nil
-		})
-
-		if len(ports) > 0 {
-			portsUint16 := make([]uint16, len(ports))
-			portsString := make([]string, len(ports))
-			for k, v := range ports {
-				portsUint16[k] = uint16(v)
-				portsString[k] = param.AsString(v)
-			}
-			if len(portsUint16) >= 2 {
-				err = nftablesutils.ValidatePortRange(portsUint16[0], portsUint16[1])
-				if err != nil {
-					return
-				}
-				if neq {
-					portSet := nftablesutils.GetPortSet(a.base.TableFilter())
-					portSet.Interval = true
-					elems, err := setutils.GenerateElementsFromPort([]string{portsString[0] + `-` + portsString[1]})
-					if err != nil {
-						return nil, err
-					}
-					err = c.AddSet(portSet, elems)
-					if err != nil {
-						return nil, err
-					}
-					args = args.Add(nftablesutils.SetSPortSet(portSet, !neq)...)
-				} else {
-					args = args.Add(nftablesutils.SetSPortRange(portsUint16[0], portsUint16[1])...)
-				}
-			} else {
-				args = args.Add(nftablesutils.SetSPort(portsUint16[0], !neq)...)
-			}
-		}
-	}
-	return
+	return a.parsePorts(c, rule.RemotePort, true, neq)
 }
 
 func (a *NFTables) buildStateRule(c *nftables.Conn, rule *driver.Rule) (args nftablesutils.Exprs, err error) {
