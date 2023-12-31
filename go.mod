@@ -15,11 +15,11 @@ require (
 	github.com/admpub/packer v0.0.3
 	github.com/admpub/pp v0.0.7
 	github.com/google/nftables v0.1.0
-	github.com/nging-plugins/servermanager v1.4.24
+	github.com/nging-plugins/servermanager v1.5.2
 	github.com/stretchr/testify v1.8.4
 	github.com/webx-top/com v1.2.11
 	github.com/webx-top/db v1.27.1
-	github.com/webx-top/echo v2.42.22+incompatible
+	github.com/webx-top/echo v2.42.24+incompatible
 	github.com/webx-top/pagination v0.2.8
 	golang.org/x/sys v0.15.0
 )
@@ -165,7 +165,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/muesli/smartcrop v0.3.0 // indirect
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 // indirect
-	github.com/nging-plugins/sshmanager v1.4.6 // indirect
+	github.com/nging-plugins/sshmanager v1.5.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/power-devops/perfstat v0.0.0-20221212215047-62379fc7944b // indirect

@@ -19,7 +19,7 @@
 				</span>
 				<h3>{{"IPTables管理"|$.T}}</h3>
 			</div>
-			<div class="content">
+			<div class="content padding xs-padding-bottom">
                 <div class="btn-group">
                 {{- range $k, $v := $.Stored.ipVerList -}}
                 <a href="{{BackendURL}}/firewall/iptables/index?from={{$from}}&ipVer={{$v.K}}" class="btn {{if eq $.Stored.ipVer $v.K}}btn-primary{{else}}btn-default{{end}}">{{$v.V}}</a>
@@ -38,9 +38,11 @@
                 <a href="{{BackendURL}}/firewall/iptables/index?from={{$from}}&ipVer={{$.Stored.ipVer}}&table={{$.Stored.table}}&chain={{$chain}}" class="btn {{if eq $.Stored.chain $chain}}btn-primary{{else}}btn-default{{end}}">{{$chain}}</a>
                 {{- end -}}
                 </div>
+			</div>
+			<div class="content">
 				<div class="table-responsive">
-					<table class="table no-border hover">
-						<thead class="no-border">
+					<table class="table no-border hover table-smooth">
+						<thead class="no-border border-top">
 							<tr>
 								<th class="text-center" style="width:30px"><strong></strong></th>
                                 {{- range $k, $v := $.Stored.fieldList -}}
