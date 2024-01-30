@@ -4,7 +4,7 @@
         {{- if CmdIsRunning `firewall` -}}
         <span class="label label-success label-btn-size x-block">{{`运行中`|$.T}}</span>
         {{- else -}}
-        <span class="label label-default label-btn-size x-block" data-toggle="tooltip" title="{{`请确保有可用动态规则`|$.T}}">{{`已停止`|$.T}}</span>
+        <span class="label label-default label-btn-size x-block" data-toggle="tooltip" data-container="body" title="{{`请确保有可用动态规则`|$.T}}">{{`已停止`|$.T}}</span>
         {{- end -}}
     </dd>
     <dd class="pull-left xs-margin-left">
