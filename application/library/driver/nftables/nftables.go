@@ -233,8 +233,8 @@ func (a *NFTables) Append(rules ...driver.Rule) (err error) {
 
 func (a *NFTables) AsWhitelist(tableName, chainName string) error {
 	// a.cfg.DefaultPolicy = `drop`
-	// return a.NFTables.Do(func(conn *nftables.Conn) error {
-	// 	conn.FlushTable(a.NFTables.TableFilter())
+	// return a.base.Do(func(conn *nftables.Conn) error {
+	// 	conn.FlushTable(a.base.TableFilter())
 	// 	// reapply
 	// 	return conn.Flush()
 	// })

@@ -182,7 +182,6 @@ func (a *NFTables) buildRemoteIPRule(c *nftables.Conn, rule *driver.Rule) (args 
 func (a *NFTables) parsePorts(c *nftables.Conn, portCfg string, source bool, neq bool) (nftablesutils.Exprs, error) {
 	ports := param.Split(portCfg, `,`).Unique().Filter().String()
 	var exprs nftablesutils.Exprs
-	var hasInterval bool
 	var portList []uint16
 	var portRange [][2]uint16
 	for _, port := range ports {
@@ -196,7 +195,6 @@ func (a *NFTables) parsePorts(c *nftables.Conn, portCfg string, source bool, neq
 			continue
 		}
 		parts := strings.SplitN(port, `-`, 2)
-		hasInterval = true
 		portsUint16 := [2]uint16{}
 		for k, v := range parts {
 			portsUint16[k] = param.AsUint16(v)
@@ -226,7 +224,7 @@ func (a *NFTables) parsePorts(c *nftables.Conn, portCfg string, source bool, neq
 		}
 	}
 	portSet := nftablesutils.GetPortSet(a.base.TableFilter())
-	portSet.Interval = hasInterval
+	portSet.Interval = true
 	elems, err := setutils.GenerateElementsFromPort(ports)
 	if err != nil {
 		return nil, fmt.Errorf(`%w: %s`, err, portCfg)
