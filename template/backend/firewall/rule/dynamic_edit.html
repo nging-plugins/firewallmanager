@@ -46,7 +46,7 @@
                         <div class="col-sm-9">
                             <textarea name="regexp" id="regexp" class="form-control" required style="resize:vertical" rows="1">{{$.Form `regexp`}}</textarea>
                             <div class="help-block">
-                                {{`请输入正则表达式，支持多个，每行一个。每个正则表达式必须带占位符`|$.T}}
+                                {{`请输入regexp2正则表达式，支持多个，每行一个。每个正则表达式必须带占位符`|$.T}}
                                 <code class="clickable" onclick="App.insertAtCursor($('#regexp')[0],$(this).text());">%ip%</code>
                                 {{`它代表IP地址 (IPv4 和 IPv6)。`|$.T}}<br />
                                 {{`如果指定了“聚合规则”，则必须在这里也加上占位符`|$.T}}
@@ -70,7 +70,7 @@
                                     <div class="col-sm-9">
                                         <textarea name="aggregateRegexp" id="aggregateRegexp" class="form-control" placeholder="{{`正则表达式规则`|$.T}}" rows="1">{{$.Form `aggregateRegexp`}}</textarea>
                                         <div class="help-block">
-                            {{`请输入正则表达式，支持多个，每行一个。指定规则时，必须带占位符`|$.T}}<code class="clickable" onclick="App.insertAtCursor($('#aggregateRegexp')[0],$(this).text());">%id%</code>。<br />
+                            {{`请输入regexp2正则表达式，支持多个，每行一个。指定规则时，必须带占位符`|$.T}}<code class="clickable" onclick="App.insertAtCursor($('#aggregateRegexp')[0],$(this).text());">%id%</code>。<br />
                             {{`在匹配到上面的“匹配规则”后，在指定时长内匹配到这里指定的规则时，每匹配一次算一次。`|$.T}}<br />
                             {{`例如：在匹配到上面的“匹配规则”后，在 5 秒内匹配到这里的规则 3 次，则算 3 次`|$.T}}
                                         </div>
