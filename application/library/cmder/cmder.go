@@ -114,9 +114,10 @@ func (c *firewallCmd) boot() error {
 	}
 
 	gerberosCfg := &gerberos.Configuration{
-		Verbose:      cfg.Verbose,
-		SaveFilePath: cfg.SaveFilePath,
-		Rules:        map[string]*gerberos.Rule{},
+		Verbose:       cfg.Verbose,
+		SaveFilePath:  cfg.SaveFilePath,
+		DisallowClear: cfg.DisallowClear,
+		Rules:         map[string]*gerberos.Rule{},
 	}
 	switch cfg.Backend {
 	case `nftables`:
@@ -151,9 +152,18 @@ func (c *firewallCmd) boot() error {
 	}
 
 	// Runner
+	initedFile := filepath.Join(echo.Wd(), `data`, `cache`, `firewall`, gerberosCfg.Backend+`.inited`)
+	gerberosCfg.DisallowInit = !gerberosCfg.DisallowClear && com.FileExists(initedFile)
 	rn := gerberos.NewRunner(gerberosCfg)
 	if err := rn.Initialize(); err != nil {
 		return fmt.Errorf("failed to initialize runner: %s", err)
+	}
+	if !gerberosCfg.DisallowInit {
+		com.MkdirAll(filepath.Join(echo.Wd(), `data`, `cache`, `firewall`), os.ModePerm)
+		err = os.WriteFile(initedFile, []byte(time.Now().Format(time.DateTime)), os.ModePerm)
+		if err != nil {
+			return fmt.Errorf("failed to write to file %s: %s", initedFile, err)
+		}
 	}
 	defer func() {
 		if err := rn.Finalize(); err != nil {

@@ -95,8 +95,8 @@ github.com/admpub/fasthttp v0.0.5/go.mod h1:wdZ0vloMGk955KgSHI92b2qsxAcjc9BpOkJA
 github.com/admpub/fsnotify v1.5.0/go.mod h1:2YN7o9RdisXYVueAUsZxjx0Rbsiz6bu6B9XCgovJHY0=
 github.com/admpub/fsnotify v1.7.0 h1:pI04ANljHE5cS3fr+uXMgDG4/Cv3iye40nH/oZE8pB0=
 github.com/admpub/fsnotify v1.7.0/go.mod h1:D9ecq8Ksz5grAhvRRrbN7AdVXnwYx3OxM1+xfjru4+4=
-github.com/admpub/gerberos v0.1.0 h1:7yWHAWU/5xS04pDxxEiDhuOMUBdTAP/Eq5ZzoNj1oQM=
-github.com/admpub/gerberos v0.1.0/go.mod h1:0yEvndP8lZ3Oh2Y7uNX4BNuFnePKn5fRsCd1+uq4nvk=
+github.com/admpub/gerberos v0.1.1 h1:vc/WiybyAo/Pn0q17fWZ6T0Ly5xju2o6cx59TqjLck0=
+github.com/admpub/gerberos v0.1.1/go.mod h1:0yEvndP8lZ3Oh2Y7uNX4BNuFnePKn5fRsCd1+uq4nvk=
 github.com/admpub/gifresize v1.0.2 h1:aFLkKkdyfyg4OIl84R2xA/q/+itFd/mOlGPnhIAbq8s=
 github.com/admpub/gifresize v1.0.2/go.mod h1:4cJFfCR1yfgyq7lZiQZomEGeR/OVQVPeflN38P0T+M0=
 github.com/admpub/go-bindata-assetfs v0.0.0-20170428090253-36eaa4c19588 h1:OzETPaPe3vghcMkx/J6VpnNFg+Sd8TiQ5L+xaty3vJY=

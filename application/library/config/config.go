@@ -23,10 +23,11 @@ import (
 )
 
 type Config struct {
-	Verbose      bool
-	Backend      string
-	SaveFilePath string
-	NgingRule    *NgingRule
+	Verbose       bool
+	Backend       string
+	SaveFilePath  string
+	DisallowClear bool
+	NgingRule     *NgingRule
 }
 
 // NgingRule Nging 自身的防火墙规则
@@ -38,7 +39,7 @@ type NgingRule struct {
 	OtherPort   []uint16 // 一般不需要设置。如果 Nging 还使用了其它端口则在此设置
 }
 
-func (a *NgingRule) OtherPortStrs(seperator ...string) []string {
+func (a *NgingRule) OtherPortStrs() []string {
 	r := make([]string, len(a.OtherPort))
 	for i, v := range a.OtherPort {
 		r[i] = param.AsString(v)
