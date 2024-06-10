@@ -21,11 +21,11 @@ package firewall
 import (
 	"encoding/json"
 	"fmt"
-	"regexp"
 	"strings"
 
 	"github.com/admpub/gerberos"
 	"github.com/admpub/nging/v5/application/library/common"
+	"github.com/admpub/regexp2"
 	"github.com/nging-plugins/firewallmanager/application/dbschema"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/code"
@@ -105,7 +105,7 @@ func DynamicRuleParseForm(c echo.Context, rule *dbschema.NgingFirewallRuleDynami
 		if !strings.Contains(re, `%id%`) {
 			return c.NewError(code.InvalidParameter, `必须在“聚合规则”的每一行规则里包含“%%id%%”，在第 %d 行规则中没有找到“%%id%%”，请添加`, idx+1).SetZone(`aggregateRegexp`)
 		}
-		if _, err := regexp.Compile(re); err != nil {
+		if _, err := regexp2.Compile(re, regexp2.RE2); err != nil {
 			return c.NewError(code.InvalidParameter, `“聚合规则”的第 %d 行规则有误：%v`, idx+1, err.Error()).SetZone(`aggregateRegexp`)
 		}
 		aggregateRegexpList = append(aggregateRegexpList, re)
@@ -132,7 +132,7 @@ func DynamicRuleParseForm(c echo.Context, rule *dbschema.NgingFirewallRuleDynami
 		if hasAggregate && !strings.Contains(re, `%id%`) {
 			return c.NewError(code.InvalidParameter, `在设置“聚合规则”的情况下，必须同时在“匹配规则”的每一行规则里包含“%%id%%”，在第 %d 行规则中没有找到“%%id%%”，请添加`, idx+1).SetZone(`regexp`)
 		}
-		if _, err := regexp.Compile(re); err != nil {
+		if _, err := regexp2.Compile(re, regexp2.RE2); err != nil {
 			return c.NewError(code.InvalidParameter, `“匹配规则”的第 %d 行规则有误：%v`, idx+1, err.Error()).SetZone(`regexp`)
 		}
 		regexpList = append(regexpList, re)

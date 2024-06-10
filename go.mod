@@ -16,6 +16,7 @@ require (
 	github.com/admpub/once v0.0.1
 	github.com/admpub/packer v0.0.3
 	github.com/admpub/pp v0.0.7
+	github.com/admpub/regexp2 v1.1.8
 	github.com/google/nftables v0.2.0
 	github.com/nging-plugins/servermanager v1.5.11
 	github.com/stretchr/testify v1.9.0
@@ -81,7 +82,6 @@ require (
 	github.com/admpub/randomize v0.0.2 // indirect
 	github.com/admpub/realip v0.2.4 // indirect
 	github.com/admpub/redistore v1.2.1 // indirect
-	github.com/admpub/regexp2 v1.1.8 // indirect
 	github.com/admpub/resty/v2 v2.7.1 // indirect
 	github.com/admpub/securecookie v1.3.0 // indirect
 	github.com/admpub/service v0.0.5 // indirect
