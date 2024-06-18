@@ -340,7 +340,11 @@ func (a *NFTables) buildLimitRuleWithTimeout(c *nftables.Conn, rule *driver.Rule
 	set.Constant = false
 	set.Dynamic = true
 	set.HasTimeout = true
-	set.Timeout = time.Duration(rule.RateExpires) * time.Second
+	if rule.RateExpires > 0 {
+		set.Timeout = time.Duration(rule.RateExpires) * time.Second
+	} else {
+		set.Timeout = 86400 * time.Second
+	}
 	set.Name = setName
 
 	var existSet *nftables.Set

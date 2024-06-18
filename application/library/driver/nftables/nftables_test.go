@@ -77,3 +77,26 @@ func TestAcceptPorts(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestDropLimit(t *testing.T) {
+	a, err := New(driver.ProtocolIPv4)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rule := driver.Rule{
+		ID:          99999,
+		Protocol:    enums.ProtocolTCP,
+		Type:        enums.TableFilter,
+		Direction:   enums.ChainInput,
+		Action:      enums.TargetDrop,
+		RateLimit:   `50+/p/s`,
+		RateBurst:   60,
+		RateExpires: 0,
+		LocalPort:   `80,443`,
+		IPVersion:   `4`,
+	}
+	err = a.Append(rule)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
