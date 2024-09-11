@@ -18,7 +18,7 @@
 
 package iptables
 
-import "github.com/admpub/nging/v5/application/library/checkinstall"
+import "github.com/coscms/webcore/library/checkinstall"
 
 var supported = checkinstall.New(`iptables`)
 

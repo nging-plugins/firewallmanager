@@ -27,9 +27,9 @@ import (
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/code"
 
-	"github.com/admpub/nging/v5/application/handler"
-	"github.com/admpub/nging/v5/application/library/common"
-	"github.com/admpub/nging/v5/application/registry/navigate"
+	"github.com/coscms/webcore/library/backend"
+	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/registry/navigate"
 	"github.com/nging-plugins/firewallmanager/application/library/cmder"
 	"github.com/nging-plugins/firewallmanager/application/library/driver/iptables"
 	"github.com/nging-plugins/firewallmanager/application/library/enums"
@@ -124,15 +124,15 @@ func ipTablesDelete(ctx echo.Context) error {
 		return ctx.NewError(code.Unsupported, `不支持 iptables`)
 	}
 	if ts != getStaticRuleLastModifyTs() {
-		handler.SendErr(ctx, ctx.NewError(code.Failure, `操作失败，规则有更改，编号可能已经发生变化，请重新操作`))
-		return ctx.Redirect(handler.URLFor(`/firewall/iptables/index`) + `?ipVer=` + ipVer + `&table=` + table + `&chain=` + chain)
+		common.SendErr(ctx, ctx.NewError(code.Failure, `操作失败，规则有更改，编号可能已经发生变化，请重新操作`))
+		return ctx.Redirect(backend.URLFor(`/firewall/iptables/index`) + `?ipVer=` + ipVer + `&table=` + table + `&chain=` + chain)
 	}
 	err := ipt.Base().DeleteByPosition(table, chain, id)
 	if err == nil {
-		handler.SendOk(ctx, ctx.T(`删除成功`))
+		common.SendOk(ctx, ctx.T(`删除成功`))
 	} else {
-		handler.SendErr(ctx, err)
+		common.SendErr(ctx, err)
 	}
 	from := ctx.Form(`from`, `dynamic`)
-	return ctx.Redirect(handler.URLFor(`/firewall/iptables/index`) + `?from=` + from + `&ipVer=` + ipVer + `&table=` + table + `&chain=` + chain)
+	return ctx.Redirect(backend.URLFor(`/firewall/iptables/index`) + `?from=` + from + `&ipVer=` + ipVer + `&table=` + table + `&chain=` + chain)
 }

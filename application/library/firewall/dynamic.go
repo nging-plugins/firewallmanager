@@ -24,8 +24,8 @@ import (
 	"strings"
 
 	"github.com/admpub/gerberos"
-	"github.com/admpub/nging/v5/application/library/common"
 	"github.com/admpub/regexp2"
+	"github.com/coscms/webcore/library/common"
 	"github.com/nging-plugins/firewallmanager/application/dbschema"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/code"

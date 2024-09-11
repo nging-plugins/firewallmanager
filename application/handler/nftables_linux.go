@@ -27,9 +27,9 @@ import (
 	"github.com/webx-top/echo/param"
 	"github.com/webx-top/pagination"
 
-	"github.com/admpub/nging/v5/application/handler"
-	"github.com/admpub/nging/v5/application/library/common"
-	"github.com/admpub/nging/v5/application/registry/navigate"
+	"github.com/coscms/webcore/library/backend"
+	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/registry/navigate"
 	"github.com/nging-plugins/firewallmanager/application/library/cmder"
 	"github.com/nging-plugins/firewallmanager/application/library/driver"
 	"github.com/nging-plugins/firewallmanager/application/library/driver/nftables"
@@ -198,9 +198,9 @@ func nfTablesDelete(ctx echo.Context) error {
 		})
 	}
 	if err == nil {
-		handler.SendOk(ctx, ctx.T(`删除成功`))
+		common.SendOk(ctx, ctx.T(`删除成功`))
 	} else {
-		handler.SendErr(ctx, err)
+		common.SendErr(ctx, err)
 	}
 	from := ctx.Form(`from`, `dynamic`)
 	qs := `?from=` + from + `&ipVer=` + ipVer + `&table=` + table
@@ -209,5 +209,5 @@ func nfTablesDelete(ctx echo.Context) error {
 	} else {
 		qs += `&chain=` + chain
 	}
-	return ctx.Redirect(handler.URLFor(`/firewall/nftables/index`) + qs)
+	return ctx.Redirect(backend.URLFor(`/firewall/nftables/index`) + qs)
 }

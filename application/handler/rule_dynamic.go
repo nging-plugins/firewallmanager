@@ -19,8 +19,8 @@
 package handler
 
 import (
-	"github.com/admpub/nging/v5/application/handler"
-	"github.com/admpub/nging/v5/application/library/common"
+	"github.com/coscms/webcore/library/backend"
+	"github.com/coscms/webcore/library/common"
 	"github.com/nging-plugins/firewallmanager/application/library/cmder"
 	"github.com/nging-plugins/firewallmanager/application/library/firewall"
 	"github.com/nging-plugins/firewallmanager/application/model"
@@ -52,10 +52,10 @@ func ruleDynamicAdd(ctx echo.Context) error {
 			goto END
 		}
 		if m.Disabled == `N` {
-			wOut, wErr, _ := handler.NoticeWriter(ctx, ctx.T(`防火墙服务`))
+			wOut, wErr, _ := backend.NoticeWriter(ctx, ctx.T(`防火墙服务`))
 			cmder.Get().Restart(wOut, wErr)
 		}
-		return ctx.Redirect(handler.URLFor(`/firewall/rule/dynamic`))
+		return ctx.Redirect(backend.URLFor(`/firewall/rule/dynamic`))
 	} else {
 		id := ctx.Formx(`copyId`).Uint()
 		if id > 0 {
@@ -95,18 +95,18 @@ func ruleDynamicEdit(ctx echo.Context) error {
 			goto END
 		}
 		if m.Disabled == `N` {
-			wOut, wErr, _ := handler.NoticeWriter(ctx, ctx.T(`防火墙服务`))
+			wOut, wErr, _ := backend.NoticeWriter(ctx, ctx.T(`防火墙服务`))
 			cmder.Get().Restart(wOut, wErr)
 		} else {
 			exists, _ := m.ExistsAvailable()
 			if !exists {
 				cmder.Stop()
 			} else {
-				wOut, wErr, _ := handler.NoticeWriter(ctx, ctx.T(`防火墙服务`))
+				wOut, wErr, _ := backend.NoticeWriter(ctx, ctx.T(`防火墙服务`))
 				cmder.Get().Restart(wOut, wErr)
 			}
 		}
-		return ctx.Redirect(handler.URLFor(`/firewall/rule/dynamic`))
+		return ctx.Redirect(backend.URLFor(`/firewall/rule/dynamic`))
 	} else if ctx.IsAjax() {
 		disabled := ctx.Query(`disabled`)
 		if len(disabled) > 0 {
@@ -125,11 +125,11 @@ func ruleDynamicEdit(ctx echo.Context) error {
 				if !exists {
 					cmder.Stop()
 				} else {
-					wOut, wErr, _ := handler.NoticeWriter(ctx, ctx.T(`防火墙服务`))
+					wOut, wErr, _ := backend.NoticeWriter(ctx, ctx.T(`防火墙服务`))
 					cmder.Get().Restart(wOut, wErr)
 				}
 			} else {
-				wOut, wErr, _ := handler.NoticeWriter(ctx, ctx.T(`防火墙服务`))
+				wOut, wErr, _ := backend.NoticeWriter(ctx, ctx.T(`防火墙服务`))
 				cmder.Get().Restart(wOut, wErr)
 			}
 			if err != nil {
@@ -157,11 +157,11 @@ func ruleDynamicDelete(ctx echo.Context) error {
 	id := ctx.Formx(`id`).Uint()
 	err := m.Delete(nil, `id`, id)
 	if err == nil {
-		wOut, wErr, _ := handler.NoticeWriter(ctx, ctx.T(`防火墙服务`))
+		wOut, wErr, _ := backend.NoticeWriter(ctx, ctx.T(`防火墙服务`))
 		cmder.Get().Restart(wOut, wErr)
-		handler.SendOk(ctx, ctx.T(`删除成功`))
+		common.SendOk(ctx, ctx.T(`删除成功`))
 	} else {
-		handler.SendErr(ctx, err)
+		common.SendErr(ctx, err)
 	}
-	return ctx.Redirect(handler.URLFor(`/firewall/rule/dynamic`))
+	return ctx.Redirect(backend.URLFor(`/firewall/rule/dynamic`))
 }

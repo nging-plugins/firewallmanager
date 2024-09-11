@@ -19,8 +19,8 @@
 package firewall
 
 import (
-	"github.com/admpub/nging/v5/application/library/errorslice"
 	"github.com/admpub/once"
+	"github.com/coscms/webcore/library/errorslice"
 	"github.com/nging-plugins/firewallmanager/application/library/driver"
 )
 

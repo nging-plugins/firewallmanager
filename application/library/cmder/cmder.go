@@ -34,9 +34,9 @@ import (
 	"github.com/webx-top/echo/defaults"
 	"github.com/webx-top/echo/param"
 
-	"github.com/admpub/nging/v5/application/library/config"
-	"github.com/admpub/nging/v5/application/library/config/cmder"
-	"github.com/admpub/nging/v5/application/library/config/extend"
+	"github.com/coscms/webcore/library/config"
+	"github.com/coscms/webcore/library/config/cmder"
+	"github.com/coscms/webcore/library/config/extend"
 
 	firewallConfig "github.com/nging-plugins/firewallmanager/application/library/config"
 	"github.com/nging-plugins/firewallmanager/application/library/firewall"

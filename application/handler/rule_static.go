@@ -34,9 +34,9 @@ import (
 	"github.com/webx-top/echo/middleware/bytes"
 	"github.com/webx-top/echo/param"
 
-	"github.com/admpub/nging/v5/application/handler"
-	"github.com/admpub/nging/v5/application/library/common"
-	"github.com/admpub/nging/v5/application/library/errorslice"
+	"github.com/coscms/webcore/library/backend"
+	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/library/errorslice"
 	"github.com/nging-plugins/firewallmanager/application/dbschema"
 	"github.com/nging-plugins/firewallmanager/application/library/enums"
 	"github.com/nging-plugins/firewallmanager/application/library/firewall"
@@ -112,7 +112,7 @@ func ruleStaticAdd(ctx echo.Context) error {
 			goto END
 		}
 		setStaticRuleLastModifyTime(time.Now())
-		return ctx.Redirect(handler.URLFor(`/firewall/rule/static`))
+		return ctx.Redirect(backend.URLFor(`/firewall/rule/static`))
 	} else {
 		id := ctx.Formx(`copyId`).Uint()
 		if id > 0 {
@@ -172,7 +172,7 @@ func ruleStaticEdit(ctx echo.Context) error {
 				goto END
 			}
 		}
-		return ctx.Redirect(handler.URLFor(`/firewall/rule/static`))
+		return ctx.Redirect(backend.URLFor(`/firewall/rule/static`))
 	} else if ctx.IsAjax() {
 		disabled := ctx.Query(`disabled`)
 		if len(disabled) > 0 {
@@ -231,11 +231,11 @@ func ruleStaticDelete(ctx echo.Context) error {
 	}
 	if err == nil {
 		setStaticRuleLastModifyTime(time.Now())
-		handler.SendOk(ctx, ctx.T(`删除成功`))
+		common.SendOk(ctx, ctx.T(`删除成功`))
 	} else {
-		handler.SendErr(ctx, err)
+		common.SendErr(ctx, err)
 	}
-	return ctx.Redirect(handler.URLFor(`/firewall/rule/static`))
+	return ctx.Redirect(backend.URLFor(`/firewall/rule/static`))
 }
 
 func ruleStaticApply(ctx echo.Context) error {
@@ -259,11 +259,11 @@ func ruleStaticApply(ctx echo.Context) error {
 
 END:
 	if err == nil {
-		handler.SendOk(ctx, ctx.T(`规则应用成功`))
+		common.SendOk(ctx, ctx.T(`规则应用成功`))
 	} else {
-		handler.SendErr(ctx, err)
+		common.SendErr(ctx, err)
 	}
-	return ctx.Redirect(handler.URLFor(`/firewall/rule/static`))
+	return ctx.Redirect(backend.URLFor(`/firewall/rule/static`))
 }
 
 func ruleStaticBan(ctx echo.Context) error {
@@ -351,7 +351,7 @@ func ruleStaticBan(ctx echo.Context) error {
 			fileSrc.Close()
 		}
 		if len(ipv4) == 0 && len(ipv6) == 0 {
-			handler.SendFail(ctx, ctx.T(`IP 数据为空`))
+			common.SendFail(ctx, ctx.T(`IP 数据为空`))
 			goto END
 		}
 		if len(ipv4) > 0 {
@@ -366,10 +366,10 @@ func ruleStaticBan(ctx echo.Context) error {
 		}
 		err = errs.ToError()
 		if err != nil {
-			handler.SendOk(ctx, ctx.T(`操作成功。但有部分错误：%s`, com.Nl2br(err.Error())))
+			common.SendOk(ctx, ctx.T(`操作成功。但有部分错误：%s`, com.Nl2br(err.Error())))
 		} else {
-			handler.SendOk(ctx, ctx.T(`操作成功`))
-			return ctx.Redirect(handler.URLFor(`/firewall/rule/static_ban`))
+			common.SendOk(ctx, ctx.T(`操作成功`))
+			return ctx.Redirect(backend.URLFor(`/firewall/rule/static_ban`))
 		}
 	}
 
