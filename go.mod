@@ -4,9 +4,7 @@ go 1.23
 
 toolchain go1.23.0
 
-replace github.com/nging-plugins/servermanager => ../servermanager
-
-replace github.com/nging-plugins/sshmanager => ../sshmanager
+// replace github.com/nging-plugins/servermanager => ../servermanager
 
 require (
 	github.com/admpub/gerberos v0.1.1
@@ -20,7 +18,7 @@ require (
 	github.com/admpub/regexp2 v1.1.8
 	github.com/coscms/webcore v0.0.0-20240911085259-de03337d48e1
 	github.com/google/nftables v0.2.0
-	github.com/nging-plugins/servermanager v1.5.11
+	github.com/nging-plugins/servermanager v1.6.0
 	github.com/stretchr/testify v1.9.0
 	github.com/webx-top/com v1.3.1
 	github.com/webx-top/db v1.27.9
