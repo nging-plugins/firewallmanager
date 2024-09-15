@@ -92,6 +92,21 @@ func (a *Base) DeleteElementInSet(table, set, element string) (err error) {
 	return
 }
 
+// Unban removing ip from backlist.
+func (a *Base) Unban(ipAddresses ...string) error {
+	if len(ipAddresses) == 0 {
+		return a.ClearSet(a.tBlacklistFilter.Name, a.filterSetBlacklistIP.Name)
+	}
+	var err error
+	for _, ipStr := range ipAddresses {
+		err = a.DeleteElementInSet(a.tBlacklistFilter.Name, a.filterSetBlacklistIP.Name, ipStr)
+		if err != nil {
+			break
+		}
+	}
+	return err
+}
+
 func (a *Base) DeleteElementInSetByHandleID(table, set string, handleID uint64) (err error) {
 	err = cmdutils.RunCmd(context.Background(), a.bin, []string{
 		`delete`, `element`, a.getTableFamilyString(), table, set,
@@ -104,6 +119,14 @@ func (a *Base) DeleteSet(table, set string) (err error) {
 	//nft delete set global myset
 	err = cmdutils.RunCmd(context.Background(), a.bin, []string{
 		`delete`, `set`, a.getTableFamilyString(), table, set,
+	}, nil)
+	return
+}
+
+func (a *Base) ClearSet(table, set string) (err error) {
+	//nft flush set ip nging_dynamic_ip4 set4
+	err = cmdutils.RunCmd(context.Background(), a.bin, []string{
+		`flush`, `set`, a.getTableFamilyString(), table, set,
 	}, nil)
 	return
 }

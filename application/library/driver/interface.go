@@ -36,5 +36,8 @@ type Driver interface {
 	Delete(rules ...Rule) error
 	Exists(rule Rule) (bool, error)
 	Ban(ips []string, expires time.Duration) error
+	Unban(ips ...string) error
+	DeleteElementInSet(table, set, element string) error
 	FindPositionByID(table, chain string, id uint) (uint, error)
+	ClearSet(table, set string) error
 }

@@ -108,6 +108,10 @@ func (a *IPTables) Ban(ips []string, expires time.Duration) error {
 	return a.base.AddToBlacklistSet(ips, expires)
 }
 
+func (a *IPTables) Unban(ips ...string) error {
+	return a.base.DelElemInBlacklistSet(ips...)
+}
+
 func (a *IPTables) ruleFrom(rule *driver.Rule) ([]string, error) {
 	if len(rule.Type) == 0 {
 		rule.Type = enums.TableFilter
@@ -349,6 +353,10 @@ func (a *IPTables) Delete(rules ...driver.Rule) (err error) {
 	return err
 }
 
+func (a *IPTables) DeleteElementInSet(table, set, element string) error {
+	return a.base.DelElemInBlacklistSet(table, set, element)
+}
+
 func (a *IPTables) Exists(rule driver.Rule) (bool, error) {
 	rulespec, err := a.ruleFrom(&rule)
 	if err != nil {
@@ -367,6 +375,10 @@ func (a *IPTables) AsWhitelist(table, chain string) error {
 func (a *IPTables) FindPositionByID(table, chain string, id uint) (uint, error) {
 	chain = getNgingChain(table, chain)
 	return a.base.FindPositionByID(table, chain, id)
+}
+
+func (a *IPTables) ClearSet(table, set string) error {
+	return a.base.ClearSet(table, set)
 }
 
 func (a *IPTables) Base() *Base {

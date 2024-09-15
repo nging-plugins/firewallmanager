@@ -150,3 +150,29 @@ func AddDefault(ipVersion string) (err error) {
 func FindPositionByID(ipVersion, table, chain string, id uint) (uint, error) {
 	return Engine(ipVersion).FindPositionByID(table, chain, id)
 }
+
+func ClearSet(ipVersion, table, set string) error {
+	return Engine(ipVersion).ClearSet(table, set)
+}
+
+// Unban如果不指定ip则代表清空所有黑名单
+func Unban(ipVersion string, ips ...string) error {
+	eng := Engine(ipVersion)
+	return eng.Unban(ips...)
+}
+
+// UnbanDynamic如果不指定ip则代表清空所有黑名单
+func UnbanDynamic(ipVersion string, ips ...string) error {
+	eng := Engine(ipVersion)
+	if len(ips) == 0 {
+		return eng.ClearSet(`nging_dynamic_ip`+ipVersion, `set`+ipVersion)
+	}
+	var err error
+	for _, ipStr := range ips {
+		err = eng.DeleteElementInSet(`nging_dynamic_ip`+ipVersion, `set`+ipVersion, ipStr)
+		if err != nil {
+			break
+		}
+	}
+	return err
+}

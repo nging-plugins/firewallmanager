@@ -112,8 +112,38 @@ func (a *Base) RemoveSet(set string, action string) error {
 	return cmdutils.RunCmd(ctx, "ipset", args, os.Stdout)
 }
 
+func (a *Base) ClearSet(_, set string) (err error) {
+	//ipset flush aa
+	ctx := context.Background()
+	args := []string{"flush", set}
+	return cmdutils.RunCmd(ctx, "ipset", args, os.Stdout)
+}
+
 func (a *Base) AddToBlacklistSet(ips []string, d time.Duration) error {
 	return a.AddToSet(a.blackListSetName, ips, d)
+}
+
+func (a *Base) DeleteElementInSet(_, set, element string) (err error) {
+	ctx := context.Background()
+	args := []string{"del", set, element}
+	err = cmdutils.RunCmd(ctx, "ipset", args, os.Stdout)
+	return
+}
+
+func (a *Base) DelElemInBlacklistSet(ips ...string) error {
+	if len(ips) == 0 {
+		return a.ClearSet(``, a.blackListSetName)
+	}
+	ctx := context.Background()
+	var err error
+	for _, ipStr := range ips {
+		args := []string{"del", a.blackListSetName, ipStr}
+		err = cmdutils.RunCmd(ctx, "ipset", args, os.Stdout)
+		if err != nil {
+			break
+		}
+	}
+	return err
 }
 
 func (a *Base) AddToSet(set string, ips []string, d time.Duration) error {

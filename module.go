@@ -26,6 +26,8 @@ import (
 	"github.com/nging-plugins/firewallmanager/application/handler"
 	pluginCmder "github.com/nging-plugins/firewallmanager/application/library/cmder"
 	"github.com/nging-plugins/firewallmanager/application/library/setup"
+
+	_ "github.com/nging-plugins/firewallmanager/application/cmd"
 )
 
 const ID = `firewall`

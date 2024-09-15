@@ -118,6 +118,10 @@ func (a *NFTables) Ban(ips []string, expires time.Duration) error {
 	return a.base.Ban(ips, expires)
 }
 
+func (a *NFTables) Unban(ips ...string) error {
+	return a.base.Unban(ips...)
+}
+
 func (a *NFTables) ruleFrom(c *nftables.Conn, rule *driver.Rule) (args nftablesutils.Exprs, err error) {
 	if len(rule.Type) == 0 {
 		rule.Type = enums.TableFilter // table
@@ -297,6 +301,10 @@ func (a *NFTables) Delete(rules ...driver.Rule) (err error) {
 	})
 }
 
+func (a *NFTables) DeleteElementInSet(table, set, element string) error {
+	return a.base.DeleteElementInSet(table, set, element)
+}
+
 func (a *NFTables) Exists(rule driver.Rule) (bool, error) {
 	var exists bool
 	err := a.base.Do(func(conn *nftables.Conn) (err error) {
@@ -314,6 +322,10 @@ func (a *NFTables) Exists(rule driver.Rule) (bool, error) {
 
 func (a *NFTables) FindPositionByID(table, chain string, id uint) (uint, error) {
 	return a.base.FindPositionByID(table, chain, id)
+}
+
+func (a *NFTables) ClearSet(table, set string) error {
+	return a.base.ClearSet(table, set)
 }
 
 func (a *NFTables) Base() *Base {

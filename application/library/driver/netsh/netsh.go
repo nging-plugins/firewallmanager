@@ -190,6 +190,14 @@ func (*NetSH) Ban(ips []string, expires time.Duration) error {
 	return driver.ErrUnsupported
 }
 
+func (a *NetSH) Unban(ips ...string) error {
+	return driver.ErrUnsupported
+}
+
+func (a *NetSH) DeleteElementInSet(table, set, element string) error {
+	return driver.ErrUnsupported
+}
+
 func (a *NetSH) Stats(table, chain string) ([]map[string]string, error) {
 	//TODO
 	return nil, driver.ErrUnsupported
@@ -214,6 +222,10 @@ func (a *NetSH) run(args []string, stdout io.Writer) error {
 func (a *NetSH) FindPositionByID(table, chain string, id uint) (uint, error) {
 	var position uint
 	return position, driver.ErrUnsupported
+}
+
+func (a *NetSH) ClearSet(table, set string) error {
+	return driver.ErrUnsupported
 }
 
 func (a *NetSH) AddDefault() error {

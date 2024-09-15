@@ -104,8 +104,20 @@ func (unsupportedDriver) Ban(ips []string, expires time.Duration) error {
 	return ErrUnsupportedOperatingSystem
 }
 
+func (unsupportedDriver) Unban(ips ...string) error {
+	return ErrUnsupportedOperatingSystem
+}
+
+func (unsupportedDriver) DeleteElementInSet(table, set, element string) error {
+	return ErrUnsupportedOperatingSystem
+}
+
 func (unsupportedDriver) FindPositionByID(table, chain string, id uint) (uint, error) {
 	return 0, ErrUnsupportedOperatingSystem
+}
+
+func (unsupportedDriver) ClearSet(table, set string) error {
+	return ErrUnsupportedOperatingSystem
 }
 
 func (unsupportedDriver) AddDefault() error {
