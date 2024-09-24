@@ -33,6 +33,7 @@ import (
 	"github.com/coscms/webcore/library/config"
 	"github.com/coscms/webcore/library/config/startup"
 	"github.com/coscms/webcore/library/errorslice"
+	"github.com/coscms/webcore/library/module"
 	"github.com/coscms/webcore/library/route"
 	"github.com/nging-plugins/firewallmanager/application/library/cmder"
 	"github.com/nging-plugins/firewallmanager/application/library/driver"
@@ -43,8 +44,8 @@ import (
 	"github.com/nging-plugins/firewallmanager/application/model"
 )
 
-func RegisterRoute(r *route.Collection) {
-	r.Backend.RegisterToGroup(`/firewall`, registerRoute)
+func RegisterRoute(r module.Router) {
+	r.Backend().RegisterToGroup(`/firewall`, registerRoute)
 }
 
 var routeRegisters route.Registers

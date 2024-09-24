@@ -18,7 +18,7 @@
 
 package handler
 
-import "github.com/coscms/webcore/registry/navigate"
+import "github.com/coscms/webcore/library/navigate"
 
 var LeftNavigate = &navigate.Item{
 	Display: true,

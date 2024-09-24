@@ -29,7 +29,7 @@ import (
 
 	"github.com/coscms/webcore/library/backend"
 	"github.com/coscms/webcore/library/common"
-	"github.com/coscms/webcore/registry/navigate"
+	"github.com/coscms/webcore/library/navigate"
 	"github.com/nging-plugins/firewallmanager/application/library/cmder"
 	"github.com/nging-plugins/firewallmanager/application/library/driver/iptables"
 	"github.com/nging-plugins/firewallmanager/application/library/enums"

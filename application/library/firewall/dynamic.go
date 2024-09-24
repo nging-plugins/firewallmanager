@@ -25,7 +25,7 @@ import (
 
 	"github.com/admpub/gerberos"
 	"github.com/admpub/regexp2"
-	"github.com/coscms/webcore/library/common"
+	"github.com/coscms/webcore/library/nerrors"
 	"github.com/nging-plugins/firewallmanager/application/dbschema"
 	"github.com/webx-top/echo"
 	"github.com/webx-top/echo/code"
@@ -150,7 +150,7 @@ func DynamicRuleFromDB(c echo.Context, row *dbschema.NgingFirewallRuleDynamic) (
 	if len(row.SourceArgs) > 0 {
 		err = json.Unmarshal([]byte(row.SourceArgs), &args)
 		if err != nil {
-			err = common.JSONBytesParseError(err, []byte(row.SourceArgs))
+			err = nerrors.JSONBytesParseError(err, []byte(row.SourceArgs))
 			err = fmt.Errorf(`failed to parse SourceArgs: %w`, err)
 			return
 		}
@@ -162,7 +162,7 @@ func DynamicRuleFromDB(c echo.Context, row *dbschema.NgingFirewallRuleDynamic) (
 	if len(row.Regexp) > 0 {
 		err = json.Unmarshal([]byte(row.Regexp), &args)
 		if err != nil {
-			err = common.JSONBytesParseError(err, []byte(row.Regexp))
+			err = nerrors.JSONBytesParseError(err, []byte(row.Regexp))
 			err = fmt.Errorf(`failed to parse Regexp: %w`, err)
 			return
 		}
@@ -178,7 +178,7 @@ func DynamicRuleFromDB(c echo.Context, row *dbschema.NgingFirewallRuleDynamic) (
 		args = []string{}
 		err = json.Unmarshal([]byte(row.AggregateRegexp), &args)
 		if err != nil {
-			err = common.JSONBytesParseError(err, []byte(row.AggregateRegexp))
+			err = nerrors.JSONBytesParseError(err, []byte(row.AggregateRegexp))
 			err = fmt.Errorf(`failed to parse AggregateRegexp: %w`, err)
 			return
 		}

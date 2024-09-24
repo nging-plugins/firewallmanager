@@ -4,6 +4,8 @@ go 1.23
 
 toolchain go1.23.0
 
+// replace github.com/coscms/webcore => ../../coscms/webcore
+
 // replace github.com/nging-plugins/servermanager => ../servermanager
 
 require (
@@ -18,12 +20,12 @@ require (
 	github.com/admpub/regexp2 v1.1.8
 	github.com/coscms/webcore v0.1.1
 	github.com/google/nftables v0.2.0
-	github.com/nging-plugins/servermanager v1.6.0
+	github.com/nging-plugins/servermanager v1.6.2
 	github.com/spf13/cobra v1.8.1
 	github.com/stretchr/testify v1.9.0
-	github.com/webx-top/com v1.3.2
-	github.com/webx-top/db v1.27.9
-	github.com/webx-top/echo v1.9.3
+	github.com/webx-top/com v1.3.3
+	github.com/webx-top/db v1.27.10
+	github.com/webx-top/echo v1.10.3
 	github.com/webx-top/pagination v0.3.1
 	golang.org/x/sys v0.25.0
 )
@@ -61,7 +63,7 @@ require (
 	github.com/admpub/goth v0.0.4 // indirect
 	github.com/admpub/httpscerts v0.0.0-20180907121630-a2990e2af45c // indirect
 	github.com/admpub/humanize v0.0.0-20190501023926-5f826e92c8ca // indirect
-	github.com/admpub/i18n v0.3.0 // indirect
+	github.com/admpub/i18n v0.3.2 // indirect
 	github.com/admpub/identicon v1.0.2 // indirect
 	github.com/admpub/imageproxy v0.10.0 // indirect
 	github.com/admpub/imaging v1.6.3 // indirect
@@ -143,7 +145,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
-	github.com/prometheus/client_golang v1.20.3 // indirect
+	github.com/prometheus/client_golang v1.20.4 // indirect
 	github.com/prometheus/client_model v0.6.1 // indirect
 	github.com/prometheus/common v0.59.1 // indirect
 	github.com/prometheus/procfs v0.15.1 // indirect
@@ -163,7 +165,7 @@ require (
 	github.com/volatiletech/strmangle v0.0.6 // indirect
 	github.com/webx-top/captcha v0.1.0 // indirect
 	github.com/webx-top/chardet v0.0.2 // indirect
-	github.com/webx-top/client v0.9.4 // indirect
+	github.com/webx-top/client v0.9.5 // indirect
 	github.com/webx-top/codec v0.3.0 // indirect
 	github.com/webx-top/image v0.1.1 // indirect
 	github.com/webx-top/poolx v0.0.0-20210912044716-5cfa2d58e380 // indirect
