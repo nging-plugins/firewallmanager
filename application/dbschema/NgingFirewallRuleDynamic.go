@@ -221,10 +221,14 @@ func (a *NgingFirewallRuleDynamic) Struct_() string {
 }
 
 func (a *NgingFirewallRuleDynamic) Name_() string {
-	if a.base.Namer() != nil {
-		return WithPrefix(a.base.Namer()(a))
+	b := a
+	if b == nil {
+		b = &NgingFirewallRuleDynamic{}
 	}
-	return WithPrefix(factory.TableNamerGet(a.Short_())(a))
+	if b.base.Namer() != nil {
+		return WithPrefix(b.base.Namer()(b))
+	}
+	return WithPrefix(factory.TableNamerGet(b.Short_())(b))
 }
 
 func (a *NgingFirewallRuleDynamic) CPAFrom(source factory.Model) factory.Model {
@@ -502,7 +506,7 @@ func (a *NgingFirewallRuleDynamic) UpdateFields(mw func(db.Result) db.Result, kv
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -537,7 +541,7 @@ func (a *NgingFirewallRuleDynamic) UpdatexFields(mw func(db.Result) db.Result, k
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -727,6 +731,9 @@ func (a *NgingFirewallRuleDynamic) AsMap(onlyFields ...string) param.Store {
 
 func (a *NgingFirewallRuleDynamic) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint(value)
@@ -757,6 +764,95 @@ func (a *NgingFirewallRuleDynamic) FromRow(row map[string]interface{}) {
 		case "updated":
 			a.Updated = param.AsUint(value)
 		}
+	}
+}
+
+func (a *NgingFirewallRuleDynamic) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "Name":
+		return a.Name
+	case "SourceType":
+		return a.SourceType
+	case "SourceArgs":
+		return a.SourceArgs
+	case "Regexp":
+		return a.Regexp
+	case "ActionType":
+		return a.ActionType
+	case "ActionArg":
+		return a.ActionArg
+	case "AggregateDuration":
+		return a.AggregateDuration
+	case "AggregateRegexp":
+		return a.AggregateRegexp
+	case "OccurrenceNum":
+		return a.OccurrenceNum
+	case "OccurrenceDuration":
+		return a.OccurrenceDuration
+	case "Disabled":
+		return a.Disabled
+	case "Created":
+		return a.Created
+	case "Updated":
+		return a.Updated
+	default:
+		return nil
+	}
+}
+
+func (a *NgingFirewallRuleDynamic) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"Name",
+		"SourceType",
+		"SourceArgs",
+		"Regexp",
+		"ActionType",
+		"ActionArg",
+		"AggregateDuration",
+		"AggregateRegexp",
+		"OccurrenceNum",
+		"OccurrenceDuration",
+		"Disabled",
+		"Created",
+		"Updated",
+	}
+}
+
+func (a *NgingFirewallRuleDynamic) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "Name":
+		return true
+	case "SourceType":
+		return true
+	case "SourceArgs":
+		return true
+	case "Regexp":
+		return true
+	case "ActionType":
+		return true
+	case "ActionArg":
+		return true
+	case "AggregateDuration":
+		return true
+	case "AggregateRegexp":
+		return true
+	case "OccurrenceNum":
+		return true
+	case "OccurrenceDuration":
+		return true
+	case "Disabled":
+		return true
+	case "Created":
+		return true
+	case "Updated":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -867,17 +963,19 @@ func (a *NgingFirewallRuleDynamic) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *NgingFirewallRuleDynamic) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *NgingFirewallRuleDynamic) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *NgingFirewallRuleDynamic) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *NgingFirewallRuleDynamic) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *NgingFirewallRuleDynamic) BatchValidate(kvset map[string]interface{}) error {

@@ -232,10 +232,14 @@ func (a *NgingFirewallRuleStatic) Struct_() string {
 }
 
 func (a *NgingFirewallRuleStatic) Name_() string {
-	if a.base.Namer() != nil {
-		return WithPrefix(a.base.Namer()(a))
+	b := a
+	if b == nil {
+		b = &NgingFirewallRuleStatic{}
 	}
-	return WithPrefix(factory.TableNamerGet(a.Short_())(a))
+	if b.base.Namer() != nil {
+		return WithPrefix(b.base.Namer()(b))
+	}
+	return WithPrefix(factory.TableNamerGet(b.Short_())(b))
 }
 
 func (a *NgingFirewallRuleStatic) CPAFrom(source factory.Model) factory.Model {
@@ -573,7 +577,7 @@ func (a *NgingFirewallRuleStatic) UpdateFields(mw func(db.Result) db.Result, kvs
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -623,7 +627,7 @@ func (a *NgingFirewallRuleStatic) UpdatexFields(mw func(db.Result) db.Result, kv
 	}
 	m := *a
 	m.FromRow(kvset)
-	var editColumns []string
+	editColumns := make([]string, 0, len(kvset))
 	for column := range kvset {
 		editColumns = append(editColumns, column)
 	}
@@ -875,6 +879,9 @@ func (a *NgingFirewallRuleStatic) AsMap(onlyFields ...string) param.Store {
 
 func (a *NgingFirewallRuleStatic) FromRow(row map[string]interface{}) {
 	for key, value := range row {
+		if _, ok := value.(db.RawValue); ok {
+			continue
+		}
 		switch key {
 		case "id":
 			a.Id = param.AsUint(value)
@@ -927,6 +934,150 @@ func (a *NgingFirewallRuleStatic) FromRow(row map[string]interface{}) {
 		case "updated":
 			a.Updated = param.AsUint(value)
 		}
+	}
+}
+
+func (a *NgingFirewallRuleStatic) GetField(field string) interface{} {
+	switch field {
+	case "Id":
+		return a.Id
+	case "Type":
+		return a.Type
+	case "Position":
+		return a.Position
+	case "Name":
+		return a.Name
+	case "Direction":
+		return a.Direction
+	case "Protocol":
+		return a.Protocol
+	case "RemoteIp":
+		return a.RemoteIp
+	case "RemotePort":
+		return a.RemotePort
+	case "LocalIp":
+		return a.LocalIp
+	case "LocalPort":
+		return a.LocalPort
+	case "NatIp":
+		return a.NatIp
+	case "NatPort":
+		return a.NatPort
+	case "Interface":
+		return a.Interface
+	case "Outerface":
+		return a.Outerface
+	case "State":
+		return a.State
+	case "ConnLimit":
+		return a.ConnLimit
+	case "RateLimit":
+		return a.RateLimit
+	case "RateBurst":
+		return a.RateBurst
+	case "RateExpires":
+		return a.RateExpires
+	case "Extra":
+		return a.Extra
+	case "Action":
+		return a.Action
+	case "IpVersion":
+		return a.IpVersion
+	case "Disabled":
+		return a.Disabled
+	case "Created":
+		return a.Created
+	case "Updated":
+		return a.Updated
+	default:
+		return nil
+	}
+}
+
+func (a *NgingFirewallRuleStatic) GetAllFieldNames() []string {
+	return []string{
+		"Id",
+		"Type",
+		"Position",
+		"Name",
+		"Direction",
+		"Protocol",
+		"RemoteIp",
+		"RemotePort",
+		"LocalIp",
+		"LocalPort",
+		"NatIp",
+		"NatPort",
+		"Interface",
+		"Outerface",
+		"State",
+		"ConnLimit",
+		"RateLimit",
+		"RateBurst",
+		"RateExpires",
+		"Extra",
+		"Action",
+		"IpVersion",
+		"Disabled",
+		"Created",
+		"Updated",
+	}
+}
+
+func (a *NgingFirewallRuleStatic) HasField(field string) bool {
+	switch field {
+	case "Id":
+		return true
+	case "Type":
+		return true
+	case "Position":
+		return true
+	case "Name":
+		return true
+	case "Direction":
+		return true
+	case "Protocol":
+		return true
+	case "RemoteIp":
+		return true
+	case "RemotePort":
+		return true
+	case "LocalIp":
+		return true
+	case "LocalPort":
+		return true
+	case "NatIp":
+		return true
+	case "NatPort":
+		return true
+	case "Interface":
+		return true
+	case "Outerface":
+		return true
+	case "State":
+		return true
+	case "ConnLimit":
+		return true
+	case "RateLimit":
+		return true
+	case "RateBurst":
+		return true
+	case "RateExpires":
+		return true
+	case "Extra":
+		return true
+	case "Action":
+		return true
+	case "IpVersion":
+		return true
+	case "Disabled":
+		return true
+	case "Created":
+		return true
+	case "Updated":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -1092,17 +1243,19 @@ func (a *NgingFirewallRuleStatic) AsRow(onlyFields ...string) param.Store {
 }
 
 func (a *NgingFirewallRuleStatic) ListPage(cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, nil, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPage(a, cond, sorts...)
 }
 
 func (a *NgingFirewallRuleStatic) ListPageAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
-	_, err := pagination.NewLister(a, recv, func(r db.Result) db.Result {
-		return r.OrderBy(sorts...)
-	}, cond.And()).Paging(a.Context())
-	return err
+	return pagination.ListPageAs(a, recv, cond, sorts...)
+}
+
+func (a *NgingFirewallRuleStatic) ListPageByOffset(cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffset(a, cond, sorts...)
+}
+
+func (a *NgingFirewallRuleStatic) ListPageByOffsetAs(recv interface{}, cond *db.Compounds, sorts ...interface{}) error {
+	return pagination.ListPageByOffsetAs(a, recv, cond, sorts...)
 }
 
 func (a *NgingFirewallRuleStatic) BatchValidate(kvset map[string]interface{}) error {
