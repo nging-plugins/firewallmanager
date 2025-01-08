@@ -45,11 +45,11 @@ func init() {
 	})
 	LeftNavigate.Children.Add(-1, &navigate.Item{
 		Display: false,
-		Name:    `NFTables`,
+		Name:    echo.T(`NFTables`),
 		Action:  `nftables/index`,
 	}, &navigate.Item{
 		Display: false,
-		Name:    `删除NFTables规则`,
+		Name:    echo.T(`删除NFTables规则`),
 		Action:  `nftables/delete`,
 	})
 }

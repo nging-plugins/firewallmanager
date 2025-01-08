@@ -44,11 +44,11 @@ func init() {
 	})
 	LeftNavigate.Children.Add(-1, &navigate.Item{
 		Display: false,
-		Name:    `IPTables`,
+		Name:    echo.T(`IPTables`),
 		Action:  `iptables/index`,
 	}, &navigate.Item{
 		Display: false,
-		Name:    `删除IPTables规则`,
+		Name:    echo.T(`删除IPTables规则`),
 		Action:  `iptables/delete`,
 	})
 }
