@@ -104,7 +104,7 @@ require (
 	github.com/gaissmai/extnetip v0.4.0 // indirect
 	github.com/go-acme/lego/v4 v4.21.0 // indirect
 	github.com/go-errors/errors v1.5.1 // indirect
-	github.com/go-jose/go-jose/v4 v4.0.4 // indirect
+	github.com/go-jose/go-jose/v4 v4.0.5 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
