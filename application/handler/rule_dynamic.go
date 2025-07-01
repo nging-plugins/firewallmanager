@@ -85,6 +85,7 @@ func ruleDynamicEdit(ctx echo.Context) error {
 		return err
 	}
 	if ctx.IsPost() {
+		oldDisabled := m.Disabled
 		err = firewall.DynamicRuleParseForm(ctx, m.NgingFirewallRuleDynamic)
 		if err != nil {
 			goto END
@@ -95,8 +96,10 @@ func ruleDynamicEdit(ctx echo.Context) error {
 			goto END
 		}
 		if m.Disabled == `N` {
-			wOut, wErr, _ := backend.NoticeWriter(ctx, ctx.T(`防火墙服务`))
-			cmder.Get().Restart(wOut, wErr)
+			if oldDisabled != m.Disabled {
+				wOut, wErr, _ := backend.NoticeWriter(ctx, ctx.T(`防火墙服务`))
+				cmder.Get().Restart(wOut, wErr)
+			}
 		} else {
 			exists, _ := m.ExistsAvailable()
 			if !exists {
@@ -113,8 +116,12 @@ func ruleDynamicEdit(ctx echo.Context) error {
 			if !common.IsBoolFlag(disabled) {
 				return ctx.NewError(code.InvalidParameter, ``).SetZone(`disabled`)
 			}
-			m.Disabled = disabled
 			data := ctx.Data()
+			if m.Disabled == disabled {
+				data.SetError(ctx.NewError(code.DataNotChanged, `状态没有改变`))
+				return ctx.JSON(data)
+			}
+			m.Disabled = disabled
 			err = m.UpdateField(nil, `disabled`, disabled, db.Cond{`id`: id})
 			if err != nil {
 				data.SetError(err)
@@ -155,10 +162,21 @@ END:
 func ruleDynamicDelete(ctx echo.Context) error {
 	m := model.NewRuleDynamic(ctx)
 	id := ctx.Formx(`id`).Uint()
-	err := m.Delete(nil, `id`, id)
+	if id < 1 {
+		return ctx.NewError(code.InvalidParameter, `无效参数`).SetZone(`id`)
+	}
+	err := m.Get(func(r db.Result) db.Result {
+		return r.Select(`disabled`)
+	}, `id`, id)
+	if err != nil {
+		return err
+	}
+	err = m.Delete(nil, `id`, id)
 	if err == nil {
-		wOut, wErr, _ := backend.NoticeWriter(ctx, ctx.T(`防火墙服务`))
-		cmder.Get().Restart(wOut, wErr)
+		if m.Disabled == common.BoolN {
+			wOut, wErr, _ := backend.NoticeWriter(ctx, ctx.T(`防火墙服务`))
+			cmder.Get().Restart(wOut, wErr)
+		}
 		common.SendOk(ctx, ctx.T(`删除成功`))
 	} else {
 		common.SendErr(ctx, err)

@@ -179,8 +179,12 @@ func ruleStaticEdit(ctx echo.Context) error {
 			if !common.IsBoolFlag(disabled) {
 				return ctx.NewError(code.InvalidParameter, ``).SetZone(`disabled`)
 			}
-			m.Disabled = disabled
 			data := ctx.Data()
+			if m.Disabled == disabled {
+				data.SetError(ctx.NewError(code.DataNotChanged, `状态没有改变`))
+				return ctx.JSON(data)
+			}
+			m.Disabled = disabled
 			err = m.UpdateField(nil, `disabled`, disabled, db.Cond{`id`: id})
 			if err != nil {
 				data.SetError(err)
