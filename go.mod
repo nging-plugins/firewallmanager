@@ -7,7 +7,7 @@ go 1.24.0
 // replace github.com/nging-plugins/servermanager => ../servermanager
 
 require (
-	github.com/admpub/gerberos v0.1.1
+	github.com/admpub/gerberos v0.1.2
 	github.com/admpub/go-iptables v0.6.5
 	github.com/admpub/log v1.4.0
 	github.com/admpub/nftablesutils v0.3.4
@@ -31,7 +31,7 @@ require (
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
 	gitee.com/admpub/certmagic v0.8.8 // indirect
-	github.com/BurntSushi/toml v1.4.0 // indirect
+	github.com/BurntSushi/toml v1.5.0 // indirect
 	github.com/abh/errorutil v1.0.0 // indirect
 	github.com/admpub/9t v0.0.0-20190605154903-a68069ace5e1 // indirect
 	github.com/admpub/captcha-go v0.0.1 // indirect

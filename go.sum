@@ -50,8 +50,8 @@ github.com/Azure/go-autorest/logger v0.1.0/go.mod h1:oExouG+K6PryycPJfVSxi/koC6L
 github.com/Azure/go-autorest/tracing v0.1.0/go.mod h1:ROEEAFwXycQw7Sn3DXNtEedEvdeRAgDr0izn4z5Ij88=
 github.com/Azure/go-autorest/tracing v0.5.0/go.mod h1:r/s2XiOKccPW3HrqB+W0TQzfbtp2fGCgRFtBroKn4Dk=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
-github.com/BurntSushi/toml v1.4.0 h1:kuoIxZQy2WRRk1pttg9asf+WVv6tWQuBNVmK8+nqPr0=
-github.com/BurntSushi/toml v1.4.0/go.mod h1:ukJfTF/6rtPPRCnwkur4qwRxa8vTRFBF0uk2lLoLwho=
+github.com/BurntSushi/toml v1.5.0 h1:W5quZX/G/csjUnuI8SUYlsHs9M38FC7znL0lIO+DvMg=
+github.com/BurntSushi/toml v1.5.0/go.mod h1:ukJfTF/6rtPPRCnwkur4qwRxa8vTRFBF0uk2lLoLwho=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/OpenDNS/vegadns2client v0.0.0-20180418235048-a3fa4a771d87/go.mod h1:iGLljf5n9GjT6kc0HBvyI1nOKnGQbNB66VzSNbK5iks=
@@ -90,8 +90,8 @@ github.com/admpub/fasthttp v0.0.7/go.mod h1:Y9fpk2Pc56QLzo2yHqBbBfu6sroaoskrP8z6
 github.com/admpub/fsnotify v1.5.0/go.mod h1:2YN7o9RdisXYVueAUsZxjx0Rbsiz6bu6B9XCgovJHY0=
 github.com/admpub/fsnotify v1.7.0 h1:pI04ANljHE5cS3fr+uXMgDG4/Cv3iye40nH/oZE8pB0=
 github.com/admpub/fsnotify v1.7.0/go.mod h1:D9ecq8Ksz5grAhvRRrbN7AdVXnwYx3OxM1+xfjru4+4=
-github.com/admpub/gerberos v0.1.1 h1:vc/WiybyAo/Pn0q17fWZ6T0Ly5xju2o6cx59TqjLck0=
-github.com/admpub/gerberos v0.1.1/go.mod h1:0yEvndP8lZ3Oh2Y7uNX4BNuFnePKn5fRsCd1+uq4nvk=
+github.com/admpub/gerberos v0.1.2 h1:ypotBi6X51/ck/p6JIkXR/e4fw4L6EaEubWwKrAuEgA=
+github.com/admpub/gerberos v0.1.2/go.mod h1:6/fz7OhsBNzMYL6v6jLZAeEgJ6znX87kVNCYo8QiS5A=
 github.com/admpub/gifresize v1.0.2 h1:aFLkKkdyfyg4OIl84R2xA/q/+itFd/mOlGPnhIAbq8s=
 github.com/admpub/gifresize v1.0.2/go.mod h1:4cJFfCR1yfgyq7lZiQZomEGeR/OVQVPeflN38P0T+M0=
 github.com/admpub/go-bindata-assetfs v0.0.0-20170428090253-36eaa4c19588 h1:OzETPaPe3vghcMkx/J6VpnNFg+Sd8TiQ5L+xaty3vJY=

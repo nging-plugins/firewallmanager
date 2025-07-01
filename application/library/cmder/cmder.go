@@ -112,12 +112,10 @@ func (c *firewallCmd) boot() error {
 	if err != nil {
 		log.Error(err.Error())
 	}
-
 	gerberosCfg := &gerberos.Configuration{
-		Verbose:       cfg.Verbose,
-		SaveFilePath:  cfg.SaveFilePath,
-		DisallowClear: cfg.DisallowClear,
-		Rules:         map[string]*gerberos.Rule{},
+		Verbose:      cfg.Verbose,
+		SaveFilePath: cfg.SaveFilePath,
+		Rules:        map[string]*gerberos.Rule{},
 	}
 	switch cfg.Backend {
 	case `nftables`:
@@ -153,12 +151,18 @@ func (c *firewallCmd) boot() error {
 
 	// Runner
 	initedFile := filepath.Join(echo.Wd(), `data`, `cache`, `firewall`, gerberosCfg.Backend+`.inited`)
-	gerberosCfg.DisallowInit = !gerberosCfg.DisallowClear && com.FileExists(initedFile)
+	if cfg.AllowClear { // 允许退出时删除本程序所设置的所有规则时
+		gerberosCfg.DisallowInit = false  // 允许初始化
+		gerberosCfg.DisallowClear = false // 允许清空本程序设置的规则
+	} else {
+		gerberosCfg.DisallowInit = com.FileExists(initedFile) // 文件存在时说明已经初始化过了，则不允许再重复初始化，反之需要初始化
+		gerberosCfg.DisallowClear = true                      // 不允许清空本程序设置的规则
+	}
 	rn := gerberos.NewRunner(gerberosCfg)
 	if err := rn.Initialize(); err != nil {
 		return fmt.Errorf("failed to initialize runner: %s", err)
 	}
-	if !gerberosCfg.DisallowInit {
+	if !cfg.AllowClear && !gerberosCfg.DisallowInit {
 		com.MkdirAll(filepath.Join(echo.Wd(), `data`, `cache`, `firewall`), os.ModePerm)
 		err = os.WriteFile(initedFile, []byte(time.Now().Format(time.DateTime)), os.ModePerm)
 		if err != nil {

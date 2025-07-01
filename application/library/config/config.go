@@ -23,11 +23,11 @@ import (
 )
 
 type Config struct {
-	Verbose       bool
-	Backend       string
-	SaveFilePath  string
-	DisallowClear bool
-	NgingRule     *NgingRule
+	Verbose      bool
+	Backend      string
+	SaveFilePath string
+	AllowClear   bool
+	NgingRule    *NgingRule
 }
 
 // NgingRule Nging 自身的防火墙规则
