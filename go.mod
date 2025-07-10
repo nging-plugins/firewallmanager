@@ -7,7 +7,7 @@ go 1.24.0
 // replace github.com/nging-plugins/servermanager => ../servermanager
 
 require (
-	github.com/admpub/gerberos v0.1.2
+	github.com/admpub/gerberos v0.2.0
 	github.com/admpub/go-iptables v0.6.5
 	github.com/admpub/log v1.4.0
 	github.com/admpub/nftablesutils v0.3.4
