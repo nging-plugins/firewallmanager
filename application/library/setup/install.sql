@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 9.0.1, for macos12.7 (x86_64)
+-- MySQL dump 10.13  Distrib 8.4.6, for Linux (x86_64)
 --
 -- Host: 127.0.0.1    Database: nging
 -- ------------------------------------------------------
--- Server version	9.0.1
+-- Server version	8.4.6
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -64,7 +64,7 @@ CREATE TABLE `nging_firewall_rule_static` (
   `interface` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '入站网口',
   `outerface` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '出站往口',
   `state` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '状态(多个用逗号","分隔)',
-  `conn_limit` varchar(100) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '连接数限制',
+  `conn_limit` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '连接数限制',
   `rate_limit` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '频率限制',
   `rate_burst` int unsigned NOT NULL DEFAULT '0' COMMENT '频率允许峰值',
   `rate_expires` int unsigned NOT NULL DEFAULT '0' COMMENT '过期时间(秒)',
@@ -88,4 +88,4 @@ CREATE TABLE `nging_firewall_rule_static` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-11-10 14:29:52
+-- Dump completed on 2026-01-20  9:22:01
