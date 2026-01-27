@@ -17,3 +17,4 @@
 _example/data
 _example/docker-data
 tower-app-*
+/vendor
