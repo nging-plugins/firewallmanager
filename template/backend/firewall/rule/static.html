@@ -39,21 +39,21 @@
 				<h3>{{"静态规则"|$.T}}</h3>
 			</div>
 			<div class="content">
-				<div class="table-responsive">
+				<div class="table-responsive" data-pattern="priority-columns">
 					<table class="table no-border hover">
 						<thead class="no-border">
 							<tr>
 								<th style="width:60px"><strong>{{"状态"|$.T}}</strong></th>
-								<th><strong>{{`类型`|$.T}}</strong></th>
-								<th><strong>{{`位置`|$.T}}</strong></th>
-								<th><strong>{{`规则名`|$.T}}</strong></th>
-								<th><strong>{{`方向`|$.T}}</strong></th>
-								<th><strong>{{`协议`|$.T}}</strong></th>
-								<th><strong>{{`远程IP:端口`|$.T}}</strong></th>
-								<th><strong>{{`本机IP:端口`|$.T}}</strong></th>
-								<th><strong>{{`限流`|$.T}}</strong></th>
-								<th><strong>{{`动作`|$.T}}</strong></th>
-								<th><strong>{{`时间`|$.T}}</strong></th>
+								<th data-priority="1"><strong>{{`类型`|$.T}}</strong></th>
+								<th data-priority="1"><strong>{{`位置`|$.T}}</strong></th>
+								<th data-priority="1"><strong>{{`规则名`|$.T}}</strong></th>
+								<th data-priority="1"><strong>{{`方向`|$.T}}</strong></th>
+								<th data-priority="1"><strong>{{`协议`|$.T}}</strong></th>
+								<th data-priority="1"><strong>{{`远程IP:端口`|$.T}}</strong></th>
+								<th data-priority="1"><strong>{{`本机IP:端口`|$.T}}</strong></th>
+								<th data-priority="1"><strong>{{`限流`|$.T}}</strong></th>
+								<th data-priority="1"><strong>{{`动作`|$.T}}</strong></th>
+								<th data-priority="5"><strong>{{`时间`|$.T}}</strong></th>
 								<th><strong>{{`操作`|$.T}}</strong></th>
 							</tr>
 						</thead>
@@ -109,7 +109,7 @@
 				</div>
 				{{$.Stored.pagination.Render}}
 			</div>
-		</div>				
+		</div>
 	</div>
 </div>
 {{/Block}}
